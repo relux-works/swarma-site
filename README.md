@@ -66,20 +66,30 @@ Real internal names are supplied outside the repository through `IDENT_DENY_TOKE
 (comma-separated literals), or the untracked local file `$HOME/.config/swarma-site/deny-tokens.txt`
 (one literal per line; commas are also accepted). A nonempty environment list takes precedence.
 Matches are case-insensitive literal substrings; diagnostics name the rule and redact matching filenames.
-Both raw source and decoded publication values receive the generic and external-token checks. JSON keys and
-string values are parsed, including Unicode escapes. CSS decoding covers character escapes, escaped string
-newlines, adjacent generated-content strings and URL targets. HTML/SVG text and attributes decode entities;
-embedded style elements and attributes receive CSS decoding. Markdown entities and link targets are decoded
-outside code spans/fences. Raw code examples remain subject to identifier rules. URL targets also receive
-percent decoding. Entity-looking text in JSON/CSS strings is not recursively HTML-decoded.
+Raw source remains checked, including code examples. Consumer values come from real parsers: JSON keys and
+strings from JSON.parse, Markdown from the CommonMark preset of markdown-it, and CSS literals/URLs from css-tree after strict PostCSS syntax validation.
+CommonMark handles emphasis, inline code, fenced and indented code, nesting and link destinations; code entities
+remain literal. No custom Markdown, HTML or CSS escape parser determines a scanner verdict.
 
-Malformed JSON and CSS lexical input fail with `publication-decode`. SVG custom entity declarations/DTDs are
-rejected by that rule because the HTML parser does not implement XML DTD expansion. The scanner uses static
-format-specific decoding; it does not execute JavaScript or arbitrary application transformations.
-Configuration parse failures return `identifier-allowlist`; external-source read failures return
-`identifier-deny-tokens`; file/traversal failures return `identifier-scan`. These fixed diagnostics and the
-identifier CLI fallback never print underlying exception messages or file contents. Normal findings pass through
-the same configured-token redaction. The allowlist requires arrays of strings for both fields.
+Chromium loads generated HTML with its shipped stylesheets unchanged. The browser supplies DOM innerText,
+decoded attributes, accessibility-tree names/descriptions and computed generated content. Local asset interception
+blocks external requests and script execution. Styled documents are sampled at 390px and 1440px in light, dark,
+increased-contrast and forced-color appearances. Unstyled documents need one equivalent observation.
+Percent decoding is applied once to URL values. JSON/CSS strings are never recursively HTML-decoded.
+Browser profiles and transient artifacts live under .temp/publication-browser/ and close after every check.
+PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH can select an existing local Chromium executable; CI uses the pinned Playwright
+browser installed by the workflow.
+
+All publication text must be valid UTF-8 without BOM or NUL bytes, including extensionless files. Unsupported
+encodings fail publication-decode before interpretation; the publication-surface check also runs before Astro.
+Known binary image/font extensions require matching signatures rather than accepting renamed text. Binary payloads
+are outside text rendering; attributes and external raw literals remain checked. SVG DTD/entity declarations are
+unsupported. Malformed JSON/CSS input also fails publication-decode instead of silently skipping values.
+Configuration parse failures return identifier-allowlist; external-source read failures return identifier-deny-tokens;
+file/traversal failures return identifier-scan. Shared CLI output redacts configured literals for every check,
+including findings from names, availability, publication features, metadata and canonical-data checks. Unexpected
+exceptions become fixed diagnostics, never underlying messages, filenames or tracebacks. The allowlist requires
+arrays of strings for both fields.
 External tokens scan all repository files, including policy sources, tests, configuration and CI files,
 without the generic-rule exemptions. Only Git metadata, dependency directories, local context and generated
 scratch/cache directories (`.temp/`, `.astro/`, `.val/`) are omitted; built `dist/` files remain checked.
@@ -134,8 +144,8 @@ An exception applies to only that file and rule, so source and output need separ
 A future sign-up form requires its own entries and checks for the text and behavior it introduces.
 The check conservatively rejects URL schemes found in decoded attributes, including style and source-set values.
 
-The names policy follows book 1.6.1: `Swarma Signer` is canonical and passes;
-the retired `Swarm` prefix remains forbidden for the signer and the other product names.
+Canonical platform names follow book 1.6.1. Refer to the signer as подписант or signer;
+the retired product prefix and prohibited metaphors remain covered by the names policy.
 
 ## Tools
 
@@ -146,8 +156,25 @@ the retired `Swarm` prefix remains forbidden for the signer and the other produc
 | Node test runner | Check controls with `npm test` | Console; temporary isolated fixtures |
 | Zod | Shared metadata validation, used by Astro and `npm run check:i18n` | Collection errors and console diagnostics |
 | gray-matter | Parse Markdown frontmatter through `npm run check:i18n` | In-memory metadata |
-| parse5 | Parse HTML through `npm run check:publication-surface`, identifier, name and status-language checks | In-memory DOM, decoded attributes and text |
+| parse5 | Standards-based structural HTML validation for publication features and canonical book-region provenance | In-memory DOM |
+| markdown-it | CommonMark rendering used by scanner commands | In-memory HTML, then Chromium observations |
+| css-tree and PostCSS | Validate CSS syntax, then parse literals and URLs through scanner commands | In-memory syntax trees; no custom escape grammar |
+| Playwright and Chromium | Render publication values through identifier, name and status-language commands | Transient profiles under `.temp/publication-browser/`; no external resource requests |
 | GitHub Actions | The `check` job on pull requests and main pushes; runs `npm ci` and `npm run check` | Hosted check logs |
+
+### Scanner threat model
+
+The checks prevent accidental publication by ordinary authors: prohibited identifiers and names, internal paths,
+private links and unsupported availability claims in text, code, attributes and common encodings. Deliberately
+obfuscating authors are outside this model. Rendered values are taken from Chromium, CommonMark and library syntax
+parsers, never a custom markup grammar; CSS colors, when evaluated, must come from getComputedStyle. This branch
+has no numeric color-contrast gate.
+
+The publication-feature denylist remains enforced. Text is UTF-8 without BOM; every diagnostic path is redacted.
+Each affected rule has a clean control beside a known violation, asserting its intended diagnostic and safe output.
+The controls cover malformed/unreadable inputs, source and output encodings, Markdown emphasis and all code forms,
+generated browser text, and real Astro public-to-dist copies. They establish these bounded contracts, not resistance
+to arbitrary program transformations or comprehensive accessibility conformance.
 
 ### Status-language patterns
 

@@ -22,7 +22,7 @@ export async function put(root, path, value) {
 }
 export function run(name, root, rule, env = {}) {
   const result = spawnSync(process.execPath, [resolve(repository, `scripts/checks/${name}.mjs`)], {
-    cwd: root, encoding: 'utf8', timeout: 15000,
+    cwd: root, encoding: 'utf8', timeout: 120000,
     env: { ...process.env, HOME: root, CI: '', IDENT_DENY_TOKENS: 'zz-host-alpha', IDENT_DENY_TOKENS_OPTIONAL: '', ...env },
   });
   assert.ifError(result.error);

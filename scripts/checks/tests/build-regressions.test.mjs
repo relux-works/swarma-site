@@ -187,3 +187,35 @@ test('build: decoded publication identifiers fail after clean controls', async t
     }
   }
 });
+
+// Real public-to-dist copying preserves the witnesses; each output rejects for its intended rule.
+test('build: structural encoding and CommonMark witnesses', async t => {
+  const root = await sourceFixture(t);
+  const clean = { 'public/encoding.html': '<p>Swarma</p>', 'public/encoding.svg': '<svg><text>Swarma</text></svg>', 'public/emphasis.md': 'Swarma **Runtime**' };
+  for (const [path, value] of Object.entries(clean)) await put(root, path, value);
+  build(root);
+  verdict('structural build clean controls', 'identifiers', root);
+  const cases = [
+    ['encoding.html', Buffer.concat([Buffer.from([255, 254]), Buffer.from('<p>zz-host-&#97;lpha</p>', 'utf16le')]), 'publication-decode'],
+    ['encoding.svg', Buffer.concat([Buffer.from([255, 254]), Buffer.from('<svg><text>&#64;reader:example.org</text></svg>', 'utf16le')]), 'publication-decode'],
+    ['emphasis.md', Buffer.from('zz-host-**alpha**'), 'deny-token'],
+    ['generic.md', Buffer.from('@rea**der**:example.org'), 'matrix-user'],
+  ];
+  for (const [path, value] of cases) await put(root, `public/${path}`, value);
+  build(root);
+  const result = run('identifiers', root, 'publication-decode');
+  for (const [path, value, rule] of cases) {
+    assert.deepEqual(await readFile(join(root, 'dist', path)), value);
+    assert.ok(result.stderr.split('\n').includes(`dist/${path}: ${rule}`), result.stderr);
+    evidence.push({ name: path, check: 'identifiers', buildExit: 0, checkExit: 1, diagnostic: `dist/${path}: ${rule}` });
+  }
+  // The npm lifecycle gate rejects invalid source bytes before replacing the previous output.
+  await cp(join(repository, 'scripts'), join(root, 'scripts'), { recursive: true });
+  const before = await readFile(join(root, 'dist/index.html'));
+  const guarded = spawnSync('npm', ['run', 'build'], { cwd: root, encoding: 'utf8', timeout: 90000, env: { ...process.env, HOME: root, IDENT_DENY_TOKENS: 'zz-host-alpha' } });
+  assert.ifError(guarded.error);
+  assert.equal(guarded.status, 1, guarded.stdout + guarded.stderr);
+  assert.match(guarded.stderr, /publication-decode/u);
+  assert.deepEqual(await readFile(join(root, 'dist/index.html')), before);
+  evidence.push({ name: 'prebuild encoding gate preserves previous output', buildExit: 1, diagnostic: 'publication-decode', previousOutputPreserved: true });
+});

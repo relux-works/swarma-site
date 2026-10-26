@@ -1,23 +1,14 @@
 import { readFile, readdir } from 'node:fs/promises';
-import { homedir } from 'node:os';
 import { join, relative } from 'node:path';
 import { cli, filesAt, scanFiles } from './lib.mjs';
 import { identifierRules } from './identifier-rules.mjs';
-import { publicationValues } from './publication-values.mjs';
-
-const split = text => text.split(/[,\r\n]+/u).map(token => token.trim()).filter(Boolean);
-const redactor = tokens => value => tokens.reduce((text, token) => text.replace(new RegExp(token.replace(/[.*+?^${}()|[\]\\]/gu, '\\$&'), 'giu'), '[redacted]'), value);
-async function denyTokens() {
-  const tokens = split(process.env.IDENT_DENY_TOKENS ?? '');
-  if (tokens.length) return tokens;
-  return split(await readFile(join(homedir(), '.config', 'swarma-site', 'deny-tokens.txt'), 'utf8').catch(error => {
-    if (error.code === 'ENOENT') return '';
-    throw error;
-  }));
-}
+import { publicationReader } from './publication-values.mjs';
+import { readPublication } from './publication-reader.mjs';
+import { denyTokens, redactor } from './scanner-policy.mjs';
 
 export async function check(root) {
-  let redact = redactor(split(process.env.IDENT_DENY_TOKENS ?? ''));
+  let redact = redactor((process.env.IDENT_DENY_TOKENS ?? '').split(/[,\r\n]+/u).filter(Boolean));
+  const reader = await publicationReader(root);
   const errors = [];
   try {
     let tokens;
@@ -41,17 +32,21 @@ export async function check(root) {
     const roots = (await readdir(root)).filter(path => !ignored.has(path));
     for (const file of (await Promise.all(roots.map(path => filesAt(root, path)))).flat()) {
       const path = relative(root, file);
-      const text = await readFile(file, 'utf8');
+      let publication;
+      try { publication = await readPublication(file); }
+      catch (error) { if (error.rule === 'publication-decode') { errors.push(`${path}: publication-decode`); continue; } throw error; }
+      const { text, bytes, binary } = publication;
       const values = [text];
-      try { values.push(...publicationValues(path, text)); }
+      try { if (!binary) values.push(...(await reader.values(path, text)).values); }
       catch { errors.push(`${path}: publication-decode`); }
       if (generic.has(file)) for (const value of values) for (const rule of identifierRules(value, allowlist)) errors.push(`${path}: ${rule}`);
-      if ([path, ...values].some(value => tokens.some(token => value.toLowerCase().includes(token.toLowerCase())))) errors.push(`${path}: deny-token`);
+      if ([path, ...(binary ? [bytes.toString('latin1')] : []), ...values].some(value => tokens.some(token => value.toLowerCase().includes(token.toLowerCase())))) errors.push(`${path}: deny-token`);
     }
   } catch {
     // Filesystem and traversal exception messages can contain paths or file contents. Never echo them.
     errors.push('identifier-scan: cannot inspect publication files');
   }
+  finally { await reader.close(); }
   return [...new Set(errors.map(redact))];
 }
 // The CLI fallback also stays fixed if an error occurs before check() can establish its policy.

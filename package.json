@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "prebuild": "npm run check:status-data && npm run check:i18n",
+    "prebuild": "npm run check:publication-surface && npm run check:status-data && npm run check:i18n",
     "build": "astro build",
     "test": "node --test scripts/checks/tests/*.test.mjs",
     "check": "npm test && npm run build && npm run check:publication-surface && npm run check:identifiers && npm run check:status-language && npm run check:names && npm run check:i18n && npm run check:status-data",
@@ -25,7 +25,11 @@
     "zod": "4.6.7"
   },
   "devDependencies": {
+    "css-tree": "3.2.1",
     "gray-matter": "4.0.3",
-    "parse5": "8.0.1"
+    "markdown-it": "15.0.3",
+    "parse5": "8.0.1",
+    "playwright": "1.64.1",
+    "postcss": "8.5.31"
   }
 }

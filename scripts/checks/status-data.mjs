@@ -38,6 +38,6 @@ export async function check(root, args = []) {
     if (args.includes('--write')) await writeFile(join(root, jsonPath), expected);
     else if (await readFile(join(root, jsonPath), 'utf8') !== expected) return ['status-stale: JSON differs from source'];
     return [];
-  } catch (error) { return [error.message]; }
+  } catch (error) { return [/^status-(?:source|mapping):/u.test(error.message) ? error.message : 'status-data: cannot read canonical data']; }
 }
 await cli(import.meta.url, check);

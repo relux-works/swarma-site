@@ -2,6 +2,7 @@ import { readdir, readFile, stat } from 'node:fs/promises';
 import { join, relative, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { parse } from 'parse5';
+import { denyTokens, redactor, safeError } from './scanner-policy.mjs';
 
 export async function filesAt(root, path) {
   const absolute = join(root, path);
@@ -63,17 +64,20 @@ export function visibleText(html, { excludedNodes = new Set() } = {}) {
   return output.join('');
 }
 
-export async function cli(url, check, args = process.argv.slice(2), diagnostic = error => error.message) {
+export async function cli(url, check, args = process.argv.slice(2), diagnostic = error => safeError(error, 'publication-scan')) {
   if (!process.argv[1] || pathToFileURL(resolve(process.argv[1])).href !== url) return;
+  let redact;
+  try { redact = redactor(await denyTokens()); }
+  catch { console.error('identifier-deny-tokens: cannot read external deny tokens'); process.exitCode = 1; return; }
   try {
     const root = process.cwd();
     const errors = await check(root, args);
     if (errors.length) {
-      console.error(errors.join('\n'));
+      console.error(errors.map(redact).join('\n'));
       process.exitCode = 1;
     } else console.log('Check passed');
   } catch (error) {
-    console.error(diagnostic(error));
+    console.error(redact(diagnostic(error)));
     process.exitCode = 1;
   }
 }
