@@ -12,8 +12,6 @@ How to read this file:
   editions the Russian one is the source of truth; where the book and the module specifications
   differ, the specifications prevail (ch. 00, title page notes). Russian titles and terms in this
   file are quoted with plain double quotes, as the book cites its chapters.
-- Items marked **PROPOSAL (awaiting owner approval)** are design choices the owner has not approved.
-  They may be implemented so the site can be built and reviewed, but they are not final.
 - Items marked **PENDING DECISION** need an owner decision before they may appear on the public
   site. Pages are designed to work without them.
 - This file states no development status for any part of Swarma, and the site states none either.
@@ -48,7 +46,7 @@ platform and offers nothing to join or install.
 The site is documentation and editorial content about an architecture. It is not a product landing,
 and it has no marketing hero: Swarma has no product interface a visitor can use from the site.
 
-| Route (under `/ru/`, later `/en/`) | Dominant archetype | First-viewport signal | Primary evidence |
+| Route (under `/ru/` and `/en/`) | Dominant archetype | First-viewport signal | Primary evidence |
 | --- | --- | --- | --- |
 | `/` (locale home) | Editorial publication | Product name, literal category, reading path into the book | Book entry, chapter references |
 | `/platform/` | Documentation | Page title, lead, the three layers, section index | Chapter references; book diagram in private builds only |
@@ -104,10 +102,18 @@ serves building and review only and is not released. Contrast evidence for every
 system's generated contrast report (`references/contrast-report.md` in the system), recomputed by its
 `scripts/check_contrast.py` against the copied file.
 
+**Brand artwork.** The Swarma mark is the owner-approved Quorum identity. Its artwork, exports,
+usage rules and provenance live in the public repository `relux-works/swarma-brand-assets`, pinned at
+commit `e750345410ccee402acc159e8e1edb8f0687a83d`, as the design system's `references/brand-identity.md` (branch
+`swarma-identity`, commit `368f1d0`) names it. The site copies the exact files it uses from that
+commit (the four horizontal lockups and the icon set, 6.6) into its public assets unchanged, checks
+them against the checksums in the commit's `assets/manifest.json`, and moves to a newer commit only
+when the design system moves its pin. The same review gate as for the token copy applies.
+
 Taken from the system:
 
 - **Typography.** PT Sans for display and interface text (page and section headings, navigation,
-  tables, captions, the interim wordmark), PT Serif for reading prose (lead and body
+  tables, captions), PT Serif for reading prose (lead and body
   paragraphs), PT Mono for technical text (chapter references, versions, code). Weights
   400 and 700; PT Mono has 400 only, so technical text is never bold. `letter-spacing: 0`
   everywhere, `font-synthesis: none`. The fixed responsive type scale; no font size tied to viewport
@@ -154,7 +160,7 @@ Taken from the system:
 Relux Works operates the site. The book's title page carries the brand line "Relux Works · Swarma"
 (ch. 00, title page). Swarma stays the primary identity on every page.
 
-- **Header:** Swarma only. The inline-start zone holds the system's interim text wordmark (6.6). The
+- **Header:** Swarma only. The inline-start zone holds the Swarma horizontal lockup (6.6). The
   Relux Works lockup does not appear in the header, so the operator never reads louder than the
   product.
 - **Footer:** the approved horizontal Relux Works lockup, copied unchanged from the approved artwork
@@ -167,21 +173,22 @@ Relux Works operates the site. The book's title page carries the brand line "Rel
 - **Relationship text:** one line next to the lockup naming Swarma and its relation to Relux Works,
   with the wording taken from the book's title page line. The legal line (copyright holder, year) is
   **PENDING DECISION**.
-- **Favicon:** **PROPOSAL (awaiting owner approval).** The design system leaves the interim favicon
-  to the product. Swarma has no approved mark, so the site uses the approved light and dark Relux
-  Works symbols as media-qualified SVG favicons, with the `.ico` and Apple touch fallbacks generated
-  from the approved light avatar, as the system's "Operator favicon" rule describes. The alternative
-  is no favicon until Swarma has an approved mark.
-- **Structured data:** `Organization` is Relux Works with `logo` set to the approved standalone
-  symbol. No product logo is declared for Swarma.
-- **Never:** a redrawn, retyped, recoloured, traced or image-generated Relux mark; the Relux
-  wordmark as live text; a Swarma mark merged with or placed inside the Relux lockup.
+- **Favicon and app icons:** the Swarma icon set from the pinned brand commit (6.6), not the Relux
+  Works symbol.
+- **Structured data:** `Organization` is Relux Works with `logo` set to the approved standalone Relux
+  Works symbol. No product logo is declared for Swarma.
+- **Never:** a redrawn, retyped, recoloured, traced or image-generated Relux or Swarma mark; either
+  wordmark as live text; a CSS filter or fill replacement on the Swarma mark; a Swarma mark merged
+  with or placed inside the Relux lockup, or a hybrid of the two marks.
 
 ## 6. Identity and expression
 
 The site's identity is the design system's. The site makes no colour, type or mark choices of its
 own; this section records which parts of the system it uses. Earlier proposals for an accent, a
-neutral tint and an Inter Tight wordmark are withdrawn.
+neutral tint and an Inter Tight wordmark are withdrawn. The Swarma mark's red, ink and white are
+identity colours and prescribe no interface colours, so the system's accent and neutrals stay as
+reviewed (design system `references/swarma-identity.md`, "The Swarma mark and the interface
+palette").
 
 ### 6.1 Accent
 
@@ -218,16 +225,35 @@ build.
 ### 6.5 Iconography
 
 Icons only where a familiar symbol is clearer than text: menu, close, external link. One open icon
-library, chosen in the code task. Every icon-only control has an accessible name. No product icon or
-symbol exists for Swarma and none is drawn.
+library, chosen in the code task. Every icon-only control has an accessible name. The Swarma symbol
+appears only as the favicon and app icons (6.6), never as an interface icon, and no icon is drawn.
 
-### 6.6 Wordmark
+### 6.6 Mark
 
-The system's interim text wordmark: "Swarma" in PT Sans 700, `letter-spacing: 0`, always in Latin
-script, LTR-isolated, in `--color-text` (`CanvasText` in forced colours). In the header it is the
-link to the locale home with the accessible name "Swarma". It is live text, not a logo. The system's
-Swarma mark slot is AWAITING OWNER ARTWORK; when the owner supplies the mark, it replaces the
-wordmark as the system describes. Nothing on the site draws a mark.
+The approved Quorum mark, from the brand repository at the pinned commit (section 4), used as the
+design system's `references/brand-identity.md` and the brand repository's `docs/USAGE.md` describe.
+
+- **Header:** the horizontal lockup, a native link to the locale home with one accessible name,
+  `Swarma` (on the link, with the image `alt=""`, or on the image with no link label; never both). It
+  renders at least 160 CSS px wide. Its view box is `0 0 344 120`, so at 160 px it is about 55.8 px
+  tall, and the clear space of 12 units of its 120-unit symbol height is about 5.6 px on every side:
+  about 67 px in all, inside the 68 px header (`--layout-header-height: 4.25rem`) and its 220 px
+  (`13.75rem`) brand track. `width` and `height` are declared from the view box.
+- **Variants:** `assets/svg/swarma-lockup-horizontal.svg` in the light appearances,
+  `assets/svg/swarma-lockup-horizontal-dark.svg` in the dark ones. Under forced colours,
+  `assets/svg/swarma-lockup-horizontal-mono.svg` when the forced palette has a light ground and
+  `assets/svg/swarma-lockup-horizontal-white.svg` when it has a dark ground. The site follows the
+  system theme, so a `picture` element selects the file: the two `(forced-colors: active)` sources
+  first, then `(prefers-color-scheme: dark)`, then the default. No CSS filter, fill replacement or
+  `CanvasText` override touches the Swarma mark; that override is for the Relux Works artwork only.
+- **Footer:** the same lockup and variants, first in the footer, before the relationship line and
+  the Relux Works lockup (section 5).
+- **Favicon and app icons:** from `assets/icons/` at the pinned commit, unchanged and not resized:
+  `favicon.svg` and `favicon-dark.svg` as media-qualified SVG icons, `favicon.ico` (16, 32 and 48 px
+  frames), `apple-touch-icon.png` (180 × 180 px), and, for a web app manifest, `icon-192.png` and
+  `icon-512.png` with `purpose: "any"` and `icon-maskable-512.png` with `purpose: "maskable"`.
+- **Always:** LTR-isolated, never mirrored, never animated; the three modules, the aperture and the
+  lettering unchanged. The wordmark is never set as live text, and the site draws nothing of its own.
 
 ### 6.7 Density
 
@@ -295,7 +321,8 @@ are semantic roles; "type" refers to the shared type roles and scale.
 
 - **Purpose:** identify Swarma, reach the main routes, switch language.
 - **Structure:** three stable zones on the shared header grid (`minmax(0, 13.75rem) minmax(0, 1fr)
-  minmax(0, 13.75rem)`), height `--layout-header-height`. Inline start: the text wordmark (6.6).
+  minmax(0, 13.75rem)`), height `--layout-header-height`. Inline start: the Swarma horizontal
+  lockup (6.6).
   Centre: primary navigation (`nav` with an accessible name) to Platform, Principles, Book, Papers,
   Open source. Inline end: the language switch (8.3). The header is static (not sticky), so
   it never covers a focused element or an anchor target.
@@ -315,22 +342,24 @@ are semantic roles; "type" refers to the shared type roles and scale.
 ### 8.2 Footer
 
 - **Purpose:** provenance and wayfinding, not a second sitemap.
-- **Content:** the Swarma name and its relation to Relux Works (section 5) with the approved
-  lockup; the book's authors as named on the title page (ch. 00, title page); links to Book, Papers,
+- **Content:** the Swarma horizontal lockup first (6.6), then the relationship line and the
+  approved Relux Works lockup (section 5); the book's authors as named on the title page (ch. 00, title page); links to Book, Papers,
   Open source and the privacy page; the contact address from the site configuration; the
   accessibility statement only when it exists; the language switch repeated.
 - **States:** default, hover, focus-visible for links.
-- **Keyboard and screen reader:** `footer` landmark; link list in reading order; the lockup link has
-  one accessible name, `Relux Works`.
+- **Keyboard and screen reader:** `footer` landmark; link list in reading order; the Swarma lockup
+  link has one accessible name, `Swarma`, and the operator lockup link one, `Relux Works`.
 - **Tokens and type:** `--color-surface-subtle` band, `--color-text-muted` for secondary text,
   `--color-link`, `--color-focus`, `--color-divider`; PT Sans compact interface size.
 
 ### 8.3 Language switch
 
 - **Purpose:** move to the same route in the other language.
-- **Behaviour:** rendered from the list of translations that exist for the current route. A
-  counterpart that does not exist is not offered: no dead link and no disabled pseudo-control. In
-  M1 only Russian pages exist, so the switch is absent while its header track keeps its width.
+- **Behaviour:** Russian is the first language and English the second. The switch is rendered from
+  the list of translations that exist for the current route and offers the other locale only when
+  the route has a counterpart in it: no dead link and no disabled pseudo-control. The English pages
+  mirror the Russian set, so every M1 route has its counterpart; a route without one shows no switch
+  while the header track keeps its width.
 - **States:** default, hover, focus-visible, current (`aria-current="true"`).
 - **Keyboard and screen reader:** native links; each label in its own language with a matching
   `lang` and `hreflang` (`Русский`, `English`).
@@ -359,7 +388,10 @@ are semantic roles; "type" refers to the shared type roles and scale.
   `Источник: глава NN "Chapter title", раздел "Section title"`, for example
   `Источник: глава 05 "Ключи и ключник", раздел "Собеседника устанавливает ядро"`. A section that
   cites several sources separates them with `; `. Titles are verbatim from the book, in plain double
-  quotes. The English format follows in M2.
+  quotes. English format: `Source: chapter NN "English title", section "English section title"`,
+  for example `Source: chapter 05 "Keys and the key holder", section "The kernel establishes the
+  peer"`, with the English titles from one fixed translation table of the book's chapter and section
+  titles at the printed numbers.
 - **States:** default; link hover and focus.
 - **Keyboard and screen reader:** the reference is a normal link whose text names the chapter and
   section; no icon-only reference; headings form a meaningful outline.
@@ -448,7 +480,9 @@ statement of what runs today.
 ## 9. Route outlines (M1)
 
 Wireframes in text. Each line names a section and what it shows, with the chapter it draws on. Final
-wording is written in the content tasks. Every page ends with the footer; every content section
+wording is written in the content tasks. Each outline below is given for the Russian route and holds
+for its English counterpart under `/en/` as well: the same sections, markers, chapter references and
+limits. Every page ends with the footer; every content section
 carries its chapter reference (8.5).
 
 Every outline item describes Swarma in its finished design state, in the book's voice and in the
@@ -611,16 +645,16 @@ boilerplate and no book references.
 ## 10. Validation matrix
 
 The completion gate of the design system applies to every release. Cells name what is checked;
-"all M1 routes" means the ten routes in section 9.
+"all M1 routes" means the ten routes in section 9, in each language.
 
 | Dimension | Values | Routes and states |
 | --- | --- | --- |
 | Width | 390, 768, 1440, 1920 CSS px | all M1 routes; header open and closed below the navigation breakpoint |
 | Appearance | light, dark, light increased contrast, dark increased contrast | all M1 routes at 390 and 1440 |
-| Forced colours | active (Windows High Contrast or emulation for screenshots, real for release) | home, one layer page, book, footer lockup |
+| Forced colours | active (Windows High Contrast or emulation for screenshots, real for release) | home, one layer page, book, the header and footer lockups in a light and a dark forced palette |
 | Motion and transparency | reduced motion, reduced transparency | mobile drawer open and close |
-| Language | Russian (M1); English (M2), each route against its counterpart | all routes per language; longest real labels in header and footer |
-| Script | Cyrillic and Latin, including Latin names inside Russian text | headings, wordmark, the book page's table of parts |
+| Language | Russian first, English second; each English route against its Russian counterpart | all routes per language; longest real labels in header and footer |
+| Script | Cyrillic and Latin, including Latin names inside Russian text | headings, the book page's table of parts, the Russian author names on the English book page |
 | Direction | LTR only; no RTL locale. Components use logical properties so RTL needs no redesign | not applicable until an RTL locale exists |
 | Zoom | 200 % text zoom, 400 % browser zoom, larger default font size | home, book, one layer page |
 | Keyboard | full journey: skip link, header, drawer, section index, table scroll region, footer | all M1 routes |
@@ -660,12 +694,17 @@ Checks required for each release:
   token file, and no literal colour appears outside it.
 - Role colours: role colours appear only on elements with that role, named in text; no status
   colour token appears in the site's CSS.
-- Identity artwork: footer lockup compared with the approved SVG (viewBox `0 0 450 100`, paths only,
-  no live text); light, dark, one-colour and forced-colours variants; minimum size and clear space;
-  favicon symbol at 16, 24 and 32 CSS px if the favicon proposal is approved.
+- Identity artwork: every Swarma lockup and icon is byte-identical to its file at the pinned brand
+  commit (manifest checksum) and appears in the variant for its appearance, including a light and a
+  dark forced palette; the header lockup is at least 160 CSS px wide with its clear space at every
+  width and the header height does not change; the footer shows the Swarma lockup before the operator
+  lockup; the operator lockup matches the approved SVG (viewBox `0 0 450 100`, paths only, no live
+  text) in its light, dark, one-colour and forced-colours variants with its minimum size and clear
+  space; the favicon renders at 16, 24 and 32 CSS px, and the ICO, Apple touch icon and manifest
+  icons are the brand icon set's files.
 - Discovery: visible facts, titles, descriptions, JSON-LD, `llms.txt` and the sitemap agree; draft
-  routes are `noindex` and absent from the sitemap; canonical and reciprocal `hreflang` once English
-  exists.
+  routes are `noindex` and absent from the sitemap; canonical and reciprocal `hreflang` between each
+  Russian route and its English counterpart.
 - Visual review of full-size screenshots for every width and appearance: the literal subject is
   obvious in the first viewport, the next section is visible, axes are coherent, hierarchy works
   without the accent, dark mode has no glare.
@@ -684,7 +723,7 @@ Checks required for each release:
 | Infrastructure product names: Matrix and other messaging servers, VPN, hosting, peer-to-peer transport and virtualisation products | The site names the role, for example "транспорт сообщений" / "message transport" or the book's "носитель". Agent environments the reader uses (Claude Code, Codex) may stay where the book uses them |
 | Role colours with a meaning the book's diagrams do not give them, or as decoration | The roles keep one meaning on every page and figure |
 | Retired or non-book names: "Swarm Signer", other names with the "Swarm" prefix instead of "Swarma", "Colony", "Swarm cell", apiary names | The book's names are the only names; book 1.6.1 aligned them on the "Swarma" family |
-| A drawn, traced or generated Swarma mark, or a placeholder for one | The mark slot waits for the owner's artwork (6.6) |
+| A drawn, traced, regenerated, recoloured or filtered Swarma mark, a live-text wordmark, or a placeholder | The owner approved the Quorum mark; the site uses its files from the pinned brand commit unchanged (6.6) |
 | Generic claims about security, scale or AI capability | Every claim needs a chapter; the book names the limits of each guarantee |
 | Testimonials, user counts, partner logos | Nothing of the kind exists to show |
 | One-hue page, pure black or pure white interface colours | Family colour rules; glare and loss of depth in dark mode |
@@ -699,7 +738,7 @@ Checks required for each release:
 
 | Deviation | Family rule | Reason |
 | --- | --- | --- |
-| No site search in M1 | The documentation archetype puts navigation, search and version context in the first screen | M1 has ten routes, each documentation page has a section index, and the book is the complete reference. Search returns when the English pages or further routes make navigation alone insufficient |
+| No site search in M1 | The documentation archetype puts navigation, search and version context in the first screen | M1 has ten routes in each language, each documentation page has a section index, and the book is the complete reference. Search returns when further routes make navigation alone insufficient |
 
 Colour-level deviations, such as the accent's closeness to the information role, are recorded in the
 design system, which owns the palette.
@@ -707,8 +746,9 @@ design system, which owns the palette.
 ## Open items
 
 - The design system's review outcome gates the release use of the copied token file (section 4).
-- Owner approval of the favicon proposal (section 5). Accent, neutrals and wordmark are the design
-  system's.
+- The design system's review outcome also gates the release use of the copied brand files
+  (section 4). Accent, neutrals and the use of the mark are the design system's; the artwork is the
+  brand repository's.
 - Book and paper links and public diagrams wait for the docs-side release pipeline (section 7,
   items 1 and 3; 8.8). Owner decision still open: the legal line in the footer (section 5).
 - The accessibility statement page and its route are not in the M1 route list; the design system
