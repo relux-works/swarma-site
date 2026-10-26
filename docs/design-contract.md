@@ -1,8 +1,9 @@
 # Swarma site: design contract
 
 This contract fixes how the Swarma site looks and behaves before any page is built. It applies the
-Relux Works product web design system to Swarma. Every page, component and check in this repository
-follows it; a deviation is recorded here before it ships.
+Swarma Platform Design System, a fork of the Relux Works product web design system whose identity
+comes from the Swarma book, to the site. Every page, component and check in this repository follows
+it; a deviation is recorded here before it ships.
 
 How to read this file:
 
@@ -17,6 +18,9 @@ How to read this file:
   site. Pages are designed to work without them.
 - This file states no development status for any part of Swarma. Status reaches the site only
   through the status data described in section 7, and only in the words of ch. 29.
+- The book edition is 1.6.1. Every version reference in this file and on the site names it.
+- "The design system" means the Swarma Platform Design System. Its tokens, typography, identity
+  rules, diagram bridge and contrast report are the site's source; section 4 states the dependency.
 
 ## 1. Product promise
 
@@ -82,21 +86,34 @@ the book metadata), and a section index (on-page navigation). On `/platform/` th
 one line each are visible without scrolling at 1440 px (ch. 02 "Имена и участники"). At 390 px the
 section index collapses to a native `details` disclosure placed after the lead.
 
-## 4. Family invariants
+## 4. Design system and invariants
 
-Taken unchanged from the Relux Works product web design system:
+The site follows the Swarma Platform Design System. It keeps the Relux Works foundations (geometry,
+type scale, semantic tokens, theme states, accessibility, QA) and takes its identity from the book.
 
-- **Typography.** Inter Tight for display (page and section headings, the text wordmark), Inter for
-  body, navigation and data, Roboto Mono for technical labels, chapter references, status words and
-  code. `letter-spacing: 0` everywhere, `font-synthesis: none`, `font-optical-sizing: auto`. The
-  fixed responsive type scale of the system; no font size tied to viewport width. Reading measure at
-  most `45rem`.
-- **Fonts as assets.** All three families are self-hosted from open-licence sources with Latin and
-  Cyrillic subsets: Inter Tight 600 and 700, Inter 400, 500 and 600, Roboto Mono 400 and 600. No
-  third-party font service. The code task records the exact package source and versions.
-- **Semantic tokens.** Components consume role tokens only (`--color-text`, `--color-surface`,
-  `--color-border`, `--color-accent`, `--color-link`, `--color-focus` and the rest of the baseline
-  token contract). Literal colours live only in the theme token layer.
+**Dependency.** The site takes the system's `assets/tokens.css` as a versioned copy: the copy in this
+repository names, in its header comment, the design-system commit it was taken from, and it changes
+only by replacing it with a newer copy, never by local edits. The system is in independent review.
+Its review outcome gates the use of the copy: until the system's review accepts that commit, the copy
+serves building and review only and is not released. Contrast evidence for every token pair is the
+system's generated contrast report (`references/contrast-report.md` in the system), recomputed by its
+`scripts/check_contrast.py` against the copied file.
+
+Taken from the system:
+
+- **Typography.** PT Sans for display and interface text (page and section headings, navigation,
+  tables, captions, status chips, the interim wordmark), PT Serif for reading prose (lead and body
+  paragraphs), PT Mono for technical text (chapter references, versions, code). Weights
+  400 and 700; PT Mono has 400 only, so technical text is never bold. `letter-spacing: 0`
+  everywhere, `font-synthesis: none`. The fixed responsive type scale; no font size tied to viewport
+  width. Reading measure at most `45rem`.
+- **Fonts as assets.** All three families are self-hosted from the OFL-1.1 packages the system's
+  typography reference lists, in Latin and Cyrillic subsets. No third-party font service. The code
+  task records the exact package versions.
+- **Semantic tokens.** Components consume the system's role tokens only (`--color-text`,
+  `--color-surface`, `--color-border`, `--color-accent`, `--color-link`, `--color-focus` and the
+  rest), including the diagram role layer (`--color-role-*`) and the status layer
+  (`--color-status-*`). Literal colours live only in the copied token file.
 - **Fixed identity colours.** `--color-brand-red: #F60D10`, `--color-brand-ink: #181A18`,
   `--color-brand-white: #FFFFFF` stay outside the product override boundary and are used only by
   the Relux Works artwork.
@@ -108,119 +125,75 @@ Taken unchanged from the Relux Works product web design system:
 - **Themes.** Light, dark, light increased contrast, dark increased contrast, reduced transparency
   and forced colours, all from system preferences. `color-scheme: light dark`. No manual theme
   switch in M1.
-- **Accessibility.** WCAG 2.2 Level AA as the release minimum, plus the stricter family rules:
-  44 × 44 px targets, visible focus in every appearance, reduced-motion equivalents.
+- **Accessibility.** WCAG 2.2 Level AA as the release minimum, plus the stricter rules the design
+  system inherits: 44 × 44 px targets, visible focus in every appearance, reduced-motion
+  equivalents.
 - **Writing.** Calm, direct, technically accurate copy; every claim maps to a book chapter or a
   paper. Russian site copy follows the book's Russian style guide: no guillemets; no dash, long or
   short, as a connector (a hyphen in compound words and numeric ranges stays); plain double quotes
   only for real quotations, chapter titles and conditional readings; the letter ё where it belongs;
-  code, commands and file names in backticks. Names exactly as in ch. 02
-  "Имена и участники": Swarma, Swarma Runtime, Swarma Protocol, Swarma Chain, Swarma Keeper,
-  Swarma Curator, Swarma Keyholder. The signer is unbranded: "подписант", "signer".
+  code, commands and file names in backticks. Names exactly as the book gives them: Swarma, Swarma
+  Runtime, Swarma Protocol, Swarma Chain, Swarma Keeper, Swarma Curator, Swarma Keyholder (ch. 02
+  "Имена и участники") and Swarma Signer (ch. 29 "Runtime: подписи сообщений и Swarma Signer").
+  Retired and non-book names are rejected (section 11).
 
 ## 5. Operator relationship
 
 Relux Works operates the site. The book's title page carries the brand line "Relux Works · Swarma"
 (ch. 00, title page). Swarma stays the primary identity on every page.
 
-- **Header:** Swarma only. The inline-start zone holds the Swarma text wordmark (section 6.6). The
+- **Header:** Swarma only. The inline-start zone holds the system's interim text wordmark (6.6). The
   Relux Works lockup does not appear in the header, so the operator never reads louder than the
   product.
-- **Footer:** the approved horizontal Relux Works lockup, copied unchanged from the design system's
-  approved artwork: the ink lockup on light surfaces, the dark (white wordmark) lockup on dark
-  surfaces, the one-colour lockup with the sanctioned `CanvasText` path-fill override under forced
-  colours. Rendered at 168 CSS px wide, never below 160 px, with at least one red-arm thickness
-  (14.14 % of the artwork height) of clear space. It is a link to the public Relux Works site with
-  the accessible name `Relux Works`; the nested SVG is `aria-hidden="true"`. LTR-isolated
+- **Footer:** the approved horizontal Relux Works lockup, copied unchanged from the approved artwork
+  the design system carries: the ink lockup on light surfaces, the dark (white wordmark) lockup on
+  dark surfaces, the one-colour lockup with the sanctioned `CanvasText` path-fill override under
+  forced colours. Rendered at 168 CSS px wide, never below 160 px, with at least one red-arm
+  thickness (14.14 % of the artwork height) of clear space. It is a link to the public Relux Works
+  site with the accessible name `Relux Works`; the nested SVG is `aria-hidden="true"`. LTR-isolated
   (`direction: ltr; unicode-bidi: isolate`), never mirrored, never animated.
 - **Relationship text:** one line next to the lockup naming Swarma and its relation to Relux Works,
   with the wording taken from the book's title page line. The legal line (copyright holder, year) is
   **PENDING DECISION**.
-- **Favicon:** **PROPOSAL (awaiting owner approval).** Swarma has no approved mark, so the site uses
-  the approved light and dark Relux Works symbols as media-qualified SVG favicons, with the `.ico`
-  and Apple touch fallbacks generated from the approved light avatar. The alternative is no
-  favicon until Swarma has an approved mark.
+- **Favicon:** **PROPOSAL (awaiting owner approval).** The design system leaves the interim favicon
+  to the product. Swarma has no approved mark, so the site uses the approved light and dark Relux
+  Works symbols as media-qualified SVG favicons, with the `.ico` and Apple touch fallbacks generated
+  from the approved light avatar, as the system's "Operator favicon" rule describes. The alternative
+  is no favicon until Swarma has an approved mark.
 - **Structured data:** `Organization` is Relux Works with `logo` set to the approved standalone
   symbol. No product logo is declared for Swarma.
 - **Never:** a redrawn, retyped, recoloured, traced or image-generated Relux mark; the Relux
   wordmark as live text; a Swarma mark merged with or placed inside the Relux lockup.
 
-## 6. Expression slots
+## 6. Identity and expression
 
-Swarma has no approved accent, logo or media. Every slot below is chosen conservatively, and only one
-identity signal carries weight: the accent. The page structure, the chapter references and the
-status data do the rest.
+The site's identity is the design system's. The site makes no colour, type or mark choices of its
+own; this section records which parts of the system it uses. Earlier proposals for an accent, a
+neutral tint and an Inter Tight wordmark are withdrawn.
 
-### 6.1 Accent: **PROPOSAL (awaiting owner approval)**
+### 6.1 Accent
 
-A deep blue, in the "developer infrastructure" direction of the family colour rules. It separates
-Swarma from the Relux Works operator red and stays clear of the success (green) and warning (amber)
-roles. It is defined as a complete set for all four appearances; hover, link, focus and soft values
-are chosen per appearance, not derived by a percentage function.
+The system's accent: the book's deep blue in the light appearance, with the system's derived values
+for dark and the two more-contrast appearances (`--color-accent`, `--color-accent-hover`,
+`--color-accent-pressed`, `--color-accent-soft`, `--color-on-accent`, `--color-link`,
+`--color-link-hover`, `--color-focus`). Links inside prose are always underlined: the system records
+that link colour alone has less than 3:1 against body text. Contrast evidence is the system's report.
 
-| Token | Light | Dark | Light, more contrast | Dark, more contrast |
-| --- | --- | --- | --- | --- |
-| `--color-accent` | `#2347B0` | `#8AA8FF` | `#172F80` | `#B3C6FF` |
-| `--color-accent-hover` / `-pressed` | `#1C3A94` | `#A3BBFF` | `#0F2266` | `#C7D5FF` |
-| `--color-link` | `#1C3A94` | `#A3BBFF` | `#172F80` | `#BCCDFF` |
-| `--color-link-hover` | `#142C75` | `#BCCDFF` | `#0F2266` | `#D1DCFF` |
-| `--color-focus` | `#2347B0` | `#A3BBFF` | `#172F80` | `#BCCDFF` |
-| `--color-on-accent` | `#F7F9F7` | `#151815` | `#F7F9F7` | `#111411` |
-| `--color-accent-soft` | `rgba(35, 71, 176, 0.09)` | `rgba(138, 168, 255, 0.15)` | `rgba(23, 47, 128, 0.14)` | `rgba(179, 198, 255, 0.20)` |
-| `--color-selection-bg` | `#D6DEF3` | `#2B3A68` | `#C9D4F2` | `#2B3A68` |
+### 6.2 Neutrals
 
-Forced colours map accent and link to `LinkText` and focus to `Highlight`, as the baseline does.
+The system's cool blue-grey neutrals in all four appearances (`--color-bg`, `--color-surface*`,
+`--color-text*`, `--color-border*`). `--color-text-faint` is used only for compact metadata, never
+for body text, chapter references or status words.
 
-Contrast evidence. WCAG 2.x relative-luminance ratio, computed by the script in Appendix A (the
-command is given there) from the hex values against the baseline Relux surface tokens of the same
-appearance (`bg`, `surface-subtle`, `surface`, and
-`surface-hover` in light themes or `surface-raised` in dark themes). Each cell gives the lowest and
-highest ratio across those surfaces.
+### 6.3 Role and status colours
 
-| Pair | Light | Dark | Light, more contrast | Dark, more contrast | Target |
-| --- | ---: | ---: | ---: | ---: | --- |
-| accent on surfaces | 6.83–7.79 | 6.29–8.06 | 9.46–11.54 | 8.57–11.25 | 4.5:1; 7:1 in more contrast |
-| accent hover on surfaces | 8.53–9.72 | 7.66–9.81 | 11.53–14.05 | 9.92–13.02 | 4.5:1; 7:1 in more contrast |
-| link on surfaces | 8.53–9.72 | 7.66–9.81 | 9.46–11.54 | 9.18–12.05 | 4.5:1; 7:1 in more contrast |
-| link hover on surfaces | 10.78–12.29 | 9.18–11.76 | 11.53–14.05 | 10.61–13.93 | 4.5:1; 7:1 in more contrast |
-| focus on surfaces (non-text) | 6.83–7.79 | 7.66–9.81 | 9.46–11.54 | 9.18–12.05 | 3:1 |
-| on-accent on accent | 7.63 | 7.78 | 11.31 | 10.99 | 4.5:1; 7:1 in more contrast |
-| on-accent on accent hover | 9.53 | 9.47 | 13.77 | 12.71 | 4.5:1; 7:1 in more contrast |
-| body text on accent-soft over `bg` | 13.99 | 11.97 | 13.35 | 11.02 | 4.5:1; 7:1 in more contrast |
-| accent on accent-soft over `bg` | 6.46 | 6.26 | 8.54 | 7.30 | 4.5:1; 7:1 in more contrast |
-| selection text on selection bg | 13.00 | 9.85 | 12.63 | 9.85 | 4.5:1 |
-| link against body text | 1.74 | 1.57 | 1.56 | 1.41 | not a pass: see below |
-
-Consequences recorded with the evidence:
-
-- Link colour alone does not separate a link from body text (ratio below 3:1 against the text
-  colour). Links inside prose are therefore always underlined; colour is an additional cue only.
-- The accent and the information role (`--color-info`) are close in luminance (1.15:1 light,
-  1.34:1 dark, 1.34:1 light more contrast, 1.12:1 dark more contrast) and differ only in hue. The
-  information role always carries a text label, so the two are never told apart by colour alone.
-  This closeness is a recorded deviation (section 12).
-- The ratios are computed values. The release gate re-measures the shipped tokens in a browser and
-  records foreground token, background token, appearance, ratio and tool.
-
-### 6.2 Neutral tint: **PROPOSAL (awaiting owner approval)**
-
-The baseline Relux neutral family, unchanged, in all four appearances. Keeping the neutrals fixed
-leaves one identity signal (the accent), reuses neutrals the family has already validated, and
-keeps the operator lockup on its tested surfaces. Measured on the same surfaces:
-
-| Text token | Light | Dark | Light, more contrast | Dark, more contrast |
-| --- | ---: | ---: | ---: | ---: |
-| `--color-text` | 14.80–16.87 | 12.02–15.40 | 14.79–18.03 | 12.95–17.00 |
-| `--color-text-muted` | 6.51–7.42 | 8.09–10.37 | 9.79–11.94 | 9.86–12.95 |
-| `--color-text-faint` | 4.72–5.38 | 5.67–7.27 | 7.37–8.98 | 8.06–10.59 |
-| `--color-border-strong` (non-text) | 3.40–3.88 | 3.41–4.37 | 4.95–6.03 | 4.60–6.04 |
-
-`--color-text-faint` is used only for compact metadata, never for body text, chapter references or
-status words.
-
-### 6.3 Supporting colour
-
-None. The status vocabulary is not colour-coded (section 8.6).
+- **Status:** status words render as chips in the system's status colours, as the book typesets them
+  (8.6).
+- **Roles:** the site may use the system's diagram role colours (`--color-role-*`) only with the
+  meaning they have in the book's diagrams (human, agent, service, store, key, external, alert,
+  neutral), only on an element that has that role in the mechanism a section describes, and always
+  with the element named in text. Role colours are never used for actions, links, navigation,
+  feedback or decoration.
 
 ### 6.4 Media
 
@@ -235,13 +208,13 @@ Icons only where a familiar symbol is clearer than text: menu, close, external l
 library, chosen in the code task. Every icon-only control has an accessible name. No product icon or
 symbol exists for Swarma and none is drawn.
 
-### 6.6 Wordmark: **PROPOSAL (awaiting owner approval)**
+### 6.6 Wordmark
 
-The text "Swarma" set in Inter Tight 700, `letter-spacing: 0`, always in Latin script in both
-locales, LTR-isolated, in `--color-text` (`CanvasText` in forced colours). In the header it is the
-link to the locale home with the accessible name "Swarma". It is live text, not artwork, and it is
-not a logo: no symbol, no container, no colour treatment, no ligature or custom kerning. When Swarma
-gets an approved mark, the mark replaces this text and this item is closed.
+The system's interim text wordmark: "Swarma" in PT Sans 700, `letter-spacing: 0`, always in Latin
+script, LTR-isolated, in `--color-text` (`CanvasText` in forced colours). In the header it is the
+link to the locale home with the accessible name "Swarma". It is live text, not a logo. The system's
+Swarma mark slot is AWAITING OWNER ARTWORK; when the owner supplies the mark, it replaces the
+wordmark as the system describes. Nothing on the site draws a mark.
 
 ### 6.7 Density
 
@@ -281,16 +254,16 @@ What makes the site credible is the material it points to, not decoration.
    - **Placement.** A page places a figure with a marker on a line of its own:
      `[[figure <name>]]`, where `<name>` is the figure's file name in the book without its extension,
      for example `[[figure three-layers]]`. The marker is the only way a book figure enters a page.
-   - **Switch on (private builds only).** The book 1.6 diagram renders unchanged: the same SVG, not
+   - **Switch on (private builds only).** The book 1.6.1 diagram renders unchanged: the same SVG, not
      recoloured, cropped or redrawn. It sits in a figure with the book's caption and a source line
-     in this form: `Источник: книга Swarma, версия 1.6, глава NN, рисунок: <подпись>`, where NN is
+     in this form: `Источник: книга Swarma, версия 1.6.1, глава NN, рисунок: <подпись>`, where NN is
      the chapter that holds the figure and `<подпись>` is the book's caption for it, verbatim
      (component 8.11).
    - **Switch off (every public build).** The marker renders nothing: no empty frame, no placeholder
      text, no reserved space. Every page is complete without its figures: what a figure shows
      already exists as text or a table in the same section.
    - **Source files.** The figure files are not committed to this repository, which is meant to
-     become public. A private build reads them from a copy of the book 1.6 release outside the
+     become public. A private build reads them from a copy of the book 1.6.1 release outside the
      repository; the code task defines how that location is given.
    - **Build checks.** A marker that names a figure the book release does not contain fails a
      private build. A public build fails if its output contains a book figure or an unresolved
@@ -327,7 +300,7 @@ are semantic roles; "type" refers to the shared type roles and scale.
   scroll is locked without shifting page width (`scrollbar-gutter: stable`).
 - **Tokens and type:** `--color-bg` (solid, no translucent material), `--color-text`,
   `--color-link-hover` for hover, `--color-focus`, `--color-divider` for the bottom rule,
-  `--color-scrim` behind the drawer; Inter compact interface size for links.
+  `--color-scrim` behind the drawer; PT Sans compact interface size for links.
 
 ### 8.2 Footer
 
@@ -340,7 +313,7 @@ are semantic roles; "type" refers to the shared type roles and scale.
 - **Keyboard and screen reader:** `footer` landmark; link list in reading order; the lockup link has
   one accessible name, `Relux Works`.
 - **Tokens and type:** `--color-surface-subtle` band, `--color-text-muted` for secondary text,
-  `--color-link`, `--color-focus`, `--color-divider`; Inter compact interface size.
+  `--color-link`, `--color-focus`, `--color-divider`; PT Sans compact interface size.
 
 ### 8.3 Language switch
 
@@ -351,7 +324,7 @@ are semantic roles; "type" refers to the shared type roles and scale.
 - **States:** default, hover, focus-visible, current (`aria-current="true"`).
 - **Keyboard and screen reader:** native links; each label in its own language with a matching
   `lang` and `hreflang` (`Русский`, `English`).
-- **Tokens and type:** `--color-link`, `--color-text` for the current item, `--color-focus`; Inter
+- **Tokens and type:** `--color-link`, `--color-text` for the current item, `--color-focus`; PT Sans
   compact interface size.
 
 ### 8.4 Page title block
@@ -374,10 +347,10 @@ are semantic roles; "type" refers to the shared type roles and scale.
 - **Keyboard and screen reader:** `h1` first in `main`; the frame line is ordinary paragraph text
   with a native link whose text names the status page; the section index is a `nav` with an
   accessible name, a native `details` disclosure below 640 px.
-- **Tokens and type:** display type at page-heading size (product-statement size only on the home
-  page), lead size, `--color-text`; body size in `--color-text-muted` for the frame line, with an
-  underlined `--color-link`; `--color-text-muted` for the version line, Roboto Mono for the version
-  string.
+- **Tokens and type:** PT Sans 700 at page-heading size (product-statement size only on the home
+  page), PT Serif at lead size, `--color-text`; PT Sans body size in `--color-text-muted` for the
+  frame line, with an underlined `--color-link`; `--color-text-muted` for the version line, PT Mono
+  for the version string.
 
 ### 8.5 Section with chapter reference
 
@@ -392,8 +365,8 @@ are semantic roles; "type" refers to the shared type roles and scale.
 - **Keyboard and screen reader:** the reference is a normal link whose text names the chapter and
   section; no icon-only reference; headings form a meaningful outline.
 - **Tokens and type:** full-width band, `--color-bg` or `--color-surface-subtle` alternating where
-  bands need separation; section heading size; Roboto Mono technical size for the reference in
-  `--color-text-muted` with `--color-link` for its link.
+  bands need separation; PT Sans 700 at section heading size; body prose in PT Serif; PT Mono
+  technical size for the reference in `--color-text-muted` with `--color-link` for its link.
 
 ### 8.6 Status table and status row
 
@@ -410,10 +383,8 @@ are semantic roles; "type" refers to the shared type roles and scale.
   shortens or normalises a cell (ch. 29 "Состояние по частям платформы").
 - **Names and identifiers in the copy:** the names check and the forbidden-identifier scan run over
   the vendored copy as well as over the site. A row that fails either cannot be embedded, and
-  embedding it fails the build. Rows are never silently reworded. One section is excluded from the
-  vendored part tables by an explicit exclusion documented in the data file: the ch. 29 section on
-  message signatures and the signer, which brands the signer and uses internal code names. The
-  exclusion stays until a book edition fixes the signer naming (open item for the lead).
+  embedding it fails the build. Rows are never silently reworded. Book 1.6.1 carries no internal
+  labels, so no section of ch. 29 is excluded.
 - **How status reaches a page:** only through this component, called by table or row key. Content
   files carry no status text, and a key with no rows fails the build. A status lint rejects
   readiness phrases, in Russian and English, in content files and in the rendered prose of every
@@ -424,18 +395,28 @@ are semantic roles; "type" refers to the shared type roles and scale.
   implemented, available now, ready to use, in development, released, live, beta, coming soon,
   production-ready. Vocabulary words that are common prose (нет, открыто, решено) are not linted;
   the component rule keeps them out of status positions.
-- **Rendering rules:** cell text verbatim, including "нет"; no colour coding, icons, traffic lights,
-  progress bars, counts or totals; status cells in Roboto Mono in `--color-text`. A `caption` names
-  the source chapter, the book version and its date. On layer pages, a filtered excerpt (rows for
-  that layer) links to `/status/`.
+- **Rendering rules:** status words follow the book's own typesetting, where each status word
+  appears as a coloured chip that contains the word.
+  - A status cell whose text is exactly one of the five vocabulary words renders as a status chip:
+    the word itself in PT Sans 700 at compact interface size, on `--color-status-<status>-bg` in
+    `--color-status-<status>-text`, `--radius-control` corners, no wrap. The tokens are the design
+    system's status layer, taken from the book's status badges.
+  - Every other cell (a quoted formulation, a quotation with a parenthetical, several quotations,
+    and every layer-map cell, including "нет") renders verbatim in `--color-text` without a chip.
+  - The status text is always present; colour repeats it and is never the only signal. In forced
+    colours the chip keeps a `CanvasText` border so it stays visible as a chip.
+  - No traffic lights, icons, progress bars, counts or totals, and no chip on anything that is not a
+    status cell.
+  - A `caption` names the source chapter, the book version and its date. On layer pages, a filtered
+    excerpt (rows for that layer) links to `/status/`.
 - **States:** default; long content; narrow width. Below 640 px the native table sits in a labelled,
   keyboard-focusable scroll region (`role="region"`, `aria-labelledby` the caption, `tabindex="0"`)
   with the first column kept visible; no column is clipped or hidden.
 - **Keyboard and screen reader:** native `table`, `caption`, `th scope="col"`, row headers with
   `scope="row"`; the scroll region is reachable and scrollable by keyboard.
 - **Tokens and type:** `--color-surface` body, `--color-surface-subtle` header row,
-  `--color-border` cell rules, `--color-text`, `--color-focus` for the region focus ring; Inter
-  compact interface size for cells.
+  `--color-border` cell rules, `--color-text`, `--color-focus` for the region focus ring,
+  `--color-status-*` for chips; PT Sans compact interface size for cells.
 
 ### 8.7 Callout for a guarantee's limits
 
@@ -460,7 +441,7 @@ are semantic roles; "type" refers to the shared type roles and scale.
 - **Keyboard and screen reader:** `article` with a heading; metadata in a description list; the
   version string LTR-isolated.
 - **Tokens and type:** repeated entries may use a card (`--color-surface`, `--color-border`, radius
-  8 px); Roboto Mono for version and date; `--color-text-muted` for metadata labels.
+  8 px); PT Mono for version and date; `--color-text-muted` for metadata labels.
 
 ### 8.9 Code excerpt: not in M1
 
@@ -475,20 +456,22 @@ later milestone brings it back, it needs its own specification and a design-vers
 - **Keyboard and screen reader:** native link with the text "Перейти к содержанию" in Russian and
   "Skip to content" in English.
 - **Tokens and type:** `--color-strong-action` background, `--color-on-strong-action` text,
-  `--color-focus` outline; Inter compact interface size.
+  `--color-focus` outline; PT Sans compact interface size.
 
 ### 8.11 Book figure (private builds only)
 
 - **Purpose:** show a book diagram unchanged where the build switch allows it (section 7, item 4).
 - **Content:** the book's SVG; a `figcaption` with the book's caption for the figure and the source
-  line `Источник: книга Swarma, версия 1.6, глава NN, рисунок: <подпись>` (section 7, item 4).
+  line `Источник: книга Swarma, версия 1.6.1, глава NN, рисунок: <подпись>` (section 7, item 4).
 - **States:** switch off: renders nothing. Switch on: the figure, with its dimensions declared from
   the SVG view box before it loads.
 - **Keyboard and screen reader:** `figure` with `figcaption`; the image has `alt` equal to the
   book's caption; the section text carries the full description. Not focusable.
-- **Tokens and type:** no frame or card; caption in `--color-text-muted` at compact interface size;
-  source line in Roboto Mono at technical size. The SVG keeps the book's colours in every
-  appearance. Its legibility in dark and forced-colours appearances is a private-build check; an
+- **Tokens and type:** the design system's diagram bridge: the unchanged SVG as an image on
+  `--color-figure-ground` (white in every appearance) with `--space-4` padding, a 1 px
+  `--color-figure-frame` border and `--radius-surface` corners; caption in PT Sans at compact
+  interface size in `--color-text-muted`, outside the white block; source line in PT Mono at
+  technical size. Its legibility in dark and forced-colours appearances is a private-build check; an
   unreadable figure is reported, never recoloured.
 
 ## 9. Route outlines (M1)
@@ -712,7 +695,13 @@ Checks required for each release:
 - Geometry: root `scrollWidth` at most one pixel wider than `clientWidth`; navigation centre within
   one pixel of the viewport centre at desktop widths; header and control boxes unchanged across
   routes and states; no clipped controls or text overlap.
-- Contrast: every token pair in section 6 re-measured from the built CSS in every appearance.
+- Contrast: the design system's `scripts/check_contrast.py` passes on the copied token file and its
+  `--control` run fails; the pairs in the system's contrast report are re-measured from the built CSS
+  in every appearance.
+- Token use: every `--color-*`, `--font-*` and layout token the site's CSS uses exists in the copied
+  token file, and no literal colour appears outside it.
+- Role and status colours: role colours appear only on elements with that role, named in text;
+  every status chip contains its status word.
 - Identity artwork: footer lockup compared with the approved SVG (viewBox `0 0 450 100`, paths only,
   no live text); light, dark, one-colour and forced-colours variants; minimum size and clear space;
   favicon symbol at 16, 24 and 32 CSS px if the favicon proposal is approved.
@@ -730,11 +719,14 @@ Checks required for each release:
 | Pattern | Why it is rejected here |
 | --- | --- |
 | Marketing hero, large empty hero, split hero cards | The site has no product interface to show; a hero would delay entry into the reading content |
-| Gradient orbs, glow fields, bokeh, decorative glass | Common decoration for AI products; it carries no information and the family rules forbid it as structure |
+| Gradient orbs, glow fields, bokeh, decorative glass | Common decoration for AI products; it carries no information and the design system forbids it as structure |
 | Swarm, hive or bee imagery, particles, node-graph backdrops | Decoration standing in for the architecture; abstract imagery where real material (the book, the diagrams, the status data) should be shown |
-| An invented Swarma logo, symbol or mascot | No approved mark exists; the text wordmark is the only identity element until one is approved |
 | Redrawn, retyped, recoloured or animated Relux Works artwork | The operator mark is fixed production artwork |
-| Readiness percentages, progress bars, counters, traffic-light status colours | Ch. 29 states that the states do not add up to one readiness percentage; colour would read as a verdict beyond the chapter's words |
+| Readiness percentages, progress bars, counters, totals, traffic lights | Ch. 29 states that the states do not add up to one readiness percentage; such devices would read as a verdict beyond the chapter's words |
+| A status colour without its status word, or a chip on anything other than one of the five vocabulary words | The book's chips always contain the word; colour only repeats it |
+| Role colours with a meaning the book's diagrams do not give them, or as decoration | The roles keep one meaning on every page and figure |
+| Retired or non-book names: "Swarm Signer", other names with the "Swarm" prefix instead of "Swarma", "Colony", "Swarm cell", apiary names | The book's names are the only names; book 1.6.1 aligned them on the "Swarma" family |
+| A drawn, traced or generated Swarma mark, or a placeholder for one | The mark slot waits for the owner's artwork (6.6) |
 | Status in prose or in headings | Status comes only from the ch. 29 data, so it can be checked mechanically |
 | Generic claims about security, scale or AI capability | Every claim needs a chapter; the book names the limits of each guarantee |
 | Testimonials, user counts, partner logos | Nothing of the kind exists to show |
@@ -744,105 +736,25 @@ Checks required for each release:
 | Hover-only information, hidden focus, motion without a reduced-motion equivalent | Accessibility baseline |
 | `overflow-x: hidden` to hide broken geometry | Geometry must be fixed, not concealed; wide tables use a labelled scroll region |
 | Scroll-triggered entrance animations | Motion must communicate state; the site has no live state |
-| Third-party fonts, analytics or tracking scripts | Not needed for reading; the family trust rules avoid tracking by default |
+| Third-party fonts, analytics or tracking scripts | Not needed for reading; the design system's trust rules avoid tracking by default |
 
-## 12. Intentional deviations from the family system
+## 12. Intentional deviations from the design system
 
 | Deviation | Family rule | Reason |
 | --- | --- | --- |
 | No site search in M1 | The documentation archetype puts navigation, search and version context in the first screen | M1 has ten routes, each design page has a section index, and the book is the complete reference. Search returns when the English pages or further routes make navigation alone insufficient |
-| Accent close to the information role in luminance (1.15:1 light, 1.34:1 dark, 1.34:1 light more contrast, 1.12:1 dark more contrast) | Developer-infrastructure palettes keep status colours functionally distinct from the accent | The accent is kept as proposed. The two roles differ in hue, and the information role always carries a text label, so no state is told apart by colour alone (6.1) |
 
-## Appendix A. Contrast computation
-
-The script that produced every ratio in 6.1 and 6.2. It uses only the Python standard library.
-Run it from the repository root:
-
-```sh
-awk '/^```python$/{f=1;next} /^```$/{f=0} f' docs/design-contract.md | python3 -
-```
-
-```python
-# WCAG 2.x contrast ratios for the tables in sections 6.1 and 6.2 of this contract.
-# Surfaces and text are the baseline Relux tokens; accent values are the 6.1 proposal.
-def rgb(h):
-    return tuple(int(h[i:i + 2], 16) / 255 for i in (1, 3, 5))
-
-def lum(c):
-    c = [x / 12.92 if x <= 0.04045 else ((x + 0.055) / 1.055) ** 2.4 for x in c]
-    return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]
-
-def ratio(a, b):
-    la, lb = lum(a), lum(b)
-    return (max(la, lb) + 0.05) / (min(la, lb) + 0.05)
-
-def over(rgba, bg):
-    *c, a = rgba
-    return tuple(x / 255 * a + y * (1 - a) for x, y in zip(c, bg))
-
-# Order: light, dark, light more contrast, dark more contrast.
-# Surfaces: bg, surface-subtle, surface, then surface-hover (light) or surface-raised (dark).
-SURFACES = [["#f4f6f4", "#e9ede9", "#fafbfa", "#eef1ee"], ["#111411", "#171b17", "#1c211c", "#252b25"],
-            ["#f4f6f4", "#e5e9e5", "#fafbfa", "#e1e6e1"], ["#0e110e", "#151915", "#1a1f1a", "#252b25"]]
-TEXT = ["#181a18", "#e7ebe7", "#101310", "#f0f3f0"]
-MUTED = ["#4d554f", "#bbc4bc", "#303630", "#d0d7d0"]
-FAINT = ["#626a64", "#9aa59b", "#414941", "#bac4bb"]
-BORDER_STRONG = ["#788179", "#727e74", "#59635a", "#89948b"]
-INFO = ["#165f80", "#64d2ff", "#0d4f6b", "#8cddff"]
-ACCENT = ["#2347b0", "#8aa8ff", "#172f80", "#b3c6ff"]
-ACCENT_HOVER = ["#1c3a94", "#a3bbff", "#0f2266", "#c7d5ff"]
-LINK = ["#1c3a94", "#a3bbff", "#172f80", "#bccdff"]
-LINK_HOVER = ["#142c75", "#bccdff", "#0f2266", "#d1dcff"]
-FOCUS = ["#2347b0", "#a3bbff", "#172f80", "#bccdff"]
-ON_ACCENT = ["#f7f9f7", "#151815", "#f7f9f7", "#111411"]
-SOFT = [(35, 71, 176, 0.09), (138, 168, 255, 0.15), (23, 47, 128, 0.14), (179, 198, 255, 0.20)]
-SELECTION_BG = ["#d6def3", "#2b3a68", "#c9d4f2", "#2b3a68"]
-SELECTION_TEXT = ["#181a18", "#f0f3f0", "#101310", "#f0f3f0"]
-
-def on_surfaces(tokens):
-    cells = []
-    for t, surfaces in zip(tokens, SURFACES):
-        values = [ratio(rgb(t), rgb(s)) for s in surfaces]
-        cells.append(f"{min(values):.2f}–{max(values):.2f}")
-    return cells
-
-def pairs(fg, bg):
-    return [f"{ratio(rgb(a), rgb(b)):.2f}" for a, b in zip(fg, bg)]
-
-rows = {
-    "accent on surfaces": on_surfaces(ACCENT),
-    "accent hover on surfaces": on_surfaces(ACCENT_HOVER),
-    "link on surfaces": on_surfaces(LINK),
-    "link hover on surfaces": on_surfaces(LINK_HOVER),
-    "focus on surfaces (non-text)": on_surfaces(FOCUS),
-    "on-accent on accent": pairs(ON_ACCENT, ACCENT),
-    "on-accent on accent hover": pairs(ON_ACCENT, ACCENT_HOVER),
-    "body text on accent-soft over `bg`":
-        [f"{ratio(rgb(t), over(s, rgb(b[0]))):.2f}" for t, s, b in zip(TEXT, SOFT, SURFACES)],
-    "accent on accent-soft over `bg`":
-        [f"{ratio(rgb(a), over(s, rgb(b[0]))):.2f}" for a, s, b in zip(ACCENT, SOFT, SURFACES)],
-    "selection text on selection bg": pairs(SELECTION_TEXT, SELECTION_BG),
-    "link against body text": pairs(LINK, TEXT),
-    "`--color-text`": on_surfaces(TEXT),
-    "`--color-text-muted`": on_surfaces(MUTED),
-    "`--color-text-faint`": on_surfaces(FAINT),
-    "`--color-border-strong` (non-text)": on_surfaces(BORDER_STRONG),
-    "accent against info (deviation, section 12)": pairs(ACCENT, INFO),
-}
-for label, cells in rows.items():
-    print(" | ".join([label] + cells))
-```
+Colour-level deviations, such as the accent's closeness to the information role, are recorded in the
+design system, which owns the palette.
 
 ## Open items
 
-- Owner approval of the proposals: accent (6.1), neutral tint (6.2), wordmark (6.6), favicon
-  (section 5).
+- The design system's review outcome gates the release use of the copied token file (section 4).
+- Owner approval of the favicon proposal (section 5). Accent, neutrals and wordmark are the design
+  system's.
 - Owner decisions: publishing the book diagrams on the public site (section 7, item 4), publishing
   the PDFs (8.8), the legal line in the footer (section 5).
 - The accessibility statement page and its route are not in the M1 route list; the design system
   requires one before a public release.
 - Command excerpts and the code excerpt component (section 7, item 5; 8.9) are out of M1 and wait
   for a later milestone.
-- For the lead: the ch. 29 section on message signatures and the signer brands the signer and uses
-  internal code names. It is excluded from the vendored part tables (8.6) until a book edition fixes
-  the signer naming.
