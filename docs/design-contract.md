@@ -7,9 +7,10 @@ follows it; a deviation is recorded here before it ships.
 How to read this file:
 
 - Anchors in parentheses point to the Swarma book, Russian edition: chapter number, chapter title
-  where needed, and section title, for example (ch. 02 «Имена и участники»). Among the book's
+  where needed, and section title, for example (ch. 02 "Имена и участники"). Among the book's
   editions the Russian one is the source of truth; where the book and the module specifications
-  differ, the specifications prevail (ch. 00, title page notes).
+  differ, the specifications prevail (ch. 00, title page notes). Russian titles and terms in this
+  file are quoted with plain double quotes, as the book cites its chapters.
 - Items marked **PROPOSAL (awaiting owner approval)** are design choices the owner has not approved.
   They may be implemented so the site can be built and reviewed, but they are not final.
 - Items marked **PENDING DECISION** need an owner decision before they may appear on the public
@@ -20,15 +21,15 @@ How to read this file:
 ## 1. Product promise
 
 The site explains Swarma, a platform for swarms of AI agents that ranges from several agents on one
-owner's machine to joint work of independent participants in an open network (ch. 00 «Для кого эта
-книга», opening; book subtitle), to an engineer who wants to know how it is built and what each
-guarantee rests on (ch. 00 «Читатель»; ch. 00 «Для кого эта книга», opening). It presents the three
-layers, the roles and the cross-cutting principles (ch. 02, opening and «Имена и участники»; ch. 03,
+owner's machine to joint work of independent participants in an open network (ch. 00 "Для кого эта
+книга", opening; book subtitle), to an engineer who wants to know how it is built and what each
+guarantee rests on (ch. 00 "Читатель"; ch. 00 "Для кого эта книга", opening). It presents the three
+layers, the roles and the cross-cutting principles (ch. 02, opening and "Имена и участники"; ch. 03,
 opening), shows the state of each part only as ch. 29 states it, and leads the reader to the book
 and the papers.
 
 The site describes architecture, not installation. Installation and commands belong to the module
-documentation (ch. 00 «Для кого эта книга», second paragraph). The site runs no part of the
+documentation (ch. 00 "Для кого эта книга", second paragraph). The site runs no part of the
 platform and offers nothing to join or install.
 
 ## 2. Page archetypes
@@ -38,8 +39,8 @@ and it has no marketing hero: Swarma has no product interface a visitor can use 
 
 | Route (under `/ru/`, later `/en/`) | Dominant archetype | First-viewport signal | Primary evidence |
 | --- | --- | --- | --- |
-| `/` (locale home) | Editorial publication | Product name, literal category, reading path into the book | Book entry, status excerpt, chapter references |
-| `/platform/` | Documentation | Page title, design frame line, the three layers, section index | Chapter references; book diagram in private builds only |
+| `/` (locale home) | Editorial publication | Product name, literal category, design frame line, reading path into the book | Book entry, status excerpt, chapter references |
+| `/platform/` | Documentation | Page title, lead, design frame line, the three layers, section index | Chapter references; book diagram in private builds only |
 | `/platform/runtime/` | Documentation | Page title, lead, design frame line, section index | Chapter references, limits callouts, status rows |
 | `/platform/protocol/` | Documentation | Page title, lead, design frame line, section index | Chapter references, limits callouts, status rows |
 | `/platform/chain/` | Documentation | Page title, lead, design frame line, section index | Chapter references, limits callouts, status rows |
@@ -52,8 +53,9 @@ and it has no marketing hero: Swarma has no product interface a visitor can use 
 Density: editorial for prose pages, standard for the home page, compact for status tables.
 
 The design pages are `/platform/`, the three layer pages, `/principles/` and `/werkstatt/`. They
-describe Swarma by its design and carry the design frame line (8.4). M1 has no site search; this is a
-recorded deviation from the documentation archetype (section 12).
+describe Swarma by its design and carry the design frame line (8.4). The locale home carries the same
+line in its title block. M1 has no site search; this is a recorded deviation from the documentation
+archetype (section 12).
 
 ## 3. Primary experience
 
@@ -62,9 +64,10 @@ recorded deviation from the documentation archetype (section 12).
 At 390 px and at 1440 px the first viewport shows, in this order:
 
 1. The header (section 8.1).
-2. The page title block: the name «Swarma» as the product statement (`h1`), the literal category
+2. The page title block: the name "Swarma" as the product statement (`h1`), the literal category
    from the book subtitle, platform for swarms of AI agents from one machine to an open network
-   (ch. 00, title page), and one short paragraph naming the three layers (ch. 00 «Три слоя Swarma»).
+   (ch. 00, title page), one short paragraph naming the three layers (ch. 00 "Три слоя Swarma"), and
+   the design frame line (8.4).
 3. One primary action, a link to `/book/`, and one secondary link to `/status/`.
 4. The top edge of the next section, so the page does not read as an isolated poster.
 
@@ -75,9 +78,9 @@ action is added only when the sign-up exists; until then no action points to it.
 
 On `/platform/` and each layer page the first viewport shows the header, the page title block with a
 lead paragraph, the design frame line (8.4), the version context line (book version and date, from
-the book metadata), and a section index (on-page navigation). On `/platform/` the three layers with one line each are visible
-without scrolling at 1440 px (ch. 02 «Имена и участники»). At 390 px the section index collapses to a
-native `details` disclosure placed after the lead.
+the book metadata), and a section index (on-page navigation). On `/platform/` the three layers with
+one line each are visible without scrolling at 1440 px (ch. 02 "Имена и участники"). At 390 px the
+section index collapses to a native `details` disclosure placed after the lead.
 
 ## 4. Family invariants
 
@@ -108,13 +111,16 @@ Taken unchanged from the Relux Works product web design system:
 - **Accessibility.** WCAG 2.2 Level AA as the release minimum, plus the stricter family rules:
   44 × 44 px targets, visible focus in every appearance, reduced-motion equivalents.
 - **Writing.** Calm, direct, technically accurate copy; every claim maps to a book chapter or a
-  paper. In Russian interface copy no guillemets and no long dashes. Names exactly as in ch. 02
-  «Имена и участники»: Swarma, Swarma Runtime, Swarma Protocol, Swarma Chain, Swarma Keeper,
-  Swarma Curator, Swarma Keyholder. The signer is unbranded: «подписант», "signer".
+  paper. Russian site copy follows the book's Russian style guide: no guillemets; no dash, long or
+  short, as a connector (a hyphen in compound words and numeric ranges stays); plain double quotes
+  only for real quotations, chapter titles and conditional readings; the letter ё where it belongs;
+  code, commands and file names in backticks. Names exactly as in ch. 02
+  "Имена и участники": Swarma, Swarma Runtime, Swarma Protocol, Swarma Chain, Swarma Keeper,
+  Swarma Curator, Swarma Keyholder. The signer is unbranded: "подписант", "signer".
 
 ## 5. Operator relationship
 
-Relux Works operates the site. The book's title page carries the brand line «Relux Works · Swarma»
+Relux Works operates the site. The book's title page carries the brand line "Relux Works · Swarma"
 (ch. 00, title page). Swarma stays the primary identity on every page.
 
 - **Header:** Swarma only. The inline-start zone holds the Swarma text wordmark (section 6.6). The
@@ -231,9 +237,9 @@ symbol exists for Swarma and none is drawn.
 
 ### 6.6 Wordmark: **PROPOSAL (awaiting owner approval)**
 
-The text «Swarma» set in Inter Tight 700, `letter-spacing: 0`, always in Latin script in both
+The text "Swarma" set in Inter Tight 700, `letter-spacing: 0`, always in Latin script in both
 locales, LTR-isolated, in `--color-text` (`CanvasText` in forced colours). In the header it is the
-link to the locale home with the accessible name «Swarma». It is live text, not artwork, and it is
+link to the locale home with the accessible name "Swarma". It is live text, not artwork, and it is
 not a logo: no symbol, no container, no colour treatment, no ligature or custom kerning. When Swarma
 gets an approved mark, the mark replaces this text and this item is closed.
 
@@ -253,10 +259,10 @@ drawer appears with a short opacity change only.
 
 What makes the site credible is the material it points to, not decoration.
 
-1. **Status table.** The layer map from ch. 29 («Карта по слоям»), rendered from a copy of that
+1. **Status table.** The layer map from ch. 29 ("Карта по слоям"), rendered from a copy of that
    table kept in the repository and tagged with the book version it came from. Its four columns are
    the chapter's own: layer and capability, works today, what is not there yet, chapter
-   (ch. 29 «Карта по слоям»). The part tables (ch. 29 «Состояние по частям платформы») come from
+   (ch. 29 "Карта по слоям"). The part tables (ch. 29 "Состояние по частям платформы") come from
    the same copy. Status reaches a page only through the status component, called by key, and a
    status lint keeps readiness phrases out of prose (8.6).
 2. **The book and the papers.** Entries with title, authors, version, date and abstract, taken from
@@ -264,10 +270,10 @@ What makes the site credible is the material it points to, not decoration.
    date (ch. 00, title page). Links to the PDFs are placeholders in M1; publishing the PDFs is
    **PENDING DECISION**.
 3. **Chapter references.** Every content section names the book chapter and section it draws on,
-   visibly (section 8.4). A reader can check any statement against the book.
+   visibly (section 8.5). A reader can check any statement against the book.
 4. **Diagrams from the book.** Proposed media source: the book's own diagrams, for example the
-   three-layer diagram (ch. 02, opening), the protocol topology (ch. 17 «Три плоскости работы») and
-   the Swarma Chain sublayers (ch. 26 «Три подслоя с разными обязательствами»). Publishing them on
+   three-layer diagram (ch. 02, opening), the protocol topology (ch. 17 "Три плоскости работы") and
+   the Swarma Chain sublayers (ch. 26 "Три подслоя с разными обязательствами"). Publishing them on
    the public site is **PENDING DECISION**. Until the owner decides, they appear only in private
    builds, behind a build switch:
    - **Switch.** The environment variable `SWARMA_BOOK_FIGURES`. Off by default; on only when set
@@ -277,10 +283,9 @@ What makes the site credible is the material it points to, not decoration.
      for example `[[figure three-layers]]`. The marker is the only way a book figure enters a page.
    - **Switch on (private builds only).** The book 1.6 diagram renders unchanged: the same SVG, not
      recoloured, cropped or redrawn. It sits in a figure with the book's caption and a source line
-     in the form decided for the site: «Источник: книга Swarma, версия 1.6, глава NN, рисунок «…»»,
-     where NN is the chapter that holds the figure and the quoted title is the book's caption for it
-     (component 8.11). This source line is the one place where Russian interface copy uses
-     guillemets, because it quotes a book title.
+     in this form: `Источник: книга Swarma, версия 1.6, глава NN, рисунок: <подпись>`, where NN is
+     the chapter that holds the figure and `<подпись>` is the book's caption for it, verbatim
+     (component 8.11).
    - **Switch off (every public build).** The marker renders nothing: no empty frame, no placeholder
      text, no reserved space. Every page is complete without its figures: what a figure shows
      already exists as text or a table in the same section.
@@ -356,14 +361,15 @@ are semantic roles; "type" refers to the shared type roles and scale.
 - **Content:** title; lead paragraph; on design pages the design frame line; version context line
   with the book version and date from the book metadata; on documentation pages the section index.
 - **Design frame line:** on every design page (`/platform/`, `/platform/runtime/`,
-  `/platform/protocol/`, `/platform/chain/`, `/principles/`, `/werkstatt/`) one fixed line, the
-  same text on every such page within a language. It says that the page describes Swarma by its
-  design, as the book does, and that the state of each part is on the status page, with a link to
-  `/status/` (ch. 00 «Дизайн и готовность»). It appears once per page, directly after the lead,
-  never per paragraph or per section: the page body keeps the book's voice, which describes the
-  target design in the present tense, and status stays in one place. It is inside the first
-  viewport at 390 and 1440 px. Its text comes from the locale strings, not from page content, so it
-  cannot drift between pages, and it contains no status word.
+  `/platform/protocol/`, `/platform/chain/`, `/principles/`, `/werkstatt/`) and on the locale home
+  (`/`) one fixed line, the same text on every such page within a language. It says that the page
+  describes Swarma by its design, as the book does, and that the state of each part is on the status
+  page, with a link to `/status/` (ch. 00 "Дизайн и готовность"). It appears once per page, directly
+  after the lead (on the home page, after the paragraph naming the three layers), never per
+  paragraph or per section: the page body keeps the book's voice, which describes the target design
+  in the present tense, and status stays in one place. It is inside the first viewport at 390 and
+  1440 px. Its text comes from the locale strings, not from page content, so it cannot drift between
+  pages, and it contains no status word.
 - **States:** static; the frame line's link has hover and focus-visible states.
 - **Keyboard and screen reader:** `h1` first in `main`; the frame line is ordinary paragraph text
   with a native link whose text names the status page; the section index is a `nav` with an
@@ -377,8 +383,11 @@ are semantic roles; "type" refers to the shared type roles and scale.
 
 - **Purpose:** every content section shows where its content comes from.
 - **Content:** section heading (`h2`, or `h3` within a group); body; a visible chapter reference
-  above or below the body: chapter number and title, section title, linked to the matching entry on
-  `/book/`. One section may cite several chapters.
+  below the body, linked to the matching entry on `/book/`. Russian format:
+  `Источник: глава NN "Chapter title", раздел "Section title"`, for example
+  `Источник: глава 05 "Ключи и ключник", раздел "Собеседника устанавливает ядро"`. A section that
+  cites several sources separates them with `; `. Titles are verbatim from the book, in plain double
+  quotes. The English format follows in M2.
 - **States:** default; link hover and focus.
 - **Keyboard and screen reader:** the reference is a normal link whose text names the chapter and
   section; no icon-only reference; headings form a meaningful outline.
@@ -392,13 +401,13 @@ are semantic roles; "type" refers to the shared type roles and scale.
 - **Data:** rendered only from the repository copy of the ch. 29 tables, tagged with the book
   version. Two shapes:
   - layer map table: layer and capability, works today, what is not there yet, chapter
-    (ch. 29 «Карта по слоям»);
-  - part rows: part, what it is, status (ch. 29 «Состояние по частям платформы»).
+    (ch. 29 "Карта по слоям");
+  - part rows: part, what it is, status (ch. 29 "Состояние по частям платформы").
 - **Status cell:** the verbatim cell string from the copy, whatever its shape: one vocabulary word,
   a quoted formulation, a quotation followed by a parenthetical, or several quotations. The
   chapter's vocabulary (работает сегодня, решено, спецификация, предложено, открыто) serves only as
   a classification, and only where the cell is exactly one of those words. It never rewrites,
-  shortens or normalises a cell (ch. 29 «Состояние по частям платформы»).
+  shortens or normalises a cell (ch. 29 "Состояние по частям платформы").
 - **Names and identifiers in the copy:** the names check and the forbidden-identifier scan run over
   the vendored copy as well as over the site. A row that fails either cannot be embedded, and
   embedding it fails the build. Rows are never silently reworded. One section is excluded from the
@@ -415,7 +424,7 @@ are semantic roles; "type" refers to the shared type roles and scale.
   implemented, available now, ready to use, in development, released, live, beta, coming soon,
   production-ready. Vocabulary words that are common prose (нет, открыто, решено) are not linted;
   the component rule keeps them out of status positions.
-- **Rendering rules:** cell text verbatim, including «нет»; no colour coding, icons, traffic lights,
+- **Rendering rules:** cell text verbatim, including "нет"; no colour coding, icons, traffic lights,
   progress bars, counts or totals; status cells in Roboto Mono in `--color-text`. A `caption` names
   the source chapter, the book version and its date. On layer pages, a filtered excerpt (rows for
   that layer) links to `/status/`.
@@ -431,9 +440,9 @@ are semantic roles; "type" refers to the shared type roles and scale.
 ### 8.7 Callout for a guarantee's limits
 
 - **Purpose:** state what a mechanism does not guarantee, next to the mechanism. The book names the
-  limits of each guarantee (ch. 00 «Читатель»), and the site keeps them beside the claim.
-- **Content:** a short heading (Limits / Пределы), the limits in the book's terms, the chapter
-  reference.
+  limits of each guarantee (ch. 00 "Читатель"), and the site keeps them beside the claim.
+- **Content:** a short heading ("Пределы" in Russian, "Limits" in English), the limits in the
+  book's terms, the chapter reference.
 - **States:** static.
 - **Keyboard and screen reader:** an `aside` with an accessible name from its heading, placed in
   source order right after the text it qualifies. Not a live region, not collapsible.
@@ -463,8 +472,8 @@ later milestone brings it back, it needs its own specification and a design-vers
 - **Purpose:** jump past the header to the main content.
 - **Behaviour:** the first focusable element; visually hidden until focused, then visible at the
   inline start; targets `main` (`tabindex="-1"`).
-- **Keyboard and screen reader:** native link with the text "Skip to content" or its Russian
-  equivalent.
+- **Keyboard and screen reader:** native link with the text "Перейти к содержанию" in Russian and
+  "Skip to content" in English.
 - **Tokens and type:** `--color-strong-action` background, `--color-on-strong-action` text,
   `--color-focus` outline; Inter compact interface size.
 
@@ -472,7 +481,7 @@ later milestone brings it back, it needs its own specification and a design-vers
 
 - **Purpose:** show a book diagram unchanged where the build switch allows it (section 7, item 4).
 - **Content:** the book's SVG; a `figcaption` with the book's caption for the figure and the source
-  line.
+  line `Источник: книга Swarma, версия 1.6, глава NN, рисунок: <подпись>` (section 7, item 4).
 - **States:** switch off: renders nothing. Switch on: the figure, with its dimensions declared from
   the SVG view box before it loads.
 - **Keyboard and screen reader:** `figure` with `figcaption`; the image has `alt` equal to the
@@ -495,33 +504,35 @@ or device is phrased as design ("as designed"); the frame line carries the state
 
 ### `/ru/` (home)
 
-1. Title block: «Swarma» and the literal category (ch. 00, title page); one paragraph with the three
-   layers (ch. 00 «Три слоя Swarma»); action to the book, link to the status page.
+1. Title block: "Swarma" and the literal category (ch. 00, title page); one paragraph with the three
+   layers (ch. 00 "Три слоя Swarma"); the design frame line (8.4); action to the book, link to the
+   status page.
 2. The problem: the three questions familiar to anyone who has run several coding agents at once:
-   who acts, on what grounds, who answers for the result when a session stops (ch. 00 «Для кого эта книга», opening; ch. 01
-   «Кто говорит и что ему разрешено», «Ответственность не передаётся отправкой»).
+   who acts, on what grounds, who answers for the result when a session stops (ch. 00 "Для кого эта
+   книга", opening; ch. 01 "Кто говорит и что ему разрешено", "Ответственность не передаётся
+   отправкой").
 3. The answer in one view: boundaries on one machine joined to boundaries between owners, built on
-   existing agent environments rather than a model or harness of its own (ch. 01 «Какой ответ мы
-   ищем»).
-4. The three layers, one line each, linking to the layer pages (ch. 02 «Имена и участники»).
+   existing agent environments rather than a model or harness of its own (ch. 01 "Какой ответ мы
+   ищем").
+4. The three layers, one line each, linking to the layer pages (ch. 02 "Имена и участники").
 5. The seven principles by name, linking to `/principles/` (ch. 03, section headings).
 6. Status excerpt: rows of the layer map selected by key in the status data, rendered verbatim, with
-   a link to `/status/` (ch. 29 «Карта по слоям»).
-7. The book: the book entry (8.8) and the reading routes for different readers (ch. 00 «Карта пяти
-   частей»).
+   a link to `/status/` (ch. 29 "Карта по слоям").
+7. The book: the book entry (8.8) and the reading routes for different readers (ch. 00 "Карта пяти
+   частей").
 
 ### `/ru/platform/` (overview)
 
 1. Title block with the design frame line: Swarma as three layers, each answering its own question
    (ch. 02, opening).
-2. Layer order: numbered bottom-up, built in the other direction (ch. 02, opening; «Порядок
-   постройки»).
+2. Layer order: numbered bottom-up, built in the other direction (ch. 02, opening; "Порядок
+   постройки").
 3. Names: the platform, the three layers, Swarma Keeper and Swarma Curator, and why the keyholder
-   (Swarma Keyholder) is not the keeper (ch. 02 «Имена и участники»).
-4. The six roles: owner, operator, agent, project, contributor, donor (ch. 02 «Имена и участники»).
-5. One path through the three layers (ch. 02 «Один путь через три слоя»).
-6. The characteristic failure at each boundary, as a limits callout (ch. 02 «Один путь через три
-   слоя», closing paragraphs).
+   (Swarma Keyholder) is not the keeper (ch. 02 "Имена и участники").
+4. The six roles: owner, operator, agent, project, contributor, donor (ch. 02 "Имена и участники").
+5. One path through the three layers (ch. 02 "Один путь через три слоя").
+6. The characteristic failure at each boundary, as a limits callout (ch. 02 "Один путь через три
+   слоя", closing paragraphs).
 7. Links to the three layer pages and to the status page.
 
 ### `/ru/platform/runtime/`
@@ -529,70 +540,70 @@ or device is phrased as design ("as designed"); the frame line carries the state
 Each mechanism section shows what it does and its limit, with a limits callout where the chapter
 names one.
 
-1. Title block with the design frame line: the swarm on one owner's machines (ch. 02 «Swarma
-   Runtime: границы на одной установке»).
-2. One OS user per agent and the agent's network (ch. 04 «Почему пользователь ОС», «Машина
-   выбирает сеть», «Станция и её гарантии»; limits: «Пределы границы»).
-3. Keys and the keyholder (ch. 05 «Мастер-секрет и стабильная личность», «Собеседника
-   устанавливает ядро»; limits: ch. 02 «Swarma Runtime: границы на одной установке», on secrets
+1. Title block with the design frame line: the swarm on one owner's machines (ch. 02 "Swarma
+   Runtime: границы на одной установке").
+2. One OS user per agent and the agent's network (ch. 04 "Почему пользователь ОС", "Машина
+   выбирает сеть", "Станция и её гарантии"; limits: "Пределы границы").
+3. Keys and the keyholder (ch. 05 "Мастер-секрет и стабильная личность", "Собеседника
+   устанавливает ядро"; limits: ch. 02 "Swarma Runtime: границы на одной установке", on secrets
    the agent can still see).
-4. Grants: delegation only narrows, revocation and unknown state (ch. 06 «Делегирование только с
-   ослаблением», «Отзыв и неизвестное состояние»).
-5. Message path and bridge: the carrier delivers, signature and grant authorise (ch. 02 «Swarma
-   Runtime: границы на одной установке»; ch. 07 «Носитель не становится источником полномочий»;
-   ch. 08 «Допуск к носителю», «Зачем нужен допуск»).
-6. Launch and session host (ch. 08 «Запуск агента и хост сессий», «Матрёшка запуска», «Служба,
-   раннер и единственный писатель»).
-7. Swarma Keeper: a handover completes with an action (ch. 09 «Передача завершается действием»).
-8. Swarma Curator: skills, profiles, overlays (ch. 10 «Скилл, профиль и оверлей»).
-9. Credentials and logins (ch. 11 «Брокер: одна подписка, аренды на запуски»).
+4. Grants: delegation only narrows, revocation and unknown state (ch. 06 "Делегирование только с
+   ослаблением", "Отзыв и неизвестное состояние").
+5. Message path and bridge: the carrier delivers, signature and grant authorise (ch. 02 "Swarma
+   Runtime: границы на одной установке"; ch. 07 "Носитель не становится источником полномочий";
+   ch. 08 "Допуск к носителю", "Зачем нужен допуск").
+6. Launch and session host (ch. 08 "Запуск агента и хост сессий", "Матрёшка запуска", "Служба,
+   раннер и единственный писатель").
+7. Swarma Keeper: a handover completes with an action (ch. 09 "Передача завершается действием").
+8. Swarma Curator: skills, profiles, overlays (ch. 10 "Скилл, профиль и оверлей").
+9. Credentials and logins (ch. 11 "Брокер: одна подписка, аренды на запуски").
 10. Remote workplace, as designed: a separate OS user on the project machine, while the model works
-    on the donor's subscription (ch. 12 «Модель думает у донора, руки у нас»).
-11. Task board: integration compares the exact head (ch. 13 «Почему интеграция сравнивает точную
-    голову»).
-12. Model router: deterministic choice (ch. 14 «Почему выбор детерминирован»).
-13. Agent memory (ch. 15 «Назначение»).
+    on the donor's subscription (ch. 12 "Модель думает у донора, руки у нас").
+11. Task board: integration compares the exact head (ch. 13 "Почему интеграция сравнивает точную
+    голову").
+12. Model router: deterministic choice (ch. 14 "Почему выбор детерминирован").
+13. Agent memory (ch. 15 "Назначение").
 14. Operator and interfaces, as designed: the companion phone app shows the exact action and signs
-    it with a key in the phone's secure chip once the person confirms presence (ch. 16 «Телефон
-    оператора»).
-15. Status excerpt: Runtime rows of the layer map, linking to `/status/` (ch. 29 «Карта по слоям»).
+    it with a key in the phone's secure chip once the person confirms presence (ch. 16 "Телефон
+    оператора").
+15. Status excerpt: Runtime rows of the layer map, linking to `/status/` (ch. 29 "Карта по слоям").
 
 ### `/ru/platform/protocol/`
 
-1. Title block with the design frame line: one environment, several owners (ch. 17 «Одна среда,
-   несколько владельцев»).
-2. Three planes: thinking, governance, execution (ch. 17 «Три плоскости работы»; ch. 02 «Swarma
-   Protocol: совместная работа независимых владельцев»).
-3. What crosses the network (ch. 17 «Что пересекает сеть»).
-4. Log, quorum certificate and the trust levels L0 to L2 (ch. 18 «Запись и её совершение», «Три
-   уровня доверия»).
-5. Task contract: the plan permits, the contract requires; three outcomes (ch. 19 «План разрешает,
-   контракт требует», «Профиль свойств и три исхода»).
-6. Orchestrator lease, epoch and fencing token (ch. 20 «Аренда, эпоха и fencing-токен»).
-7. Candidate, independent review and atomic head advance; the five steps of a change (ch. 20 «Кто
-   проверяет кандидата», «Атомарное продвижение головы»; ch. 02 «Swarma Protocol: совместная
-   работа независимых владельцев»).
-8. External effects, stop with one signature, federation (ch. 22 «Остановка одной подписью»,
-   «Федерация проектов»).
-9. Limits callout: what the protocol does not guarantee (ch. 23 «Явные пределы обещания»), and where
-   a bounded model check ends (ch. 21 «Где заканчивается установленный результат»). Any statement of
+1. Title block with the design frame line: one environment, several owners (ch. 17 "Одна среда,
+   несколько владельцев").
+2. Three planes: thinking, governance, execution (ch. 17 "Три плоскости работы"; ch. 02 "Swarma
+   Protocol: совместная работа независимых владельцев").
+3. What crosses the network (ch. 17 "Что пересекает сеть").
+4. Log, quorum certificate and the trust levels L0 to L2 (ch. 18 "Запись и её совершение", "Три
+   уровня доверия").
+5. Task contract: the plan permits, the contract requires; three outcomes (ch. 19 "План разрешает,
+   контракт требует", "Профиль свойств и три исхода").
+6. Orchestrator lease, epoch and fencing token (ch. 20 "Аренда, эпоха и fencing-токен").
+7. Candidate, independent review and atomic head advance; the five steps of a change (ch. 20 "Кто
+   проверяет кандидата", "Атомарное продвижение головы"; ch. 02 "Swarma Protocol: совместная
+   работа независимых владельцев").
+8. External effects, stop with one signature, federation (ch. 22 "Остановка одной подписью",
+   "Федерация проектов").
+9. Limits callout: what the protocol does not guarantee (ch. 23 "Явные пределы обещания"), and where
+   a bounded model check ends (ch. 21 "Где заканчивается установленный результат"). Any statement of
    what has been checked appears only through status rows.
-10. Status excerpt: Protocol rows of the layer map, linking to `/status/` (ch. 29 «Карта по слоям»).
+10. Status excerpt: Protocol rows of the layer map, linking to `/status/` (ch. 29 "Карта по слоям").
 
 ### `/ru/platform/chain/`
 
-1. Title block with the design frame line: the participant beyond one project (ch. 02 «Swarma
-   Chain: участник за пределами проекта»).
-2. Three sublayers: chain, p2p memory, social graph, each with its own guarantee (ch. 02 «Swarma
-   Chain: участник за пределами проекта»; ch. 26 «Три подслоя с разными обязательствами»).
-3. Identity cell (ch. 24 «Ячейка личности»; limits: «Границы»).
-4. Attestations and portable reputation (ch. 25 «Что в свидетельстве»; limits: «Чего репутация не
-   обещает»).
-5. Chain design: where consensus ends, the hash-only cryptographic profile, names (ch. 26 «Где
-   заканчивается консенсус», «Криптографический профиль: только хэш-функции», «Имена»).
+1. Title block with the design frame line: the participant beyond one project (ch. 02 "Swarma
+   Chain: участник за пределами проекта").
+2. Three sublayers: chain, p2p memory, social graph, each with its own guarantee (ch. 02 "Swarma
+   Chain: участник за пределами проекта"; ch. 26 "Три подслоя с разными обязательствами").
+3. Identity cell (ch. 24 "Ячейка личности"; limits: "Границы").
+4. Attestations and portable reputation (ch. 25 "Что в свидетельстве"; limits: "Чего репутация не
+   обещает").
+5. Chain design: where consensus ends, the hash-only cryptographic profile, names (ch. 26 "Где
+   заканчивается консенсус", "Криптографический профиль: только хэш-функции", "Имена").
 6. Social layer and network memory: pointer apart from the file, the graph decides what the network
-   remembers (ch. 27 «Публикация: указатель отдельно от файла», «Граф решает, что помнит сеть»).
-7. Status excerpt: Chain rows of the layer map, linking to `/status/` (ch. 29 «Карта по слоям»).
+   remembers (ch. 27 "Публикация: указатель отдельно от файла", "Граф решает, что помнит сеть").
+7. Status excerpt: Chain rows of the layer map, linking to `/status/` (ch. 29 "Карта по слоям").
 
 ### `/ru/principles/`
 
@@ -600,23 +611,23 @@ names one.
    needs a different mechanism on each layer (ch. 03, opening).
 2. Seven sections, one per principle, in the book's order, each with its purpose and three rows,
    Runtime, Protocol, Chain (ch. 03, the seven sections):
-   - «Ключ задаёт личность, агент просит подпись»;
-   - «Полномочия только сужаются»;
-   - «Журнал хранит истину, сессия модели служит кэшем»;
-   - «Суждение моделей остаётся вне консенсуса»;
-   - «Одобрение относится к точным версиям»;
-   - «Чего нельзя проверить, то не разрешено»;
-   - «Человек подписывает своё действие».
+   - "Ключ задаёт личность, агент просит подпись";
+   - "Полномочия только сужаются";
+   - "Журнал хранит истину, сессия модели служит кэшем";
+   - "Суждение моделей остаётся вне консенсуса";
+   - "Одобрение относится к точным версиям";
+   - "Чего нельзя проверить, то не разрешено";
+   - "Человек подписывает своё действие".
    The three rows use a repeated structured-row grid, not cards.
-3. Reading the guarantees together, with the outer limits as a limits callout (ch. 03 «Как читать
-   гарантии вместе»).
+3. Reading the guarantees together, with the outer limits as a limits callout (ch. 03 "Как читать
+   гарантии вместе").
 
 ### `/ru/werkstatt/`
 
 1. Title block with the design frame line: a workbench is an agent's permanent workplace,
    project × role × environment
-   (ch. 08 «Запуск агента и хост сессий», «Верстак: постоянное рабочее место агента»; ch. 30,
-   entry «Верстак, Werkstatt»).
+   (ch. 08 "Запуск агента и хост сессий", "Верстак: постоянное рабочее место агента"; ch. 30,
+   entry "Верстак, Werkstatt").
 2. What a workbench has: its own managed Swarma Curator home with the role profile, its own clone,
    its own identity on the carrier, a record in the workbench registry on the board (same section).
 3. Launch through the session host, as designed: the record describes the launch, and the session
@@ -624,11 +635,11 @@ names one.
    start. No command text is shown (same section).
 4. How tasks arrive: messages in project rooms; the right to a task comes from the board record, not
    from the message text; review independence is checked by identity (same section).
-5. Two context modes, «продолжать» and «свежий»; identity, home and memory stay constant (same
+5. Two context modes, "продолжать" and "свежий"; identity, home and memory stay constant (same
    section).
 6. Clones in a separate root with no `CLAUDE.md` or `AGENTS.md` above them (same section).
 7. How the model router picks a workbench (same section, last paragraph).
-8. Status row for the workbench, by key (ch. 29 «Runtime: хост сессий и запуск»).
+8. Status row for the workbench, by key (ch. 29 "Runtime: хост сессий и запуск").
 
 The page explains the design. It offers no workbench to visitors and no sign-up for one.
 
@@ -637,24 +648,24 @@ The page explains the design. It offers no workbench to visitors and no sign-up 
 1. Title block: book version and date of the status copy, link to the full chapter in the book entry.
 2. How to read: states belong to named capabilities and do not add up to a readiness percentage;
    the meaning of the columns; adjacent rows do not mean tested integration (ch. 29, opening and
-   «Карта по слоям»).
-3. The layer map table, rendered from data (8.6) (ch. 29 «Карта по слоям»).
-4. The status vocabulary and its meaning, rendered from data (ch. 29 «Состояние по частям
-   платформы»).
-5. A pointer to the open questions in the book (ch. 29 «Нерешённые вопросы»); the questions are not
+   "Карта по слоям").
+3. The layer map table, rendered from data (8.6) (ch. 29 "Карта по слоям").
+4. The status vocabulary and its meaning, rendered from data (ch. 29 "Состояние по частям
+   платформы").
+5. A pointer to the open questions in the book (ch. 29 "Нерешённые вопросы"); the questions are not
    restated.
 
 ### `/ru/book/`
 
 1. Title block: the book entry (8.8): title, subtitle, authors, version, date (ch. 00, title page).
-2. What the book is: architecture, not installation (ch. 00 «Для кого эта книга»). Among the book's
+2. What the book is: architecture, not installation (ch. 00 "Для кого эта книга"). Among the book's
    editions the Russian one is the source of truth, and where the book and the module
    specifications differ, the specifications prevail (ch. 00, title page notes).
 3. Design and readiness: the book describes the finished design in the present tense, the state of
-   each part is in ch. 29 (ch. 00 «Дизайн и готовность»).
-4. Map of the five parts with their main questions (ch. 00 «Карта пяти частей»).
+   each part is in ch. 29 (ch. 00 "Дизайн и готовность").
+4. Map of the five parts with their main questions (ch. 00 "Карта пяти частей").
 5. Reading routes for the owner of an installation, the runtime engineer, the distributed-systems
-   engineer and the reader interested in the chain (ch. 00 «Карта пяти частей»).
+   engineer and the reader interested in the chain (ch. 00 "Карта пяти частей").
 6. PDF link placeholder (M1 has no PDF).
 
 ### `/ru/papers/`
@@ -663,7 +674,7 @@ The page explains the design. It offers no workbench to visitors and no sign-up 
 2. One paper entry (8.8) per released paper, metadata and abstract from the paper itself; link
    placeholders in M1.
 3. The relation to the book: where a chapter refers to a paper, the paper entry links that chapter
-   (for example ch. 29 «Карта по слоям» refers to the protocol paper).
+   (for example ch. 29 "Карта по слоям" refers to the protocol paper).
 
 ## 10. Validation matrix
 
@@ -691,7 +702,11 @@ Checks required for each release:
 
 - Repository build and every repository check pass, including i18n completeness, the status lint
   (8.6), the names and forbidden-identifier scan over the site and over the vendored ch. 29 copy,
-  and the public-build figure check (section 7, item 4).
+  and the public-build figure check (section 7, item 4). Tool, module and daemon names that the book
+  prints in the ch. 29 layer map are book content, not internal identifiers; the forbidden-identifier
+  list does not include them.
+- Russian copy check: rendered Russian pages and Russian locale strings contain no guillemets and no
+  dash used as a connector (8.5, section 4).
 - `axe-core` in a real browser after each state is stable; the gate fails on any WCAG A or AA tagged
   violation and on any serious or critical one. No global rule suppression.
 - Geometry: root `scrollWidth` at most one pixel wider than `clientWidth`; navigation centre within
