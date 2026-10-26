@@ -3,7 +3,6 @@ title: "Swarma Protocol"
 description: "Swarma Protocol: joint work of independent owners over one execution environment. Three planes, a journal with a quorum, the task contract, the orchestrator's lease, independent review and the limits of the promise."
 order: 3
 nav: true
-status_rows: [protocol-environment, protocol-journal, protocol-task, protocol-lease, protocol-integration, protocol-effects, protocol-federation]
 ---
 
 The execution environment is the place where the project's working tree lives, commands and checks run, artifacts are built and the main branch advances. The agent loop, that is, a model with its context and tool calls, runs at the contributor, who gives the capacity of their model. The environment does not run these loops: it passively executes permitted commands that come from outside. In this way computing the next action and the action itself end up on different sides of the trust boundary.
@@ -75,9 +74,3 @@ Source: chapter 23 "External effects, stop and federation", section "Stop with o
 Enumeration of a bounded model is exhaustive only within its given bounds: it does not extend to an arbitrary number of tasks, contract versions, epochs or deliveries. The environment and validators in such a model are honest, and it does not represent code content, model judgement, the full-scale lease, stopping or external effects. Carrying the result beyond these limits requires a separate argument.
 
 Source: chapter 24 "Threat model", section "Explicit limits of the promise"; chapter 22 "What has been checked and how to check the rest", section "Where the established result ends"
-
-## Where we are
-
-[[status]]
-
-Source: chapter 30 "Where we are and what comes next", section "Layer map"

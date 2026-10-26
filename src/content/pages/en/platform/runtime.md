@@ -3,7 +3,6 @@ title: "Swarma Runtime"
 description: "Swarma Runtime: the swarm on the machines of one owner. One OS user per agent, the key holder, grants, the bridge, the session host, Swarma Keeper, Swarma Curator and other modules with their guarantees and limits."
 order: 2
 nav: true
-status_rows: [runtime-launcher, runtime-network, runtime-keys, runtime-operator, runtime-grants, runtime-transport, runtime-admission, runtime-dispatcher, runtime-sessions, runtime-keeper, runtime-curator, runtime-mcp, runtime-logins, runtime-credentials, runtime-remote-workplace, runtime-results, runtime-board, runtime-model-routing, runtime-memory]
 ---
 
 Swarma Runtime holds the swarm on the machines of one owner. It is built from small modules with named contracts, and the module diagram makes sense together with the physical boundary: who can read whose files, open which sockets and call which operations.
@@ -84,7 +83,7 @@ Source: chapter 12 "Credentials and logins", section "The broker: one subscripti
 
 ## The remote workplace
 
-By design, a workplace is a separate OS user on the project machine: its own home, its own firewall, its own resource group and the ceilings of that machine. The model runs on the donor's subscription. Tool calls and mail reach the project environment over one SSH connection that the donor opens. The project opens no reverse connections.
+A workplace is a separate OS user on the project machine: its own home, its own firewall, its own resource group and the ceilings of that machine. The model runs on the donor's subscription. Tool calls and mail reach the project environment over one SSH connection that the donor opens. The project opens no reverse connections.
 
 > **Limit.** This adds no computing resources to the environment: the throughput of the project machine remains the constraint.
 
@@ -116,14 +115,8 @@ Source: chapter 16 "Agent memory", section "Purpose"
 
 ## The operator and interfaces
 
-By design, the operator's companion app shows the exact action and signs it with a key in the phone's secure chip once the person has confirmed presence. Showing the exact content is required, for example, for issuing a grant and connecting a subscription. Such an action is not accepted from inside an agent session, and the signature of one action does not fit another.
+The operator's companion app shows the exact action and signs it with a key in the phone's secure chip once the person has confirmed presence. Showing the exact content is required, for example, for issuing a grant and connecting a subscription. Such an action is not accepted from inside an agent session, and the signature of one action does not fit another.
 
 > **Limit.** If the boundary of OS users is intact, an injection into an agent does not obtain the owner's signature. The user boundary does not protect against a compromise of the kernel or of the signing device itself.
 
 Source: chapter 17 "The operator and interfaces", section "The operator's phone"
-
-## Where we are
-
-[[status]]
-
-Source: chapter 30 "Where we are and what comes next", section "Layer map"

@@ -19,12 +19,6 @@ The Russian version of the book is the source of truth. Where the book and the m
 
 Source: chapter 00 "Who this book is for"; chapter 00 "Who this book is for", section "The reader"
 
-## Design and state
-
-The book describes the platform in finished form, in the present tense: this is how the service is built by design. The development state of each part is collected in the chapter "Where we are and what comes next", which also holds the only list of open questions. On the site this chapter is represented by the page [Where we are](/en/status/).
-
-Source: chapter 00 "Who this book is for", section "Design and readiness"
-
 ## Five parts
 
 The book goes from cause to mechanism and then assembles the mechanisms into end-to-end scenarios.
@@ -35,7 +29,7 @@ The book goes from cause to mechanism and then assembles the mechanisms into end
 | Swarma Runtime: a swarm on the machines of one owner | how to hold agents and their capabilities on your own machines |
 | Swarma Protocol: many owners, one environment | how to admit someone else's capacity to a shared project |
 | Swarma Chain: identity, reputation, economics | where a participant exists beyond one project |
-| Together | how the parts connect and what exists today |
+| Together | how the parts connect |
 
 Source: chapter 00 "Who this book is for", section "Map of the five parts"
 

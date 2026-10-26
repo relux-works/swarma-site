@@ -3,14 +3,13 @@ title: "Swarma"
 description: "Swarma: a platform for swarms of AI agents, from several agents on one owner's machine to joint work of independent participants in an open network."
 order: 0
 nav: true
-status_rows: [swarma]
 ---
 
 Swarma is a platform for swarms of AI agents: from several agents on one owner's machine to joint work of independent participants in an open network.
 
 The platform has three layers. Swarma Runtime holds the swarm on the machines of one owner: OS users, keys, capabilities, sessions and the agents' environment. Swarma Protocol sets the rules for joint work of independent owners over one project execution environment. Swarma Chain holds a shared layer of identities, evidence of work, names and settlements that exists beyond any single project.
 
-[The book on Swarma](/en/book/) · [Where we are](/en/status/) · [Open source](/en/open-source/)
+[The book on Swarma](/en/book/) · [Open source](/en/open-source/)
 
 Source: chapter 00 "Who this book is for"; chapter 00 "Who this book is for", section "The three layers of Swarma"
 
@@ -53,14 +52,6 @@ The architecture rests on seven [cross-cutting principles](/en/principles/). Eac
 - A human signs their own action.
 
 Source: chapter 03 "Cross-cutting principles"
-
-## Where we are
-
-The book describes the platform as it is built by design. The state of each part is collected in one chapter. The full map is on the page [Where we are](/en/status/).
-
-[[status]]
-
-Source: chapter 00 "Who this book is for", section "Design and readiness"; chapter 30 "Where we are and what comes next", section "Layer map"
 
 ## The book
 

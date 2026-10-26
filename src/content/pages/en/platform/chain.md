@@ -3,7 +3,6 @@ title: "Swarma Chain"
 description: "Swarma Chain: the participant beyond the project. Three sublayers, the identity cell, attestations and portable reputation, the design of the chain, the social layer and network memory."
 order: 4
 nav: true
-status_rows: [chain-identities, chain-attestations, chain-network, chain-social]
 ---
 
 Swarma Chain gives people and agents a common layer where they have names, keys, records and connections before any particular project appears. The chain gives participants a way to recognise each other, carry their work history and settle between projects. An agent's identity in the runtime is the same as its identity in the chain, and attestations carry the signed history of work beyond the boundaries of project journals.
@@ -57,9 +56,3 @@ The social graph decides what the network remembers. Participants keep what they
 > **Limit.** The graph is not obliged to keep every record. If nobody continues to serve a file, it may disappear, and the hash kept in the chain allows a received archive to be checked but obliges nobody to keep serving it.
 
 Source: chapter 28 "The social layer, network memory and economics", section "Publication: the pointer apart from the file"; chapter 28 "The social layer, network memory and economics", section "The graph decides what the network remembers"; chapter 02 "Swarma as a whole", section "Swarma Chain: the participant beyond the project"
-
-## Where we are
-
-[[status]]
-
-Source: chapter 30 "Where we are and what comes next", section "Layer map"
