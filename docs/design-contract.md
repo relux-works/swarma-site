@@ -6,13 +6,14 @@ follows it; a deviation is recorded here before it ships.
 
 How to read this file:
 
-- Anchors in parentheses point to the Swarma book (Russian edition, the source of truth):
-  chapter number, chapter title where needed, and section title, for example
-  (ch. 02 «Имена и участники»).
+- Anchors in parentheses point to the Swarma book, Russian edition: chapter number, chapter title
+  where needed, and section title, for example (ch. 02 «Имена и участники»). Among the book's
+  editions the Russian one is the source of truth; where the book and the module specifications
+  differ, the specifications prevail (ch. 00, title page notes).
 - Items marked **PROPOSAL (awaiting owner approval)** are design choices the owner has not approved.
   They may be implemented so the site can be built and reviewed, but they are not final.
-- Items marked **PENDING DECISION** need an owner decision before they may appear on the site.
-  Pages are designed to work without them.
+- Items marked **PENDING DECISION** need an owner decision before they may appear on the public
+  site. Pages are designed to work without them.
 - This file states no development status for any part of Swarma. Status reaches the site only
   through the status data described in section 7, and only in the words of ch. 29.
 
@@ -38,17 +39,21 @@ and it has no marketing hero: Swarma has no product interface a visitor can use 
 | Route (under `/ru/`, later `/en/`) | Dominant archetype | First-viewport signal | Primary evidence |
 | --- | --- | --- | --- |
 | `/` (locale home) | Editorial publication | Product name, literal category, reading path into the book | Book entry, status excerpt, chapter references |
-| `/platform/` | Documentation | Page title, the three layers, section index | Chapter references, diagram if approved |
-| `/platform/runtime/` | Documentation | Page title, lead, section index | Chapter references, limits callouts, status rows |
-| `/platform/protocol/` | Documentation | Page title, lead, section index | Chapter references, limits callouts, status rows |
-| `/platform/chain/` | Documentation | Page title, lead, section index | Chapter references, limits callouts, status rows |
-| `/principles/` | Documentation | Page title, list of the seven principles | Per-layer mechanism for each principle |
-| `/werkstatt/` | Documentation | Page title, the definition of a workbench | Chapter references, status row |
+| `/platform/` | Documentation | Page title, design frame line, the three layers, section index | Chapter references; book diagram in private builds only |
+| `/platform/runtime/` | Documentation | Page title, lead, design frame line, section index | Chapter references, limits callouts, status rows |
+| `/platform/protocol/` | Documentation | Page title, lead, design frame line, section index | Chapter references, limits callouts, status rows |
+| `/platform/chain/` | Documentation | Page title, lead, design frame line, section index | Chapter references, limits callouts, status rows |
+| `/principles/` | Documentation | Page title, design frame line, list of the seven principles | Per-layer mechanism for each principle |
+| `/werkstatt/` | Documentation | Page title, design frame line, the definition of a workbench | Chapter references, status row |
 | `/status/` | Documentation (data reference) | Page title, book version and date, start of the layer map | The layer map table rendered from data |
 | `/book/` | Editorial publication | Book entry: title, authors, version, date | Book metadata, map of the five parts |
 | `/papers/` | Editorial publication | List of paper entries | Paper metadata |
 
 Density: editorial for prose pages, standard for the home page, compact for status tables.
+
+The design pages are `/platform/`, the three layer pages, `/principles/` and `/werkstatt/`. They
+describe Swarma by its design and carry the design frame line (8.4). M1 has no site search; this is a
+recorded deviation from the documentation archetype (section 12).
 
 ## 3. Primary experience
 
@@ -69,8 +74,8 @@ action is added only when the sign-up exists; until then no action points to it.
 ### Platform page, first viewport
 
 On `/platform/` and each layer page the first viewport shows the header, the page title block with a
-lead paragraph, the version context line (book version and date, from the book metadata), and a
-section index (on-page navigation). On `/platform/` the three layers with one line each are visible
+lead paragraph, the design frame line (8.4), the version context line (book version and date, from
+the book metadata), and a section index (on-page navigation). On `/platform/` the three layers with one line each are visible
 without scrolling at 1440 px (ch. 02 «Имена и участники»). At 390 px the section index collapses to a
 native `details` disclosure placed after the lead.
 
@@ -160,8 +165,9 @@ are chosen per appearance, not derived by a percentage function.
 
 Forced colours map accent and link to `LinkText` and focus to `Highlight`, as the baseline does.
 
-Contrast evidence. WCAG 2.x relative-luminance ratio, computed from the hex values against the
-baseline Relux surface tokens of the same appearance (`bg`, `surface-subtle`, `surface`, and
+Contrast evidence. WCAG 2.x relative-luminance ratio, computed by the script in Appendix A (the
+command is given there) from the hex values against the baseline Relux surface tokens of the same
+appearance (`bg`, `surface-subtle`, `surface`, and
 `surface-hover` in light themes or `surface-raised` in dark themes). Each cell gives the lowest and
 highest ratio across those surfaces.
 
@@ -184,8 +190,9 @@ Consequences recorded with the evidence:
 - Link colour alone does not separate a link from body text (ratio below 3:1 against the text
   colour). Links inside prose are therefore always underlined; colour is an additional cue only.
 - The accent and the information role (`--color-info`) are close in luminance (1.15:1 light,
-  1.34:1 dark) and differ only in hue. The information role always carries a text label, so the two
-  are never told apart by colour alone.
+  1.34:1 dark, 1.34:1 light more contrast, 1.12:1 dark more contrast) and differ only in hue. The
+  information role always carries a text label, so the two are never told apart by colour alone.
+  This closeness is a recorded deviation (section 12).
 - The ratios are computed values. The release gate re-measures the shipped tokens in a browser and
   records foreground token, background token, appearance, ratio and tool.
 
@@ -211,9 +218,10 @@ None. The status vocabulary is not colour-coded (section 8.6).
 
 ### 6.4 Media
 
-Swarma has no approved media. Proposed media source: diagrams from the book, **PENDING DECISION**
-(section 7). Without that decision pages contain no images. No stock imagery, no illustrations, no
-generated imagery, no abstract network or particle graphics.
+Swarma has no approved media. The only proposed media source is the book's own diagrams (section 7,
+item 4). Publishing them on the public site is **PENDING DECISION**; until then they appear only in
+private builds, behind the build switch. Public builds contain no images. No stock imagery, no
+illustrations, no generated imagery, no abstract network or particle graphics, in any build.
 
 ### 6.5 Iconography
 
@@ -248,26 +256,43 @@ What makes the site credible is the material it points to, not decoration.
 1. **Status table.** The layer map from ch. 29 («Карта по слоям»), rendered from a copy of that
    table kept in the repository and tagged with the book version it came from. Its four columns are
    the chapter's own: layer and capability, works today, what is not there yet, chapter
-   (ch. 29 «Карта по слоям»). The per-part status vocabulary (ch. 29 «Состояние по частям
-   платформы») is rendered from the same data. A build check compares every status word on the site
-   with that copy; a page cannot show a status the copy does not contain.
+   (ch. 29 «Карта по слоям»). The part tables (ch. 29 «Состояние по частям платформы») come from
+   the same copy. Status reaches a page only through the status component, called by key, and a
+   status lint keeps readiness phrases out of prose (8.6).
 2. **The book and the papers.** Entries with title, authors, version, date and abstract, taken from
    the release metadata. The book's own metadata gives its title, subtitle, authors, version and
    date (ch. 00, title page). Links to the PDFs are placeholders in M1; publishing the PDFs is
    **PENDING DECISION**.
 3. **Chapter references.** Every content section names the book chapter and section it draws on,
    visibly (section 8.4). A reader can check any statement against the book.
-4. **Diagrams from the book: PENDING DECISION.** Proposed media source: the book's own diagrams, for
-   example the three-layer diagram (ch. 02, opening), the protocol topology (ch. 17 «Три плоскости
-   работы») and the Swarma Chain sublayers (ch. 26 «Три подслоя с разными обязательствами»). They
-   may appear only after the owner approves publishing them. Every page that would hold a diagram is
-   complete without it: the same information exists as text or a table in the section, and the
-   diagram, when approved, adds a figure with a caption, a text alternative and the chapter
-   reference.
-5. **Command excerpts.** Where the book itself shows a command, a page may show that excerpt as code
-   with the chapter reference, for example `werkstatt up` and `werkstatt down` (ch. 08 «Запуск
-   агента и хост сессий», «Верстак: постоянное рабочее место агента»). No command appears that the
-   book does not show.
+4. **Diagrams from the book.** Proposed media source: the book's own diagrams, for example the
+   three-layer diagram (ch. 02, opening), the protocol topology (ch. 17 «Три плоскости работы») and
+   the Swarma Chain sublayers (ch. 26 «Три подслоя с разными обязательствами»). Publishing them on
+   the public site is **PENDING DECISION**. Until the owner decides, they appear only in private
+   builds, behind a build switch:
+   - **Switch.** The environment variable `SWARMA_BOOK_FIGURES`. Off by default; on only when set
+     to `1`. Every public build runs with it off, and the public build pipeline never sets it.
+   - **Placement.** A page places a figure with a marker on a line of its own:
+     `[[figure <name>]]`, where `<name>` is the figure's file name in the book without its extension,
+     for example `[[figure three-layers]]`. The marker is the only way a book figure enters a page.
+   - **Switch on (private builds only).** The book 1.6 diagram renders unchanged: the same SVG, not
+     recoloured, cropped or redrawn. It sits in a figure with the book's caption and a source line
+     in the form decided for the site: «Источник: книга Swarma, версия 1.6, глава NN, рисунок «…»»,
+     where NN is the chapter that holds the figure and the quoted title is the book's caption for it
+     (component 8.11). This source line is the one place where Russian interface copy uses
+     guillemets, because it quotes a book title.
+   - **Switch off (every public build).** The marker renders nothing: no empty frame, no placeholder
+     text, no reserved space. Every page is complete without its figures: what a figure shows
+     already exists as text or a table in the same section.
+   - **Source files.** The figure files are not committed to this repository, which is meant to
+     become public. A private build reads them from a copy of the book 1.6 release outside the
+     repository; the code task defines how that location is given.
+   - **Build checks.** A marker that names a figure the book release does not contain fails a
+     private build. A public build fails if its output contains a book figure or an unresolved
+     marker.
+5. **Command excerpts: not in M1.** Commands that the book shows are not shown on M1 pages. Code on
+   a page reads as something a visitor can run today, which is a status statement, and the site makes
+   status statements only through the status data. Recorded as an open item for a later milestone.
 
 No statistics, percentages of readiness, user counts, testimonials or logos of third parties. The
 book states that the states of the parts do not add up to one readiness percentage (ch. 29, opening),
@@ -326,15 +351,27 @@ are semantic roles; "type" refers to the shared type roles and scale.
 
 ### 8.4 Page title block
 
-- **Purpose:** the one `h1` of the page, the lead, and the version context.
-- **Content:** title; lead paragraph; version context line with the book version and date from the
-  book metadata; on documentation pages the section index.
-- **States:** static.
-- **Keyboard and screen reader:** `h1` first in `main`; the section index is a `nav` with an
+- **Purpose:** the one `h1` of the page, the lead, the design frame line on design pages, and the
+  version context.
+- **Content:** title; lead paragraph; on design pages the design frame line; version context line
+  with the book version and date from the book metadata; on documentation pages the section index.
+- **Design frame line:** on every design page (`/platform/`, `/platform/runtime/`,
+  `/platform/protocol/`, `/platform/chain/`, `/principles/`, `/werkstatt/`) one fixed line, the
+  same text on every such page within a language. It says that the page describes Swarma by its
+  design, as the book does, and that the state of each part is on the status page, with a link to
+  `/status/` (ch. 00 «Дизайн и готовность»). It appears once per page, directly after the lead,
+  never per paragraph or per section: the page body keeps the book's voice, which describes the
+  target design in the present tense, and status stays in one place. It is inside the first
+  viewport at 390 and 1440 px. Its text comes from the locale strings, not from page content, so it
+  cannot drift between pages, and it contains no status word.
+- **States:** static; the frame line's link has hover and focus-visible states.
+- **Keyboard and screen reader:** `h1` first in `main`; the frame line is ordinary paragraph text
+  with a native link whose text names the status page; the section index is a `nav` with an
   accessible name, a native `details` disclosure below 640 px.
 - **Tokens and type:** display type at page-heading size (product-statement size only on the home
-  page), lead size, `--color-text`, `--color-text-muted` for the version line, Roboto Mono for the
-  version string.
+  page), lead size, `--color-text`; body size in `--color-text-muted` for the frame line, with an
+  underlined `--color-link`; `--color-text-muted` for the version line, Roboto Mono for the version
+  string.
 
 ### 8.5 Section with chapter reference
 
@@ -353,17 +390,35 @@ are semantic roles; "type" refers to the shared type roles and scale.
 
 - **Purpose:** show the state of Swarma parts exactly as ch. 29 gives it.
 - **Data:** rendered only from the repository copy of the ch. 29 tables, tagged with the book
-  version. Content files cannot contain status text; a page that needs status embeds a status table
-  or row by key. Two shapes:
+  version. Two shapes:
   - layer map table: layer and capability, works today, what is not there yet, chapter
     (ch. 29 «Карта по слоям»);
-  - part rows: part, what it is, status, where the status is either one word of the chapter's
-    vocabulary or the chapter's exact quoted formulation (ch. 29 «Состояние по частям платформы»).
+  - part rows: part, what it is, status (ch. 29 «Состояние по частям платформы»).
+- **Status cell:** the verbatim cell string from the copy, whatever its shape: one vocabulary word,
+  a quoted formulation, a quotation followed by a parenthetical, or several quotations. The
+  chapter's vocabulary (работает сегодня, решено, спецификация, предложено, открыто) serves only as
+  a classification, and only where the cell is exactly one of those words. It never rewrites,
+  shortens or normalises a cell (ch. 29 «Состояние по частям платформы»).
+- **Names and identifiers in the copy:** the names check and the forbidden-identifier scan run over
+  the vendored copy as well as over the site. A row that fails either cannot be embedded, and
+  embedding it fails the build. Rows are never silently reworded. One section is excluded from the
+  vendored part tables by an explicit exclusion documented in the data file: the ch. 29 section on
+  message signatures and the signer, which brands the signer and uses internal code names. The
+  exclusion stays until a book edition fixes the signer naming (open item for the lead).
+- **How status reaches a page:** only through this component, called by table or row key. Content
+  files carry no status text, and a key with no rows fails the build. A status lint rejects
+  readiness phrases, in Russian and English, in content files and in the rendered prose of every
+  page outside status markup (elements the component marks as status). Its phrase list and its
+  allow-list live in the repository; every allow-list entry names the file, the exact sentence and
+  the reason. Initial phrase list: работает сегодня, уже работает, реализовано, реализован,
+  готово к, доступно, в разработке, запущено, выпущено, бета; works today, already works,
+  implemented, available now, ready to use, in development, released, live, beta, coming soon,
+  production-ready. Vocabulary words that are common prose (нет, открыто, решено) are not linted;
+  the component rule keeps them out of status positions.
 - **Rendering rules:** cell text verbatim, including «нет»; no colour coding, icons, traffic lights,
-  progress bars, counts or totals; status words in Roboto Mono in `--color-text`; a quoted
-  formulation rendered exactly as in the data, in the double quotation marks the book uses (never
-  guillemets). A `caption` names the source chapter, the book version and its date. On layer pages,
-  a filtered excerpt (rows for that layer) links to `/status/`.
+  progress bars, counts or totals; status cells in Roboto Mono in `--color-text`. A `caption` names
+  the source chapter, the book version and its date. On layer pages, a filtered excerpt (rows for
+  that layer) links to `/status/`.
 - **States:** default; long content; narrow width. Below 640 px the native table sits in a labelled,
   keyboard-focusable scroll region (`role="region"`, `aria-labelledby` the caption, `tabindex="0"`)
   with the first column kept visible; no column is clipped or hidden.
@@ -398,13 +453,10 @@ are semantic roles; "type" refers to the shared type roles and scale.
 - **Tokens and type:** repeated entries may use a card (`--color-surface`, `--color-border`, radius
   8 px); Roboto Mono for version and date; `--color-text-muted` for metadata labels.
 
-### 8.9 Code excerpt
+### 8.9 Code excerpt: not in M1
 
-- **Purpose:** show a command the book shows (section 7, item 5).
-- **States:** default; copy control optional, with a stable box when its label changes.
-- **Keyboard and screen reader:** `pre` and `code`, LTR-isolated, horizontally scrollable inside a
-  labelled region on narrow screens.
-- **Tokens and type:** `--color-surface-subtle`, `--color-text`, Roboto Mono.
+Dropped from M1 together with command excerpts (section 7, item 5). Recorded as an open item; when a
+later milestone brings it back, it needs its own specification and a design-versus-state rule.
 
 ### 8.10 Skip link
 
@@ -416,11 +468,30 @@ are semantic roles; "type" refers to the shared type roles and scale.
 - **Tokens and type:** `--color-strong-action` background, `--color-on-strong-action` text,
   `--color-focus` outline; Inter compact interface size.
 
+### 8.11 Book figure (private builds only)
+
+- **Purpose:** show a book diagram unchanged where the build switch allows it (section 7, item 4).
+- **Content:** the book's SVG; a `figcaption` with the book's caption for the figure and the source
+  line.
+- **States:** switch off: renders nothing. Switch on: the figure, with its dimensions declared from
+  the SVG view box before it loads.
+- **Keyboard and screen reader:** `figure` with `figcaption`; the image has `alt` equal to the
+  book's caption; the section text carries the full description. Not focusable.
+- **Tokens and type:** no frame or card; caption in `--color-text-muted` at compact interface size;
+  source line in Roboto Mono at technical size. The SVG keeps the book's colours in every
+  appearance. Its legibility in dark and forced-colours appearances is a private-build check; an
+  unreadable figure is reported, never recoloured.
+
 ## 9. Route outlines (M1)
 
 Wireframes in text. Each line names a section and what it shows, with the chapter it draws on. Final
 wording is written in the content tasks. Every page ends with the footer; every content section
 carries its chapter reference (8.5).
+
+Design pages carry the design frame line (8.4), and their outline items describe the design in the
+book's voice. No item invites a visitor to install, run, download or use a part of Swarma, and no
+item links to an application, a store page or a command. An item that names a user-facing interface
+or device is phrased as design ("as designed"); the frame line carries the state.
 
 ### `/ru/` (home)
 
@@ -441,7 +512,8 @@ carries its chapter reference (8.5).
 
 ### `/ru/platform/` (overview)
 
-1. Title block: Swarma as three layers, each answering its own question (ch. 02, opening).
+1. Title block with the design frame line: Swarma as three layers, each answering its own question
+   (ch. 02, opening).
 2. Layer order: numbered bottom-up, built in the other direction (ch. 02, opening; «Порядок
    постройки»).
 3. Names: the platform, the three layers, Swarma Keeper and Swarma Curator, and why the keyholder
@@ -457,8 +529,8 @@ carries its chapter reference (8.5).
 Each mechanism section shows what it does and its limit, with a limits callout where the chapter
 names one.
 
-1. Title block: the swarm on one owner's machines (ch. 02 «Swarma Runtime: границы на одной
-   установке»).
+1. Title block with the design frame line: the swarm on one owner's machines (ch. 02 «Swarma
+   Runtime: границы на одной установке»).
 2. One OS user per agent and the agent's network (ch. 04 «Почему пользователь ОС», «Машина
    выбирает сеть», «Станция и её гарантии»; limits: «Пределы границы»).
 3. Keys and the keyholder (ch. 05 «Мастер-секрет и стабильная личность», «Собеседника
@@ -474,19 +546,21 @@ names one.
 7. Swarma Keeper: a handover completes with an action (ch. 09 «Передача завершается действием»).
 8. Swarma Curator: skills, profiles, overlays (ch. 10 «Скилл, профиль и оверлей»).
 9. Credentials and logins (ch. 11 «Брокер: одна подписка, аренды на запуски»).
-10. Remote workplace: the model thinks at the donor, the hands are in the project (ch. 12 «Модель
-    думает у донора, руки у нас»).
+10. Remote workplace, as designed: a separate OS user on the project machine, while the model works
+    on the donor's subscription (ch. 12 «Модель думает у донора, руки у нас»).
 11. Task board: integration compares the exact head (ch. 13 «Почему интеграция сравнивает точную
     голову»).
 12. Model router: deterministic choice (ch. 14 «Почему выбор детерминирован»).
 13. Agent memory (ch. 15 «Назначение»).
-14. Operator and interfaces: the operator's phone shows the exact action (ch. 16 «Телефон
+14. Operator and interfaces, as designed: the companion phone app shows the exact action and signs
+    it with a key in the phone's secure chip once the person confirms presence (ch. 16 «Телефон
     оператора»).
 15. Status excerpt: Runtime rows of the layer map, linking to `/status/` (ch. 29 «Карта по слоям»).
 
 ### `/ru/platform/protocol/`
 
-1. Title block: one environment, several owners (ch. 17 «Одна среда, несколько владельцев»).
+1. Title block with the design frame line: one environment, several owners (ch. 17 «Одна среда,
+   несколько владельцев»).
 2. Three planes: thinking, governance, execution (ch. 17 «Три плоскости работы»; ch. 02 «Swarma
    Protocol: совместная работа независимых владельцев»).
 3. What crosses the network (ch. 17 «Что пересекает сеть»).
@@ -507,8 +581,8 @@ names one.
 
 ### `/ru/platform/chain/`
 
-1. Title block: the participant beyond one project (ch. 02 «Swarma Chain: участник за пределами
-   проекта»).
+1. Title block with the design frame line: the participant beyond one project (ch. 02 «Swarma
+   Chain: участник за пределами проекта»).
 2. Three sublayers: chain, p2p memory, social graph, each with its own guarantee (ch. 02 «Swarma
    Chain: участник за пределами проекта»; ch. 26 «Три подслоя с разными обязательствами»).
 3. Identity cell (ch. 24 «Ячейка личности»; limits: «Границы»).
@@ -522,8 +596,8 @@ names one.
 
 ### `/ru/principles/`
 
-1. Title block: the three layers face different adversaries, so one idea needs a different mechanism
-   on each layer (ch. 03, opening).
+1. Title block with the design frame line: the three layers face different adversaries, so one idea
+   needs a different mechanism on each layer (ch. 03, opening).
 2. Seven sections, one per principle, in the book's order, each with its purpose and three rows,
    Runtime, Protocol, Chain (ch. 03, the seven sections):
    - «Ключ задаёт личность, агент просит подпись»;
@@ -539,13 +613,15 @@ names one.
 
 ### `/ru/werkstatt/`
 
-1. Title block: a workbench is an agent's permanent workplace, project × role × environment
+1. Title block with the design frame line: a workbench is an agent's permanent workplace,
+   project × role × environment
    (ch. 08 «Запуск агента и хост сессий», «Верстак: постоянное рабочее место агента»; ch. 30,
    entry «Верстак, Werkstatt»).
 2. What a workbench has: its own managed Swarma Curator home with the role profile, its own clone,
    its own identity on the carrier, a record in the workbench registry on the board (same section).
-3. Launch through the session host: the record describes the launch; `werkstatt up` and
-   `werkstatt down` (same section).
+3. Launch through the session host, as designed: the record describes the launch, and the session
+   host starts and stops the session from that record; without the session host a workbench does not
+   start. No command text is shown (same section).
 4. How tasks arrive: messages in project rooms; the right to a task comes from the board record, not
    from the message text; review independence is checked by identity (same section).
 5. Two context modes, «продолжать» and «свежий»; identity, home and memory stay constant (same
@@ -571,8 +647,9 @@ The page explains the design. It offers no workbench to visitors and no sign-up 
 ### `/ru/book/`
 
 1. Title block: the book entry (8.8): title, subtitle, authors, version, date (ch. 00, title page).
-2. What the book is: architecture, not installation; the Russian edition is the source of truth
-   (ch. 00 «Для кого эта книга»; title page notes).
+2. What the book is: architecture, not installation (ch. 00 «Для кого эта книга»). Among the book's
+   editions the Russian one is the source of truth, and where the book and the module
+   specifications differ, the specifications prevail (ch. 00, title page notes).
 3. Design and readiness: the book describes the finished design in the present tense, the state of
    each part is in ch. 29 (ch. 00 «Дизайн и готовность»).
 4. Map of the five parts with their main questions (ch. 00 «Карта пяти частей»).
@@ -604,12 +681,17 @@ The completion gate of the design system applies to every release. Cells name wh
 | Direction | LTR only; no RTL locale. Components use logical properties so RTL needs no redesign | not applicable until an RTL locale exists |
 | Zoom | 200 % text zoom, 400 % browser zoom, larger default font size | home, status, one layer page |
 | Keyboard | full journey: skip link, header, drawer, section index, status scroll region, footer | all M1 routes |
+| Interactive states | default, hover, focus-visible, pressed, current page, expanded and collapsed, per component: header links, menu button, drawer, language switch, section index disclosure, design frame link, chapter reference links, footer links, status scroll region, skip link | all M1 routes at 390 and 1440. Loading, success, warning and error are not applicable in M1: no component fetches data, submits a form or reports a result (they arrive with the sign-up) |
+| Long and empty content | longest status cell and longest row label in the vendored copy; longest chapter and section title cited in a chapter reference; longest translated navigation label; a status key with no rows (must fail the build, not render an empty table); a page with every figure switched off | status, each layer page, header, footer |
+| Drawer reversal | rapid open-close-open on the menu button, by pointer and by keyboard, including during the transition | 390 and 768 px, with and without reduced motion: no jump, no stale overlay, focus back on the button |
+| Build mode | public (`SWARMA_BOOK_FIGURES` unset or not `1`): no book figure and no marker text in the output, every page complete; private (`SWARMA_BOOK_FIGURES=1`): each marked figure unchanged, with caption and source line | public mode on all M1 routes; private mode on every route with a marker |
 | Screen reader | macOS Safari + VoiceOver; Windows NVDA with Firefox or Chrome; Android Chrome + TalkBack; iOS Safari + VoiceOver for the primary mobile journey | home, one layer page, status, book |
 
 Checks required for each release:
 
-- Repository build and every repository check pass, including i18n completeness, the status-claim
-  check against the vendored ch. 29 copy, and the scan for forbidden identifiers.
+- Repository build and every repository check pass, including i18n completeness, the status lint
+  (8.6), the names and forbidden-identifier scan over the site and over the vendored ch. 29 copy,
+  and the public-build figure check (section 7, item 4).
 - `axe-core` in a real browser after each state is stable; the gate fails on any WCAG A or AA tagged
   violation and on any serious or critical one. No global rule suppression.
 - Geometry: root `scrollWidth` at most one pixel wider than `clientWidth`; navigation centre within
@@ -649,11 +731,103 @@ Checks required for each release:
 | Scroll-triggered entrance animations | Motion must communicate state; the site has no live state |
 | Third-party fonts, analytics or tracking scripts | Not needed for reading; the family trust rules avoid tracking by default |
 
+## 12. Intentional deviations from the family system
+
+| Deviation | Family rule | Reason |
+| --- | --- | --- |
+| No site search in M1 | The documentation archetype puts navigation, search and version context in the first screen | M1 has ten routes, each design page has a section index, and the book is the complete reference. Search returns when the English pages or further routes make navigation alone insufficient |
+| Accent close to the information role in luminance (1.15:1 light, 1.34:1 dark, 1.34:1 light more contrast, 1.12:1 dark more contrast) | Developer-infrastructure palettes keep status colours functionally distinct from the accent | The accent is kept as proposed. The two roles differ in hue, and the information role always carries a text label, so no state is told apart by colour alone (6.1) |
+
+## Appendix A. Contrast computation
+
+The script that produced every ratio in 6.1 and 6.2. It uses only the Python standard library.
+Run it from the repository root:
+
+```sh
+awk '/^```python$/{f=1;next} /^```$/{f=0} f' docs/design-contract.md | python3 -
+```
+
+```python
+# WCAG 2.x contrast ratios for the tables in sections 6.1 and 6.2 of this contract.
+# Surfaces and text are the baseline Relux tokens; accent values are the 6.1 proposal.
+def rgb(h):
+    return tuple(int(h[i:i + 2], 16) / 255 for i in (1, 3, 5))
+
+def lum(c):
+    c = [x / 12.92 if x <= 0.04045 else ((x + 0.055) / 1.055) ** 2.4 for x in c]
+    return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]
+
+def ratio(a, b):
+    la, lb = lum(a), lum(b)
+    return (max(la, lb) + 0.05) / (min(la, lb) + 0.05)
+
+def over(rgba, bg):
+    *c, a = rgba
+    return tuple(x / 255 * a + y * (1 - a) for x, y in zip(c, bg))
+
+# Order: light, dark, light more contrast, dark more contrast.
+# Surfaces: bg, surface-subtle, surface, then surface-hover (light) or surface-raised (dark).
+SURFACES = [["#f4f6f4", "#e9ede9", "#fafbfa", "#eef1ee"], ["#111411", "#171b17", "#1c211c", "#252b25"],
+            ["#f4f6f4", "#e5e9e5", "#fafbfa", "#e1e6e1"], ["#0e110e", "#151915", "#1a1f1a", "#252b25"]]
+TEXT = ["#181a18", "#e7ebe7", "#101310", "#f0f3f0"]
+MUTED = ["#4d554f", "#bbc4bc", "#303630", "#d0d7d0"]
+FAINT = ["#626a64", "#9aa59b", "#414941", "#bac4bb"]
+BORDER_STRONG = ["#788179", "#727e74", "#59635a", "#89948b"]
+INFO = ["#165f80", "#64d2ff", "#0d4f6b", "#8cddff"]
+ACCENT = ["#2347b0", "#8aa8ff", "#172f80", "#b3c6ff"]
+ACCENT_HOVER = ["#1c3a94", "#a3bbff", "#0f2266", "#c7d5ff"]
+LINK = ["#1c3a94", "#a3bbff", "#172f80", "#bccdff"]
+LINK_HOVER = ["#142c75", "#bccdff", "#0f2266", "#d1dcff"]
+FOCUS = ["#2347b0", "#a3bbff", "#172f80", "#bccdff"]
+ON_ACCENT = ["#f7f9f7", "#151815", "#f7f9f7", "#111411"]
+SOFT = [(35, 71, 176, 0.09), (138, 168, 255, 0.15), (23, 47, 128, 0.14), (179, 198, 255, 0.20)]
+SELECTION_BG = ["#d6def3", "#2b3a68", "#c9d4f2", "#2b3a68"]
+SELECTION_TEXT = ["#181a18", "#f0f3f0", "#101310", "#f0f3f0"]
+
+def on_surfaces(tokens):
+    cells = []
+    for t, surfaces in zip(tokens, SURFACES):
+        values = [ratio(rgb(t), rgb(s)) for s in surfaces]
+        cells.append(f"{min(values):.2f}–{max(values):.2f}")
+    return cells
+
+def pairs(fg, bg):
+    return [f"{ratio(rgb(a), rgb(b)):.2f}" for a, b in zip(fg, bg)]
+
+rows = {
+    "accent on surfaces": on_surfaces(ACCENT),
+    "accent hover on surfaces": on_surfaces(ACCENT_HOVER),
+    "link on surfaces": on_surfaces(LINK),
+    "link hover on surfaces": on_surfaces(LINK_HOVER),
+    "focus on surfaces (non-text)": on_surfaces(FOCUS),
+    "on-accent on accent": pairs(ON_ACCENT, ACCENT),
+    "on-accent on accent hover": pairs(ON_ACCENT, ACCENT_HOVER),
+    "body text on accent-soft over `bg`":
+        [f"{ratio(rgb(t), over(s, rgb(b[0]))):.2f}" for t, s, b in zip(TEXT, SOFT, SURFACES)],
+    "accent on accent-soft over `bg`":
+        [f"{ratio(rgb(a), over(s, rgb(b[0]))):.2f}" for a, s, b in zip(ACCENT, SOFT, SURFACES)],
+    "selection text on selection bg": pairs(SELECTION_TEXT, SELECTION_BG),
+    "link against body text": pairs(LINK, TEXT),
+    "`--color-text`": on_surfaces(TEXT),
+    "`--color-text-muted`": on_surfaces(MUTED),
+    "`--color-text-faint`": on_surfaces(FAINT),
+    "`--color-border-strong` (non-text)": on_surfaces(BORDER_STRONG),
+    "accent against info (deviation, section 12)": pairs(ACCENT, INFO),
+}
+for label, cells in rows.items():
+    print(" | ".join([label] + cells))
+```
+
 ## Open items
 
 - Owner approval of the proposals: accent (6.1), neutral tint (6.2), wordmark (6.6), favicon
   (section 5).
-- Owner decisions: publishing the book diagrams (section 7), publishing the PDFs (8.8), the legal
-  line in the footer (section 5).
+- Owner decisions: publishing the book diagrams on the public site (section 7, item 4), publishing
+  the PDFs (8.8), the legal line in the footer (section 5).
 - The accessibility statement page and its route are not in the M1 route list; the design system
   requires one before a public release.
+- Command excerpts and the code excerpt component (section 7, item 5; 8.9) are out of M1 and wait
+  for a later milestone.
+- For the lead: the ch. 29 section on message signatures and the signer brands the signer and uses
+  internal code names. It is excluded from the vendored part tables (8.6) until a book edition fixes
+  the signer naming.
