@@ -191,13 +191,13 @@ test('build: decoded publication identifiers fail after clean controls', async t
 // Real public-to-dist copying preserves the witnesses; each output rejects for its intended rule.
 test('build: structural encoding and CommonMark witnesses', async t => {
   const root = await sourceFixture(t);
-  const clean = { 'public/encoding.html': '<p>Swarma</p>', 'public/encoding.svg': '<svg><text>Swarma</text></svg>', 'public/emphasis.md': 'Swarma **Runtime**' };
+  const clean = { 'public/encoding.html': '<p>Swarma</p>', 'public/encoding.svg': '<svg xmlns="http://www.w3.org/2000/svg"><text>Swarma</text></svg>', 'public/emphasis.md': 'Swarma **Runtime**' };
   for (const [path, value] of Object.entries(clean)) await put(root, path, value);
   build(root);
   verdict('structural build clean controls', 'identifiers', root);
   const cases = [
     ['encoding.html', Buffer.concat([Buffer.from([255, 254]), Buffer.from('<p>zz-host-&#97;lpha</p>', 'utf16le')]), 'publication-decode'],
-    ['encoding.svg', Buffer.concat([Buffer.from([255, 254]), Buffer.from('<svg><text>&#64;reader:example.org</text></svg>', 'utf16le')]), 'publication-decode'],
+    ['encoding.svg', Buffer.concat([Buffer.from([255, 254]), Buffer.from('<svg xmlns="http://www.w3.org/2000/svg"><text>&#64;reader:example.org</text></svg>', 'utf16le')]), 'publication-decode'],
     ['emphasis.md', Buffer.from('zz-host-**alpha**'), 'deny-token'],
     ['generic.md', Buffer.from('@rea**der**:example.org'), 'matrix-user'],
   ];
@@ -218,4 +218,21 @@ test('build: structural encoding and CommonMark witnesses', async t => {
   assert.match(guarded.stderr, /publication-decode/u);
   assert.deepEqual(await readFile(join(root, 'dist/index.html')), before);
   evidence.push({ name: 'prebuild encoding gate preserves previous output', buildExit: 1, diagnostic: 'publication-decode', previousOutputPreserved: true });
+});
+
+// A real image reference keeps its external SVG document checked after public-to-dist copying.
+test('build: external SVG availability is rejected beside a neutral badge', async t => {
+  const root = await sourceFixture(t);
+  const svg = text => `<svg xmlns="http://www.w3.org/2000/svg" width="320" height="50"><text x="10" y="32">${text}</text></svg>`;
+  await layoutPlant(root, '<img src="/badge.svg" alt="Platform status" />');
+  await put(root, 'public/badge.svg', svg('In preparation'));
+  build(root);
+  assert.match(await readFile(join(root, 'dist/ru/index.html'), 'utf8'), /<img\b[^>]*src="\/badge\.svg"/u);
+  for (const check of ['identifiers', 'names', 'status-language']) verdict('neutral external SVG badge', check, root);
+  await put(root, 'public/badge.svg', svg('Swarma Chain available now'));
+  build(root);
+  assert.equal(await readFile(join(root, 'dist/badge.svg'), 'utf8'), svg('Swarma Chain available now'));
+  const result = run('status-language', root, 'status-language');
+  assert.ok(result.stderr.split('\n').includes('dist/badge.svg: status-language'), result.stderr);
+  evidence.push({ name: 'external SVG readiness badge', check: 'status-language', buildExit: 0, checkExit: result.status, diagnostic: 'dist/badge.svg: status-language' });
 });

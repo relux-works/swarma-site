@@ -5,6 +5,7 @@ import { identifierRules } from './identifier-rules.mjs';
 import { publicationReader } from './publication-values.mjs';
 import { readPublication } from './publication-reader.mjs';
 import { denyTokens, redactor } from './scanner-policy.mjs';
+import { includesToken } from './publication/normalization.mjs';
 
 export async function check(root) {
   let redact = redactor((process.env.IDENT_DENY_TOKENS ?? '').split(/[,\r\n]+/u).filter(Boolean));
@@ -40,7 +41,7 @@ export async function check(root) {
       try { if (!binary) values.push(...(await reader.values(path, text)).values); }
       catch { errors.push(`${path}: publication-decode`); }
       if (generic.has(file)) for (const value of values) for (const rule of identifierRules(value, allowlist)) errors.push(`${path}: ${rule}`);
-      if ([path, ...(binary ? [bytes.toString('latin1')] : []), ...values].some(value => tokens.some(token => value.toLowerCase().includes(token.toLowerCase())))) errors.push(`${path}: deny-token`);
+      if ([path, ...(binary ? [bytes.toString('latin1')] : []), ...values].some(value => tokens.some(token => includesToken(value, token)))) errors.push(`${path}: deny-token`);
     }
   } catch {
     // Filesystem and traversal exception messages can contain paths or file contents. Never echo them.

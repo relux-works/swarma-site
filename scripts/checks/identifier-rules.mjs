@@ -1,4 +1,5 @@
 // The policy patterns and planted controls are intentionally outside publication scan roots.
+import { normalizeText } from './publication/normalization.mjs';
 export const rules = [
   ['matrix-user', /@[A-Za-z0-9._=+\/-]+:[A-Za-z0-9.-]+/u],
   ['matrix-event', /\$[A-Za-z0-9_-]{20,}/u],
@@ -10,6 +11,7 @@ export const rules = [
 ];
 
 export function identifierRules(text, allowlist) {
+  text = normalizeText(text);
   const found = rules.filter(([, pattern]) => pattern.test(text)).map(([name]) => name);
   for (const match of text.matchAll(/github\.com\/relux-works\/([A-Za-z0-9_.-]+)/giu)) {
     const repo = match[1].replace(/\.git$/i, '');

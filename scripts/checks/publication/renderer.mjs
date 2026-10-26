@@ -42,7 +42,7 @@ export async function publicationReader(root, { assetRoots = [] } = {}) {
       try {
         const url = new URL(route.request().url());
         if (url.origin !== 'http://publication.invalid') return await route.abort();
-        if (url.pathname === current.urlPath) return await route.fulfill({ contentType: 'text/html; charset=utf-8', body: current.html });
+        if (url.pathname === current.urlPath) return await route.fulfill({ contentType: current.contentType, body: current.html });
         const local = decodeURIComponent(url.pathname).replace(/^\/+/, '');
         let found;
         for (const base of [dirname(join(root, current.path)), ...assetRoots.map(path => join(root, path)), root]) {
@@ -59,8 +59,10 @@ export async function publicationReader(root, { assetRoots = [] } = {}) {
   }
   async function render(path, html, excluded = []) {
     await ready();
-    current = { path, html, failed: false, urlPath: '/' + path.replace(/^(?:dist|public)\//u, '').split('/').map(encodeURIComponent).join('/') };
+    const svg = extname(path).toLowerCase() === '.svg';
+    current = { path, html, failed: false, contentType: `${svg ? 'image/svg+xml' : 'text/html'}; charset=utf-8`, urlPath: '/' + path.replace(/^(?:dist|public)\//u, '').split('/').map(encodeURIComponent).join('/') };
     await page.goto('http://publication.invalid' + current.urlPath, { waitUntil: 'load', timeout: 10000 });
+    if (svg && await page.evaluate(() => document.documentElement.localName !== 'svg' || Boolean(document.querySelector('parsererror')))) throw failure('publication-decode');
     const styled = await page.evaluate(() => document.styleSheets.length > 0 || Boolean(document.querySelector('[style]')));
     let observed = false;
     const values = [], prose = [], accessible = [], styles = [], json = [];
@@ -90,16 +92,27 @@ export async function publicationReader(root, { assetRoots = [] } = {}) {
             const style = getComputedStyle(element, pseudo);
             if (getComputedStyle(element).display !== 'none' && style.display !== 'none' && style.content && !['none', 'normal'].includes(style.content)) generated.push(style.content);
           }
-          if (['svg', 'title', 'desc', 'text'].includes(element.localName)) labels.push(element.textContent);
+          if (['title', 'desc', 'text', 'tspan'].includes(element.localName)) labels.push(element.textContent);
         }
-        const text = document.body?.innerText ?? document.documentElement.innerText;
+        function renderedText() {
+          const root = document.body ?? document.documentElement;
+          if (typeof root.innerText === 'string') return root.innerText;
+          // SVG has no innerText. Chromium's Selection API supplies rendered text and layout line breaks.
+          const selection = getSelection(), range = document.createRange();
+          range.selectNodeContents(root);
+          selection.removeAllRanges(); selection.addRange(range);
+          const text = selection.toString();
+          selection.removeAllRanges();
+          return text;
+        }
+        const text = renderedText();
         const saved = excluded.map(index => all[index]).filter(Boolean).map(node => [node, node.style.cssText]);
         for (const [node] of saved) node.style.setProperty('display', 'none', 'important');
-        const prose = document.body?.innerText ?? document.documentElement.innerText;
+        const prose = renderedText();
         for (const [node, style] of saved) node.style.cssText = style;
         return { text, prose, attrs, urls, labels, css, generated, json };
       }, excluded);
-      values.push(data.text, ...data.attrs, ...data.urls.map(decodePercent));
+      values.push(data.text, ...data.attrs, ...data.labels, ...data.urls.map(decodePercent));
       prose.push(data.prose);
       accessible.push(...data.labels);
       styles.push(...data.css);

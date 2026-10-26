@@ -66,7 +66,11 @@ The tracked identifier policies and test controls contain only generic shapes an
 Real internal names are supplied outside the repository through `IDENT_DENY_TOKENS`
 (comma-separated literals), or the untracked local file `$HOME/.config/swarma-site/deny-tokens.txt`
 (one literal per line; commas are also accepted). A nonempty environment list takes precedence.
-Matches are case-insensitive literal substrings; diagnostics name the rule and redact matching filenames.
+Matches are case-insensitive literal substrings after Unicode whitespace/separator normalization, including
+the separator-free variant. Soft hyphens, U+180E, U+200B–U+200D, U+2060 and U+FEFF are removed for comparison.
+Generic identifier, name and availability rules use normalized whitespace without removing word boundaries.
+Browser line breaks from `br` and block elements count as whitespace. Diagnostics name the rule and redact
+matching original filename spans with the same normalization, including overlapping tokens.
 Raw source remains checked, including code examples. Consumer values come from real parsers: JSON keys and
 strings from JSON.parse, Markdown from the CommonMark preset of markdown-it, and CSS literals/URLs from css-tree after strict PostCSS syntax validation.
 CommonMark handles emphasis, inline code, fenced and indented code, nesting and link destinations; code entities
@@ -80,6 +84,11 @@ Percent decoding is applied once to URL values. JSON/CSS strings are never recur
 Downloads, traces and browser XDG caches live under .temp/publication-browser/. Playwright manages and removes browser profiles in the caller's OS temporary directory (TMPDIR when supplied); keep that path short for Chromium's Unix socket limit.
 PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH can select an existing local Chromium executable; CI uses the pinned Playwright
 browser installed by the workflow.
+
+Every published SVG is also loaded as a standalone `image/svg+xml` document, including unlinked files.
+Chromium's Selection API supplies SVG rendered text and layout line breaks where `innerText` is unavailable.
+SVG text, titles, descriptions, decoded attributes and accessible names receive the same identifier, name and
+availability policies as inline SVG. Malformed XML fails `publication-decode`; stylesheet source is not prose.
 
 All publication text must be valid UTF-8 without BOM or NUL bytes, including extensionless files. Unsupported
 encodings fail publication-decode before interpretation; the publication-surface check also runs before Astro.
@@ -106,7 +115,7 @@ They assert safe output for malformed configuration and actual unreadable files,
 plants with valid controls in source and output. Real Astro builds verify that encoded public files reach `dist/`
 and are rejected there, alongside clean public-to-dist controls.
 
-Status-language checks inspect all authored content and decoded rendered HTML text;
+Status-language checks inspect all authored content, decoded rendered HTML text and public/built SVG documents;
 the source marker alone grants no exemption. Each marked DOM table is compared with
 the complete expected table from canonical JSON; each marked row is compared by
 `data-status-row` with its expected ID, four exact cell strings, element structure and attributes.

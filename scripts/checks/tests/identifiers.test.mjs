@@ -187,7 +187,7 @@ for (const [name, suffix, external, generic, clean, genericRule = 'matrix-user']
 for (const [suffix, source] of [
   ['md', '&amp;#64;reader:example.org'],
   ['html', '<p>&amp;#64;reader:example.org</p>'],
-  ['svg', '<svg><text>&amp;#64;reader:example.org</text></svg>'],
+  ['svg', '<svg xmlns="http://www.w3.org/2000/svg"><text>&amp;#64;reader:example.org</text></svg>'],
   ['json', '{"label":"&#64;reader:example.org"}'],
   ['css', String.raw`p {content:"\26 #64;reader:example.org"}`],
 ]) test(`identifiers decoding boundary ${suffix}`, async t => {
@@ -197,7 +197,7 @@ for (const [suffix, source] of [
 
 // Malformed JSON/CSS and unsupported custom XML entities cannot silently skip the decoded scan.
 for (const [suffix, source] of [['json', '{"label":'], ['css', 'p {content:"unfinished}'], ['css', '/* unfinished'],
-  ['svg', '<!DOCTYPE svg [<!ENTITY private "zz-host-alpha">]><svg><text>&private;</text></svg>']]) test(`identifiers decode failure ${suffix}: ${source}`, async t => {
+  ['svg', '<!DOCTYPE svg [<!ENTITY private "zz-host-alpha">]><svg xmlns="http://www.w3.org/2000/svg"><text>&private;</text></svg>']]) test(`identifiers decode failure ${suffix}: ${source}`, async t => {
   const root = await fixture(t, { [`public/probe.${suffix}`]: source });
   run('identifiers', root, 'publication-decode');
 });

@@ -4,7 +4,7 @@ import { fixture, put, run } from './fixture.mjs';
 
 // Valid UTF-8 controls pass; BOM, invalid UTF-8 and NUL-encoded text fail before consumer decoding.
 for (const suffix of ['html', 'svg', 'md', 'css', 'json', 'txt']) test(`structural encoding ${suffix}`, async t => {
-  const clean = suffix === 'json' ? '{"label":"Swarma"}' : suffix === 'css' ? 'p {color: inherit}' : 'Swarma';
+  const clean = suffix === 'json' ? '{"label":"Swarma"}' : suffix === 'css' ? 'p {color: inherit}' : suffix === 'svg' ? '<svg xmlns="http://www.w3.org/2000/svg"><text>Swarma</text></svg>' : 'Swarma';
   const root = await fixture(t, { [`public/probe.${suffix}`]: clean });
   run('identifiers', root);
   for (const bytes of [Buffer.from('\ufeffSwarma'), Buffer.concat([Buffer.from([0xff, 0xfe]), Buffer.from('zz-host-&#97;lpha', 'utf16le')]), Buffer.from([0xc3, 0x28]), Buffer.from('S\0w\0')]) {
