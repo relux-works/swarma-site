@@ -11,11 +11,11 @@ Source: chapter 02 "Swarma as a whole"
 
 ## Order of the layers
 
-The layers are numbered from the bottom: Swarma Chain is layer 0, Swarma Protocol layer 1, Swarma Runtime layer 2. The platform is built in the reverse order, from local foundations: first local execution, then verifiable cooperation, then the shared participant and its history. The runtime is useful on its own, the protocol relies on the runtime, and the chain connects participants of different projects.
+The layers are numbered from the bottom: Swarma Chain is layer 0, Swarma Protocol layer 1, Swarma Runtime layer 2. The runtime is useful on its own, the protocol relies on the runtime, and the chain connects participants of different projects.
 
 [[figure three-layers]]
 
-Source: chapter 02 "Swarma as a whole"; chapter 02 "Swarma as a whole", section "Order of construction"; chapter 00 "Who this book is for", section "The three layers of Swarma"
+Source: chapter 02 "Swarma as a whole"; chapter 00 "Who this book is for", section "The three layers of Swarma"
 
 ## Names
 
@@ -28,7 +28,7 @@ Swarma names the whole platform; the other names denote its parts.
 - Swarma Keeper denotes the main loop of a node, which holds the agents' obligations, deadlines, the handover of responsibility and escalation.
 - Swarma Curator is responsible for agent homes, profiles, skills, overlays, MCP, the login storage policy and home snapshots.
 
-Swarma Keeper and the key holder are responsible for different things. Swarma Keeper makes sure that work continues and that every obligation has a holder. The key holder keeps the master secret and performs cryptographic operations for the agents; in the Swarma family of names it is called Swarma Keyholder. The keyholder must not be called the keeper: that would mix the management of obligations with the custody of keys, which have different trust boundaries.
+Swarma Keeper and the key holder are responsible for different things. Swarma Keeper makes sure that work continues and that every obligation has a holder. The key holder keeps the master secret and performs cryptographic operations for the agents; in the Swarma family of names it is called Swarma Keyholder. The key holder must not be called the keeper: that would mix the management of obligations with the custody of keys, which have different trust boundaries.
 
 Source: chapter 02 "Swarma as a whole", section "Names and participants"
 
