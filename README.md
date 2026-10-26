@@ -19,7 +19,8 @@ npm run check
 `npm run build` writes static HTML and assets to `dist/`.
 Its `prebuild` gate rejects invalid localization metadata and stale or inconsistent status data.
 `npm run check` runs the checks' positive and planted negative controls, builds the site,
-then checks both source and output. CI runs the same command with Node 22.
+then checks both source and output. CI runs the same command on self-hosted Linux x64 runners with Node 22 already on PATH.
+The job asserts the Node major version and installs Chromium for browser checks before running the checks.
 
 Pages live in `src/content/pages/ru/` and `src/content/pages/en/`.
 Each Markdown page needs `title`, `description`, numeric `order` and boolean `nav` frontmatter.
@@ -84,8 +85,9 @@ without the generic-rule exemptions. Only Git metadata, dependency directories, 
 scratch/cache directories (`.temp/`, `.astro/`, `.val/`) are omitted; built `dist/` files remain checked.
 Never add real tokens to source, fixtures, documentation, command arguments or logs.
 
-Set the repository secret `IDENT_DENY_TOKENS` before running CI; the workflow passes it to the check job.
-CI fails when neither source supplies a nonempty list, even if `IDENT_DENY_TOKENS_OPTIONAL=1`.
+Set the repository secret `IDENT_DENY_TOKENS` before running CI; the workflow passes it only to the checks step.
+That step rejects an empty or delimiter-only secret before running checks, without using a local-file fallback.
+CI requires a nonempty repository secret, even if `IDENT_DENY_TOKENS_OPTIONAL=1`.
 Locally, missing tokens print a warning and run generic checks, but still exit nonzero.
 Only an explicit local `IDENT_DENY_TOKENS_OPTIONAL=1 npm run check` permits a generic-only pass.
 The isolated controls inject synthetic lists and temporary home directories; they do not need the real list.

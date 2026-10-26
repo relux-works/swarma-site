@@ -8,14 +8,21 @@ permissions:
 jobs:
   check:
     name: check
-    runs-on: ubuntu-latest
-    env:
-      IDENT_DENY_TOKENS: ${{ secrets.IDENT_DENY_TOKENS }}
+    runs-on: [self-hosted, swarma-ci]
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: npm
+      - name: Node version
+        run: node -e "if (Number(process.versions.node.split('.')[0]) !== 22) process.exit(1); console.log(process.version)"
       - run: npm ci
-      - run: npm run check
+      - name: Chromium
+        run: npx --yes playwright install chromium
+      - name: Checks
+        shell: bash
+        env:
+          IDENT_DENY_TOKENS: ${{ secrets.IDENT_DENY_TOKENS }}
+        run: |
+          if [[ -z "${IDENT_DENY_TOKENS//[[:space:],]/}" ]]; then
+            echo "IDENT_DENY_TOKENS must contain a nonempty token list" >&2
+            exit 1
+          fi
+          npm run check
