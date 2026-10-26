@@ -32,7 +32,7 @@ The book goes from cause to mechanism and then assembles the mechanisms into end
 | Part | Main question |
 | --- | --- |
 | Why and what | why the existing agent process is not enough |
-| Swarma Runtime: a swarm on the machines of one owner | how to hold agents and their authority on your own machines |
+| Swarma Runtime: a swarm on the machines of one owner | how to hold agents and their capabilities on your own machines |
 | Swarma Protocol: many owners, one environment | how to admit someone else's capacity to a shared project |
 | Swarma Chain: identity, reputation, economics | where a participant exists beyond one project |
 | Together | how the parts connect and what exists today |
@@ -43,7 +43,7 @@ Source: chapter 00 "Who this book is for", section "Map of the five parts"
 
 The book can be read in order, or you can choose a route for your task.
 
-- The owner of an installation should start with the first part, then read the chapters "One OS user per agent and the agent's network", "Grants and authority" and "The operator and interfaces", and then "End-to-end scenarios" and "Where we are and what comes next".
+- The owner of an installation should start with the first part, then read the chapters "One OS user per agent and the agent's network", "Grants and capabilities" and "The operator and interfaces", and then "End-to-end scenarios" and "Where we are and what comes next".
 - A runtime engineer needs the whole path from the account to the session.
 - An engineer of the distributed layer can go from the first part to the chapters "The protocol model" and "Journal, quorum and invariants", and then return to the local boundaries.
 - Those interested in the chain need the chapter "Agent identity" first.

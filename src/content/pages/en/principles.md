@@ -13,7 +13,7 @@ Source: chapter 03 "Cross-cutting principles"
 
 A name says how to address a participant. A signature binds particular bytes to a key. If a private key sits in a file the agent can read, an injection can persuade the agent to read that file. So a local agent does not receive its identity key: it asks a separate service to sign the data. Whether a signed message is sensible and permitted is checked separately.
 
-**Swarma Runtime.** The keyholder plays this role. The kernel tells it the UID of the connected process, and the registration binds the account and its generation to a stable identity. A line "I am the reviewer" in the request is not enough to sign for a neighbour.
+**Swarma Runtime.** The key holder plays this role. The kernel tells it the UID of the connected process, and the registration binds the account and its generation to a stable identity. A line "I am the reviewer" in the request is not enough to sign for a neighbour.
 
 **Swarma Protocol.** A long-lived identity key certifies short-lived node keys. The contributor signs on the machine of their agent loop, and keys are not handed to the project environment. A new name does not prove independence.
 
@@ -21,21 +21,21 @@ A name says how to address a participant. A signature binds particular bytes to 
 
 Source: chapter 03 "Cross-cutting principles", section "A key defines identity, the agent asks for a signature"
 
-## Authority only narrows
+## Capabilities only narrow
 
 Delegation distributes a right that was received and creates no new one. A capability defines what a participant may do with which objects. A child request stays within its parent in actions, targets and duration. Otherwise an orchestrator could bypass its own ceiling simply by creating a child with wider rights.
 
 **Swarma Runtime.** A grant is a signed permission. An orchestrator that may launch with only one profile cannot delegate a different profile or a longer duration to a child. The service that receives the request checks this.
 
-**Swarma Protocol.** The chain of authority runs from the goal through the orchestrator's capability to the task and the revision. A task "fix synchronisation" does not give the producer the right to change protected checks or rewrite its own acceptance criteria: that needs a new version of the contract with separate authorisation.
+**Swarma Protocol.** The chain of capabilities runs from the goal through the orchestrator's capability to the task and the revision. A task "fix synchronisation" does not give the producer the right to change protected checks or rewrite its own acceptance criteria: that needs a new version of the contract with separate authorisation.
 
 **Swarma Chain.** The boundary runs between identity and admission. An identity brings a history of attestations, and the receiving runtime decides by its own policy what participation to allow. A reviewer's reputation in one project gives no right to integrate code in another.
 
-Source: chapter 03 "Cross-cutting principles", section "Authority only narrows"
+Source: chapter 03 "Cross-cutting principles", section "Capabilities only narrow"
 
 ## The journal holds the truth, the model session is a cache
 
-The model's context is needed for work, but on its own it does not define the state of authority and obligations. It gets lost, compressed and handed to a successor together with mistaken assumptions. The journal holds what was committed by the rules of the system, so the authoritative state is restored without trusting the previous agent's retelling.
+The model's context is needed for work, but on its own it does not define the state of capabilities and obligations. It gets lost, compressed and handed to a successor together with mistaken assumptions. The journal holds what was committed by the rules of the system, so the authoritative state is restored without trusting the previous agent's retelling.
 
 **Swarma Runtime.** Swarma Keeper restores holders and continuations from its journal. If the conversation says "handed over the work" but there is no confirmation that the new holder started, the session's memory does not close the obligation.
 
@@ -49,7 +49,7 @@ Source: chapter 03 "Cross-cutting principles", section "The journal holds the tr
 
 Review answers a question of substance; a validator answers the question whether the rules were followed. Consensus agrees on records, signatures, versions and allowed transitions. It cannot turn a mistaken understanding of a requirement by several models into a correct one.
 
-**Swarma Runtime.** An agent may propose to restart a service and explain why that helps. Confidence does not create authority: a deterministic handler checks admission and performs only a registered action.
+**Swarma Runtime.** An agent may propose to restart a service and explain why that helps. Confidence does not create capabilities: a deterministic handler checks admission and performs only a registered action.
 
 **Swarma Protocol.** The reviewer assesses the candidate, and the validator checks the signature, the addressing of the result and independence under the project's policy. A positive verdict from the producer in place of the required independent participant is not valid for integration. The protocol answers for the independence and accountability of judgement, but it does not promise infallibility.
 
@@ -95,7 +95,7 @@ Source: chapter 03 "Cross-cutting principles", section "A human signs their own 
 
 ## Reading the guarantees together
 
-The principles meet at the boundary of a particular action. A genuine sender must have authority; the authority must be current; the check must refer to the object being accepted; the record must be committed by the rules; the execution must be physically held within the granted scope. One link does not prove the others.
+The principles meet at the boundary of a particular action. A genuine sender must have a capability; the capability must be current; the check must refer to the object being accepted; the record must be committed by the rules; the execution must be physically held within the granted scope. One link does not prove the others.
 
 > **Limit.** The guarantees have outer limits. A compromise of root breaks the local boundary; a compromise of the authoritative environment goes beyond the protocol's promises. A model's mistaken judgement can pass a correct procedure. A content hash does not guarantee that the content exists, and a portable history does not guarantee the honesty of the next action.
 

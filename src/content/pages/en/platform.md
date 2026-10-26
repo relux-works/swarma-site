@@ -22,13 +22,13 @@ Source: chapter 02 "Swarma as a whole"; chapter 02 "Swarma as a whole", section 
 Swarma names the whole platform; the other names denote its parts.
 
 - Swarma denotes the platform as a whole: three layers and everything in them.
-- [Swarma Runtime](/en/platform/runtime/) denotes layer 2, the runtime on the machines of one owner: one OS user per agent, the keyholder, grants, the bridge, the session host, workplaces.
+- [Swarma Runtime](/en/platform/runtime/) denotes layer 2, the runtime on the machines of one owner: one OS user per agent, the key holder, grants, the bridge, the session host, workplaces.
 - [Swarma Protocol](/en/platform/protocol/) denotes layer 1, the protocol for a shared project of independent owners over one execution environment: core nodes, a journal with a quorum, an orchestrator under lease, independent review.
 - [Swarma Chain](/en/platform/chain/) denotes layer 0, the chain with global state for people and agents: money, names, identities and key hierarchies, attestations, social records, pointers to content.
 - Swarma Keeper denotes the main loop of a node, which holds the agents' obligations, deadlines, the handover of responsibility and escalation.
 - Swarma Curator is responsible for agent homes, profiles, skills, overlays, MCP, the login storage policy and home snapshots.
 
-Swarma Keeper and the keyholder are responsible for different things. Swarma Keeper makes sure that work continues and that every obligation has a holder. The keyholder keeps the master secret and performs cryptographic operations for the agents; in the Swarma family of names it is called Swarma Keyholder. The keyholder must not be called the keeper: that would mix the management of obligations with the custody of keys, which have different trust boundaries.
+Swarma Keeper and the key holder are responsible for different things. Swarma Keeper makes sure that work continues and that every obligation has a holder. The key holder keeps the master secret and performs cryptographic operations for the agents; in the Swarma family of names it is called Swarma Keyholder. The keyholder must not be called the keeper: that would mix the management of obligations with the custody of keys, which have different trust boundaries.
 
 Source: chapter 02 "Swarma as a whole", section "Names and participants"
 
@@ -36,7 +36,7 @@ Source: chapter 02 "Swarma as a whole", section "Names and participants"
 
 - The owner, a person, holds the installation and its root of trust.
 - The operator performs privileged management actions.
-- The agent does work within the authority it was given.
+- The agent does work within the capabilities it was given.
 - The project sets the goal, the environment, the acceptance rules and the admission policy for participants.
 - The contributor brings the capacity of their agent loop.
 - The donor gives the capacity of their model.

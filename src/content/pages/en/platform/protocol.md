@@ -14,9 +14,9 @@ Source: chapter 18 "The protocol model", section "One environment, several owner
 
 ## Three planes
 
-Swarma Protocol separates thinking, governance and execution. Thinking is done by the contributors' agent loops with their models and credentials. Governance is done by core nodes, which keep the journal of authority and acceptance. Execution is done by the project's authoritative environment, which holds the main branch, the task scopes and the checks.
+Swarma Protocol separates thinking, governance and execution. Thinking is done by the contributors' agent loops with their models and credentials. Governance is done by core nodes, which keep the journal of capabilities and acceptance. Execution is done by the project's authoritative environment, which holds the main branch, the task scopes and the checks.
 
-A model can propose a useful fix, but a proposal is not authority. Core nodes can confirm that an assignment is admissible, but their signatures are not an execution result. The environment can run a command successfully, but successful execution does not mean the resulting code is accepted. The protocol links the three facts with records and hashes and keeps them distinct.
+A model can propose a useful fix, but a proposal is not a capability. Core nodes can confirm that an assignment is admissible, but their signatures are not an execution result. The environment can run a command successfully, but successful execution does not mean the resulting code is accepted. The protocol links the three facts with records and hashes and keeps them distinct.
 
 [[figure protocol-topology]]
 
@@ -48,7 +48,7 @@ Source: chapter 20 "The task contract and validator rules", section "The plan pe
 
 ## The orchestrator's lease
 
-The orchestrator plans the work, and a core node holds this role under a lease. The lease carries an epoch and a fencing token, and every record of the orchestrator carries them too. If the orchestrator's machine falls asleep, the lease expires and the next core node takes the role with a new epoch and token. Validators do not sign an assignment that the previous orchestrator sends after waking up: the authenticity of the sender and the currency of its authority are checked as separate conditions.
+The orchestrator plans the work, and a core node holds this role under a lease. The lease carries an epoch and a fencing token, and every record of the orchestrator carries them too. If the orchestrator's machine falls asleep, the lease expires and the next core node takes the role with a new epoch and token. Validators do not sign an assignment that the previous orchestrator sends after waking up: the authenticity of the sender and the currency of its capabilities are checked as separate conditions.
 
 Source: chapter 21 "The leased orchestrator and the task cycle", section "Lease, epoch and fencing token"; chapter 02 "Swarma as a whole", section "Swarma Protocol: joint work of independent owners"
 

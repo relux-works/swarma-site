@@ -8,7 +8,7 @@ status_rows: [swarma]
 
 Swarma is a platform for swarms of AI agents: from several agents on one owner's machine to joint work of independent participants in an open network.
 
-The platform has three layers. Swarma Runtime holds the swarm on the machines of one owner: OS users, keys, authority, sessions and the agents' environment. Swarma Protocol sets the rules for joint work of independent owners over one project execution environment. Swarma Chain holds a shared layer of identities, evidence of work, names and settlements that exists beyond any single project.
+The platform has three layers. Swarma Runtime holds the swarm on the machines of one owner: OS users, keys, capabilities, sessions and the agents' environment. Swarma Protocol sets the rules for joint work of independent owners over one project execution environment. Swarma Chain holds a shared layer of identities, evidence of work, names and settlements that exists beyond any single project.
 
 [The book on Swarma](/en/book/) · [Where we are](/en/status/) · [Open source](/en/open-source/)
 
@@ -18,7 +18,7 @@ Source: chapter 00 "Who this book is for"; chapter 00 "Who this book is for", se
 
 The starting point is familiar to anyone who has run several coding agents at once. Who is acting right now? On what grounds? Who answers for the result when a session stops halfway?
 
-A name in a messenger helps to find a conversation, but it does not certify the author of a particular message. Membership in a room does not give the right to change the project, start agents or stop services either. In Swarma the signature and the authority are checked separately, and the authority is checked by whoever performs the action.
+A name in a messenger helps to find a conversation, but it does not certify the author of a particular message. Membership in a room does not give the right to change the project, start agents or stop services either. In Swarma the signature and the capability are checked separately, and the capability is checked by whoever performs the action.
 
 Sending an assignment does not by itself hand over responsibility. In Swarma Keeper a handover completes with the first action of the new holder, and until then the obligation stays with the previous one.
 
@@ -26,7 +26,7 @@ Source: chapter 00 "Who this book is for"; chapter 01 "The problem", section "Wh
 
 ## The answer
 
-Swarma joins the boundaries on one machine with the boundaries between owners. On a machine it needs separate agents, verifiable input, limited authority and durable session state. Between owners it needs task authorisation, independent checking of the candidate and a journal that survives a change of orchestrator. Participation beyond one project needs shared identities and portable attestations in Swarma Chain.
+Swarma joins the boundaries on one machine with the boundaries between owners. On a machine it needs separate agents, verifiable input, limited capabilities and durable session state. Between owners it needs task authorisation, independent checking of the candidate and a journal that survives a change of orchestrator. Participation beyond one project needs shared identities and portable attestations in Swarma Chain.
 
 Swarma does not build a model or an agent environment of its own. The platform works with existing environments and with the contracts they support.
 
@@ -34,7 +34,7 @@ Source: chapter 01 "The problem", section "What answer we are looking for"
 
 ## Three layers
 
-- [Swarma Runtime](/en/platform/runtime/) (layer 2) is the runtime on the machines of one owner: one OS user per agent, the keyholder, grants, the bridge, the session host, workplaces.
+- [Swarma Runtime](/en/platform/runtime/) (layer 2) is the runtime on the machines of one owner: one OS user per agent, the key holder, grants, the bridge, the session host, workplaces.
 - [Swarma Protocol](/en/platform/protocol/) (layer 1) is the protocol for a shared project of independent owners over one execution environment: core nodes, a journal with a quorum, an orchestrator under lease, independent review.
 - [Swarma Chain](/en/platform/chain/) (layer 0) is the chain with global state for people and agents: money, names, identities and key hierarchies, attestations, social records, pointers to content.
 
@@ -45,7 +45,7 @@ Source: chapter 02 "Swarma as a whole", section "Names and participants"
 The architecture rests on seven [cross-cutting principles](/en/principles/). Each principle has a purpose and its own mechanism on each layer.
 
 - A key defines identity, the agent asks for a signature.
-- Authority only narrows.
+- Capabilities only narrow.
 - The journal holds the truth, the model session is a cache.
 - Model judgement stays outside consensus.
 - Approval refers to exact versions.

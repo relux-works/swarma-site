@@ -1,6 +1,6 @@
 ---
 title: "Swarma Runtime"
-description: "Swarma Runtime: the swarm on the machines of one owner. One OS user per agent, the keyholder, grants, the bridge, the session host, Swarma Keeper, Swarma Curator and other modules with their guarantees and limits."
+description: "Swarma Runtime: the swarm on the machines of one owner. One OS user per agent, the key holder, grants, the bridge, the session host, Swarma Keeper, Swarma Curator and other modules with their guarantees and limits."
 order: 2
 nav: true
 status_rows: [runtime-launcher, runtime-network, runtime-keys, runtime-operator, runtime-grants, runtime-transport, runtime-admission, runtime-dispatcher, runtime-sessions, runtime-keeper, runtime-curator, runtime-mcp, runtime-logins, runtime-credentials, runtime-remote-workplace, runtime-results, runtime-board, runtime-model-routing, runtime-memory]
@@ -22,15 +22,15 @@ A station is the place of one agent on a machine: its own OS account, its own id
 
 Source: chapter 04 "One OS user per agent and the agent's network", section "Why an OS user"; chapter 04 "One OS user per agent and the agent's network", section "The machine chooses the network"; chapter 04 "One OS user per agent and the agent's network", section "The station and its guarantees"; chapter 04 "One OS user per agent and the agent's network", section "Limits of the boundary"
 
-## Keys and the keyholder
+## Keys and the key holder
 
 An installation has one master secret. Where possible, hardware storage protects it. Agent keys are derived from it hierarchically, along a derivation path that encodes a stable identity. An OS user can disappear and reappear, while the persistent identity stays.
 
-The keyholder listens on a Unix socket, and the kernel tells it the peer's UID. An agent does not choose its identity with a text field in the request: a reviewer's process can write the orchestrator's name in a request, but its connection still carries the reviewer's UID. The identity key does not sit in a file the agent can read, and the agent asks the keyholder for a signature.
+The key holder listens on a Unix socket, and the kernel tells it the peer's UID. An agent does not choose its identity with a text field in the request: a reviewer's process can write the orchestrator's name in a request, but its connection still carries the reviewer's UID. The identity key does not sit in a file the agent can read, and the agent asks the key holder for a signature.
 
 > **Limit.** Some secrets are still visible to the agent. The model environment presents the provider token itself, so it can read the token in its own environment. The broker limits to whom and when such a token is issued, but it cannot make the token non-exportable.
 
-Source: chapter 05 "Keys and the keyholder", section "Master secret and stable identity"; chapter 05 "Keys and the keyholder", section "The kernel establishes the peer"; chapter 02 "Swarma as a whole", section "Swarma Runtime: boundaries on one installation"
+Source: chapter 05 "Keys and the key holder", section "Master secret and stable identity"; chapter 05 "Keys and the key holder", section "The kernel establishes the peer"; chapter 02 "Swarma as a whole", section "Swarma Runtime: boundaries on one installation"
 
 ## Grants
 
@@ -40,7 +40,7 @@ Before every start the dispatcher asks the broker for a revocation check of the 
 
 > **Limit.** Revocation does not pull back a token that sits in the agent's process. Revocation stops new issuance, but it does not take back a secret that has been disclosed, so containment is wider than revoking a grant.
 
-Source: chapter 06 "Grants and authority", section "Delegation only by attenuation"; chapter 06 "Grants and authority", section "Revocation and unknown state"
+Source: chapter 06 "Grants and capabilities", section "Delegation only by attenuation"; chapter 06 "Grants and capabilities", section "Revocation and unknown state"
 
 ## The message path and the bridge
 
@@ -48,7 +48,7 @@ Input and output pass through the bridge. The carrier delivers messages, the bri
 
 Carrier admission removes the shared registration secret: an account goes to whoever the key of a registered machine vouched for. A shared token for all machines would open everything if it leaked from any one of them, and an account name proves nothing by itself.
 
-Source: chapter 02 "Swarma as a whole", section "Swarma Runtime: boundaries on one installation"; chapter 07 "The message path and the bridge", section "The carrier does not become a source of authority"; chapter 08 "Carrier admission", section "Why admission is needed"
+Source: chapter 02 "Swarma as a whole", section "Swarma Runtime: boundaries on one installation"; chapter 07 "The message path and the bridge", section "The carrier does not become a source of capabilities"; chapter 08 "Carrier admission", section "Why admission is needed"
 
 ## Launch and the session host
 
@@ -70,7 +70,7 @@ Source: chapter 10 "Swarma Keeper", section "A handover completes with an action
 
 A skill is a package with `SKILL.md` and supporting material. The project declares skills in `Skillfile.json`, Swarma Curator installs them and pins the resolved versions in a lock file, so the set is reproduced at every launch. A profile combines the root context package, its skills and MCP declarations, and an overlay adds machine or operator changes.
 
-> **Limit.** Installing a profile gives no system authority to launch as another user or to reach someone else's secrets. Those boundaries are held by the runtime's mechanisms.
+> **Limit.** Installing a profile gives no system capabilities to launch as another user or to reach someone else's secrets. Those boundaries are held by the runtime's mechanisms.
 
 Source: chapter 11 "Swarma Curator", section "Skill, profile and overlay"
 
@@ -110,7 +110,7 @@ Source: chapter 15 "Models and money", section "Why the choice is deterministic"
 
 Memory answers the question about evidence. It names the decision in force and its exact source, shows which decision it replaced, and says honestly where the check is incomplete.
 
-> **Limit.** Memory does not establish what is true in the world, and it gives no authority. The right to an action is checked by the component that performs the action.
+> **Limit.** Memory does not establish what is true in the world, and it gives no capabilities. The right to an action is checked by the component that performs the action.
 
 Source: chapter 16 "Agent memory", section "Purpose"
 

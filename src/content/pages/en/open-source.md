@@ -1,6 +1,6 @@
 ---
 title: "Open source"
-description: "The open repositories of Swarma modules: each is described in the book's words about the part of the platform it implements and shown with its row from the layer map."
+description: "The open repositories of Swarma modules and the parts of the platform they implement."
 order: 6
 nav: true
 ---
