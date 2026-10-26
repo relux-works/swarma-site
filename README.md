@@ -77,7 +77,7 @@ decoded attributes, accessibility-tree names/descriptions and computed generated
 blocks external requests and script execution. Styled documents are sampled at 390px and 1440px in light, dark,
 increased-contrast and forced-color appearances. Unstyled documents need one equivalent observation.
 Percent decoding is applied once to URL values. JSON/CSS strings are never recursively HTML-decoded.
-Downloads and traces live under .temp/publication-browser/. Playwright manages and removes browser profiles in the caller's OS temporary directory (TMPDIR when supplied); keep that path short for Chromium's Unix socket limit.
+Downloads, traces and browser XDG caches live under .temp/publication-browser/. Playwright manages and removes browser profiles in the caller's OS temporary directory (TMPDIR when supplied); keep that path short for Chromium's Unix socket limit.
 PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH can select an existing local Chromium executable; CI uses the pinned Playwright
 browser installed by the workflow.
 

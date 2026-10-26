@@ -32,7 +32,11 @@ export async function publicationReader(root, { assetRoots = [] } = {}) {
     if (!scratch) scratch = await mkdtemp(join(temp, 'run-'));
     // Chromium's Unix socket needs the caller's short OS temporary directory, independently of document depth.
     // Playwright owns and removes its profile; downloads and traces remain in the reader's explicit scratch.
-    browser = await chromium.launch({ headless: true, executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || undefined, downloadsPath: scratch, tracesDir: scratch });
+    browser = await chromium.launch({
+      headless: true, executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || undefined,
+      downloadsPath: scratch, tracesDir: scratch,
+      env: { ...process.env, XDG_CACHE_HOME: join(scratch, 'cache'), XDG_CONFIG_HOME: join(scratch, 'config'), XDG_DATA_HOME: join(scratch, 'data') },
+    });
     context = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 1440, height: 1000 }, serviceWorkers: 'block' });
     await context.route('**/*', async route => {
       try {

@@ -20,6 +20,7 @@ The caller retains raw-source policy checks, applies rules to returned values, r
 and always closes the reader in finally. Downloads and traces stay under root/.temp/. Playwright manages
 and removes browser profiles in the caller's OS temporary directory (TMPDIR when supplied). Keep that
 directory short for Chromium's Unix socket limit; it must not depend on publication/fixture nesting.
+Browser XDG cache/config/data directories live in the reader scratch and are removed with it.
 No source text, rendered values or external policy is persisted by this module. Missing browser/read/parse
 failures must reject rather than count as a clean scan. Script execution and external resources are disabled.
 The renderer samples 390px/1440px, light/dark, increased contrast and forced colors when styles are present;

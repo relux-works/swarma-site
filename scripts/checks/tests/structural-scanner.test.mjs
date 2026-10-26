@@ -184,3 +184,19 @@ test('structural browser scratch is independent of publication depth', async t =
   await put(deep, 'dist/index.html', '<p>zz-host-alpha</p>');
   run('identifiers', deep, 'deny-token');
 });
+
+// Reading a publication twice must not create browser cache/config files that enter the next scan.
+// Linux CI exercises native font/dconf caches; every platform checks the publication's file set.
+test('structural browser preserves publication files across repeated scans', async t => {
+  const { readdir } = await import('node:fs/promises');
+  const root = await fixture(t, { 'dist/index.html': '<p>Swarma</p>' });
+  const files = async () => (await readdir(root, { recursive: true })).filter(path => path !== '.temp' && !path.startsWith('.temp/')).sort();
+  const before = await files();
+  run('identifiers', root);
+  assert.deepEqual(await files(), before);
+  run('identifiers', root);
+  assert.deepEqual(await files(), before);
+  await put(root, 'dist/index.html', '<p>zz-host-alpha</p>');
+  run('identifiers', root, 'deny-token');
+  assert.deepEqual(await files(), before);
+});
