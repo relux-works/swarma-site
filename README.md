@@ -47,6 +47,7 @@ The source's inline Markdown notation remains literal in generated cell strings.
 
 | Command | Claim checked | Output |
 | --- | --- | --- |
+| `npm run check:browser` | Chromium launches and returns actual rendered text; safe diagnostics identify startup problems | Console; transient browser artifacts |
 | `npm test` | Clean controls pass; planted violations fail for the intended diagnostic | Console; isolated fixtures in `.temp/check-fixtures/` are removed after each test |
 | `npm run check:publication-surface` | Only supported HTML publication features occur in source and output | Console; nonzero on a violation |
 | `npm run check:identifiers` | Publication files contain no prohibited identifiers, paths, session links, unlisted repository links or emails | Console; nonzero on a violation |

@@ -11,14 +11,15 @@
     "prebuild": "npm run check:publication-surface && npm run check:status-data && npm run check:i18n",
     "build": "astro build",
     "test": "node --test scripts/checks/tests/*.test.mjs",
-    "check": "npm test && npm run build && npm run check:publication-surface && npm run check:identifiers && npm run check:status-language && npm run check:names && npm run check:i18n && npm run check:status-data",
+    "check": "npm run check:browser && npm test && npm run build && npm run check:publication-surface && npm run check:identifiers && npm run check:status-language && npm run check:names && npm run check:i18n && npm run check:status-data",
     "check:identifiers": "node scripts/checks/identifiers.mjs",
     "check:status-language": "node scripts/checks/status-language.mjs",
     "check:names": "node scripts/checks/names.mjs",
     "check:i18n": "node scripts/checks/i18n.mjs",
     "check:status-data": "node scripts/checks/status-data.mjs",
     "status:generate": "node scripts/checks/status-data.mjs --write",
-    "check:publication-surface": "node scripts/checks/publication-surface.mjs"
+    "check:publication-surface": "node scripts/checks/publication-surface.mjs",
+    "check:browser": "node scripts/checks/browser-ready.mjs"
   },
   "dependencies": {
     "astro": "7.4.2",

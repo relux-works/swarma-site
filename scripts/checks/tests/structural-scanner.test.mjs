@@ -163,3 +163,11 @@ test('structural installed browser survives policy HOME isolation', async t => {
   await assert.rejects(access(join(root, cached.slice(home.length))), { code: 'ENOENT' });
   assert.deepEqual(await readdir(join(root, '.temp/publication-browser')), [], 'Repeated startup errors must leave no browser scratch');
 });
+
+// Browser readiness has a clean rendered control and safely reports an actual missing executable before scanning.
+test('structural browser preflight diagnoses missing engine safely', async t => {
+  const root = await fixture(t);
+  run('browser-ready', root);
+  const result = run('browser-ready', root, 'publication-browser', { PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH: '/missing/zz-host-alpha' });
+  assert.ok(!(result.stdout + result.stderr).includes('zz-host-alpha'));
+});
