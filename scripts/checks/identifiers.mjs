@@ -1,6 +1,7 @@
-import { readFile, readdir } from 'node:fs/promises';
+import { readdir } from 'node:fs/promises';
 import { join, relative } from 'node:path';
 import { cli, filesAt, scanFiles } from './lib.mjs';
+import { publicConfig } from './site-config.mjs';
 import { identifierRules } from './identifier-rules.mjs';
 import { publicationReader } from './publication-values.mjs';
 import { readPublication } from './publication-reader.mjs';
@@ -23,8 +24,7 @@ export async function check(root) {
     }
     let allowlist;
     try {
-      allowlist = JSON.parse(await readFile(join(root, 'config/public-repos.json'), 'utf8'));
-      if (!allowlist || Array.isArray(allowlist) || ['repositories', 'emails'].some(key => !Array.isArray(allowlist[key]) || allowlist[key].some(value => typeof value !== 'string'))) throw new Error();
+      ({ allowlist } = publicConfig(root));
     } catch { return [...errors, 'identifier-allowlist: invalid configuration'].map(redact); }
 
     const generic = new Set(await scanFiles(root));

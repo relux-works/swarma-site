@@ -1,0 +1,96 @@
+[
+  {
+    "name": "curator",
+    "description_key": "curator",
+    "status_rows": [
+      "runtime-curator",
+      "runtime-mcp"
+    ]
+  },
+  {
+    "name": "curator-spec",
+    "description_key": "curator-spec",
+    "status_rows": [
+      "runtime-curator"
+    ]
+  },
+  {
+    "name": "curator-agent-launcher",
+    "description_key": "curator-agent-launcher",
+    "status_rows": [
+      "runtime-curator"
+    ]
+  },
+  {
+    "name": "swarma-keymaker",
+    "description_key": "swarma-keymaker",
+    "status_rows": [
+      "runtime-keys"
+    ]
+  },
+  {
+    "name": "swarma-registrar",
+    "description_key": "swarma-registrar",
+    "status_rows": [
+      "runtime-admission"
+    ]
+  },
+  {
+    "name": "swarma-owner-registry",
+    "description_key": "swarma-owner-registry",
+    "status_rows": [
+      "runtime-grants",
+      "runtime-keys"
+    ]
+  },
+  {
+    "name": "swarma-witness",
+    "description_key": "swarma-witness",
+    "status_rows": [
+      "runtime-grants"
+    ]
+  },
+  {
+    "name": "swarma-credential-broker",
+    "description_key": "swarma-credential-broker",
+    "status_rows": [
+      "runtime-credentials"
+    ]
+  },
+  {
+    "name": "swarma-user-manager",
+    "description_key": "swarma-user-manager",
+    "status_rows": [
+      "runtime-launcher"
+    ]
+  },
+  {
+    "name": "swarma-dispatcher",
+    "description_key": "swarma-dispatcher",
+    "status_rows": [
+      "runtime-dispatcher"
+    ]
+  },
+  {
+    "name": "swarma-session-host",
+    "description_key": "swarma-session-host",
+    "status_rows": [
+      "runtime-sessions"
+    ]
+  },
+  {
+    "name": "swarma-pool",
+    "description_key": "swarma-pool",
+    "status_rows": [
+      "part-023",
+      "part-024"
+    ]
+  },
+  {
+    "name": "swarma-memory",
+    "description_key": "swarma-memory",
+    "status_rows": [
+      "runtime-memory"
+    ]
+  }
+]

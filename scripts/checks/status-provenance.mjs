@@ -27,7 +27,7 @@ function structure(node) {
   return [node.tagName ?? node.nodeName, (node.attrs ?? []).map(attr => [attr.name, attr.value]).sort(), children.map(structure)];
 }
 const attribute = (node, name) => node.attrs?.find(attr => attr.name === name)?.value;
-function expectedTable(node, rows) {
+function expectedTable(node, rows, lang) {
   const body = node.childNodes.find(child => child.tagName === 'tbody');
   const rowNodes = body?.childNodes.filter(child => child.tagName === 'tr') ?? [];
   const selected = rowNodes.map(node => rows.find(row => row.id === attribute(node, rowMarker)));
@@ -37,9 +37,12 @@ function expectedTable(node, rows) {
   if (selected.some(row => ('part' in row) !== parts || ('meaning' in row) !== vocabulary)) return null;
   const caption = node.childNodes.find(child => child.tagName === 'caption');
   const id = attribute(caption, 'id');
-  const titles = vocabulary ? ['Состояние по частям платформы'] : parts ? ['Состояние по частям платформы', ...new Set(selected.map(row => row.section))] : ['Карта по слоям'];
-  if (!id || !/^(?:status-layer-map|status-vocabulary|status-parts-\d+|status-excerpt-\d+)$/.test(id)) return null;
-  const title = titles.find(title => JSON.stringify(structure(caption)) === JSON.stringify(element('caption', { id }, [text(`${title}. Книга Swarma, версия 1.6.1, октябрь 2026, глава 30 "Где мы и что дальше"`)])));
+  const titles = lang === 'en' ? (vocabulary ? ['State by platform part'] : parts ? ['State by platform part', ...new Set(selected.map(row => row.section))] : ['Layer map']) : vocabulary ? ['Состояние по частям платформы'] : parts ? ['Состояние по частям платформы', ...new Set(selected.map(row => row.section))] : ['Карта по слоям'];
+  if (!id || !/^(?:status-layer-map|status-vocabulary|status-parts-\d+|status-excerpt-(?:repo-[a-z0-9._-]+-)?\d+)$/.test(id)) return null;
+  const captionText = title => lang === 'en'
+    ? `${title}. Swarma book, version 1.6.1, October 2026, chapter 30 "Where we are and what comes next". Quoted cells from the Russian edition.`
+    : `${title}. Книга Swarma, версия 1.6.1, октябрь 2026, глава 30 "Где мы и что дальше"`;
+  const title = titles.find(title => JSON.stringify(structure(caption)) === JSON.stringify(element('caption', { id }, [text(captionText(title))])));
   if (!title) return null;
   if (id === 'status-layer-map') {
     const canonical = rows.filter(row => 'capability' in row);
@@ -50,9 +53,9 @@ function expectedTable(node, rows) {
     if (selected.map(row => row.id).join('|') !== canonical.map(row => row.id).join('|')) return null;
   }
   return element('table', { [marker]: 'book-1.6.1' }, [
-    element('caption', { id }, [text(`${title}. Книга Swarma, версия 1.6.1, октябрь 2026, глава 30 "Где мы и что дальше"`)]),
-    element('thead', {}, [element('tr', {}, (vocabulary ? ['Статус', 'Основание'] : parts ? partsHeadings : headings).map(value => cell('th', value, 'col')))]),
-    element('tbody', {}, selected.map(expectedRow)),
+    element('caption', { id }, [text(captionText(title))]),
+    element('thead', {}, [element('tr', {}, (lang === 'en' ? (vocabulary ? ['Status', 'Basis'] : parts ? ['Part', 'What it is', 'Status'] : ['Layer and capability', 'Works today', 'What is not there yet', 'Chapter']) : vocabulary ? ['Статус', 'Основание'] : parts ? partsHeadings : headings).map(value => cell('th', value, 'col')))]),
+    element('tbody', lang === 'en' ? { lang: 'ru' } : {}, selected.map(expectedRow)),
   ]);
 }
 export async function markerLocations(root) {
@@ -72,6 +75,8 @@ export async function verifiedRegions(root, html) {
   }
   visit(parsed);
   const excludedNodes = new Set(), errors = [];
+  const htmlNode = parsed.childNodes.find(node => node.tagName === 'html');
+  const lang = attribute(htmlNode, 'lang') === 'en' ? 'en' : 'ru';
   if (marked.length) {
     const rows = JSON.parse(await readFile(join(root, 'src/data/status/layer-map.ru.json'), 'utf8'));
     for (const path of ['src/data/status/parts.ru.json', 'src/data/status/vocabulary.ru.json']) {
@@ -80,7 +85,7 @@ export async function verifiedRegions(root, html) {
     }
     for (const node of marked) {
       const row = rows.find(row => row.id === attribute(node, rowMarker));
-      const expected = node.tagName === 'table' ? expectedTable(node, rows) : node.tagName === 'tr' && row ? expectedRow(row) : null;
+      const expected = node.tagName === 'table' ? expectedTable(node, rows, lang) : node.tagName === 'tr' && row ? expectedRow(row) : null;
       if (!expected || JSON.stringify(structure(node)) !== JSON.stringify(expected)) errors.push('status-provenance');
       else excludedNodes.add(node);
     }

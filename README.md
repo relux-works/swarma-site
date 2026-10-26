@@ -70,7 +70,7 @@ Identifier and name checks scan `src/`, `public/`, `docs/`, `README.md`, `dist/`
 `scripts/`. The only generic-rule policy-code exclusions are `scripts/checks/identifier-rules.mjs`,
 `scripts/checks/names.mjs` and `scripts/checks/tests/`, which contain generic patterns,
 the names policy and isolated synthetic violations. No publication directory is excluded.
-`config/public-repos.json` holds exact repository-name and email allowlists, both initially empty.
+`config/site.json` and `config/repos.json` supply the exact contact and repository URL allowlists.
 The tracked identifier policies and test controls contain only generic shapes and synthetic values.
 Real internal names are supplied outside the repository through `IDENT_DENY_TOKENS`
 (comma-separated literals), or the untracked local file `$HOME/.config/swarma-site/deny-tokens.txt`
@@ -226,11 +226,16 @@ contract and `UNRESOLVED_QUESTIONS.md` for remaining publication and assistive-t
 
 Page files stay plain Markdown. Second- and third-level headings form the outline; the section index
 uses second-level headings. The title, lead, fixed design frame and version context share one layout.
+Ordinary Markdown tables keep their native table markup inside a labelled, keyboard-focusable scroll region.
 
 - A standalone paragraph beginning exactly `Источник: ` (or `Source: `) contains references separated
   by `; `. Each reference is `глава NN "Chapter title"`, optionally followed by
   `, раздел "Section title"`. Names and printed numbers must match `src/data/book-chapters.json`;
-  mismatches fail the build with the file and line. Links resolve to `/ru/book/#chNN` on Russian pages.
+  mismatches fail the build with the file and line. English syntax is `chapter NN "Chapter title"`,
+  optionally `, section "Section title"`, checked against the approved `title_en` and section `en`
+  translations. Links resolve to the matching locale's `/book/#chNN` anchor. Source-only headings
+  without a supplied English translation remain Russian catalog entries and cannot validate an
+  invented English title.
 - A blockquote whose first child starts with `**Предел.**` (or `**Limit.**`) becomes a named limits
   aside. Other blockquotes remain ordinary quotes.
 - `status_rows: [swarma, part-002]` in frontmatter plus a standalone `[[status]]` selects exact source
@@ -239,7 +244,12 @@ uses second-level headings. The title, lead, fixed design frame and version cont
 - A standalone `[[figure three-layers]]`, `[[figure protocol-topology]]` or `[[figure sublayers]]`
   uses `src/data/figures.json`. Default builds render nothing for these markers. Private builds use
   `SWARMA_BOOK_FIGURES=1 npm run check`, preserving the source SVG, caption, alternative and printed
-  chapter reference. Private and default content stores are separate under `.temp/astro-cache/`.
+  chapter reference. Private and default content stores are separate under `.temp/astro-cache/`;
+  their revision includes renderer code and data so configuration changes cannot reuse stale Markdown links.
+- `[[repos]]` renders the configured repository rows with localised descriptions from
+  `src/lib/repository-descriptions.mjs`, native repository links and the canonical status component.
+  Empty status selections render no status; unknown selected IDs fail. English status tables have
+  English column headings and provenance captions, with Russian source cells marked `lang="ru"`.
 - `[[publications book]]` or `[[publications papers]]` renders the publication metadata and excerpt
   from `src/data/publications.json`. PDF placeholders are text; they cannot download a file.
 

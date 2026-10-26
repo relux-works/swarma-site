@@ -18,7 +18,7 @@ export async function filesAt(root, path) {
 }
 
 export async function scanFiles(root) {
-  const files = (await Promise.all(['src', 'public', 'docs', 'README.md', 'dist', 'scripts'].map(path => filesAt(root, path)))).flat();
+  const files = (await Promise.all(['src', 'public', 'docs', 'README.md', 'dist', 'scripts', 'config'].map(path => filesAt(root, path)))).flat();
   return files.filter(file => {
     const path = relative(root, file);
     return path !== 'scripts/checks/identifier-rules.mjs'

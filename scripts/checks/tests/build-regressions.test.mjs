@@ -1,6 +1,6 @@
 import test, { after } from 'node:test';
 import assert from 'node:assert/strict';
-import { cp, mkdir, readFile, symlink, writeFile } from 'node:fs/promises';
+import { cp, mkdir, readFile, rm, symlink, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
@@ -19,6 +19,8 @@ after(async () => {
 async function sourceFixture(t) {
   const root = await fixture(t);
   for (const path of ['src', 'config', 'scripts', 'astro.config.mjs', 'package.json', 'tsconfig.json']) await cp(join(repository, path), join(root, path), { recursive: true });
+  // English cases create their entire locale explicitly, independent of authored English content.
+  await rm(join(root, 'src/content/pages/en'), { recursive: true, force: true });
   await symlink(join(repository, 'node_modules'), join(root, 'node_modules'), 'dir');
   return root;
 }
@@ -136,7 +138,11 @@ async function verifyHomeLinks(root, expected) {
   assert.equal(attr(parsed.find(node => node.tagName === 'html'), 'lang'), 'en');
   for (const path of (await filesAt(root, 'dist')).filter(path => path.endsWith('.html'))) {
     for (const node of nodes(document(await readFile(path, 'utf8')))) {
-      if (node.tagName === 'a' && attr(node, 'href')?.startsWith('/')) await readFile(join(root, 'dist', attr(node, 'href'), 'index.html'));
+      if (node.tagName === 'a' && attr(node, 'href')?.startsWith('/')) {
+        const target = new URL(attr(node, 'href'), 'https://example.org');
+        const destination = await readFile(join(root, 'dist', target.pathname, 'index.html'), 'utf8');
+        if (target.hash) assert.ok(nodes(document(destination)).some(node => attr(node, 'id') === decodeURIComponent(target.hash.slice(1))), target.href);
+      }
     }
   }
 }

@@ -1,3 +1,4 @@
+import { attributes } from './lib.mjs';
 // The policy patterns and planted controls are intentionally outside publication scan roots.
 import { normalizeText } from './publication/normalization.mjs';
 export const rules = [
@@ -13,9 +14,8 @@ export const rules = [
 export function identifierRules(text, allowlist) {
   text = normalizeText(text);
   const found = rules.filter(([, pattern]) => pattern.test(text)).map(([name]) => name);
-  for (const match of text.matchAll(/github\.com\/relux-works\/([A-Za-z0-9_.-]+)/giu)) {
-    const repo = match[1].replace(/\.git$/i, '');
-    if (!allowlist.repositories.includes(repo)) found.push('private-repository');
+  for (const match of text.matchAll(/(?:https?:\/\/)?github\.com\/[A-Za-z0-9_.-]+\/[^\s<>"'`\\)\]{}]+/giu)) {
+    if (!allowlist.repositories.includes(attributes(`<a href="${match[0]}"></a>`))) found.push('private-repository');
   }
   for (const match of text.matchAll(/[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+/gu)) {
     if (!allowlist.emails.includes(match[0])) found.push('email');

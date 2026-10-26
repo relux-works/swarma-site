@@ -22,8 +22,8 @@ const { Content } = await render(page);
     <p>Книга Swarma, версия 1.6.1, глава 30: Где мы и что дальше. Карта по слоям.</p>
     <Fragment set:html={renderStatus({ full: true })} />
   </>}
-  {page.id === 'ru/book' && <section class="book-chapters" aria-labelledby="book-contents">
-    <h2 id="book-contents">Главы книги</h2>
-    <ol start="0">{chapters.map(chapter => <li id={`ch${chapter.number}`}><span class="technical">{chapter.number}</span> {chapter.title}</li>)}</ol>
+  {page.id === `${lang}/book` && <section class="book-chapters" aria-labelledby="book-contents">
+    <h2 id="book-contents">{lang === 'en' ? 'Book chapters' : 'Главы книги'}</h2>
+    <ol start="0">{chapters.map(chapter => <li id={`ch${chapter.number}`}><span class="technical">{chapter.number}</span> {lang === 'en' && chapter.title_en ? chapter.title_en : <span lang="ru">{chapter.title}</span>}</li>)}</ol>
   </section>}
 </Page>

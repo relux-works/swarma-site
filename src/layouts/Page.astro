@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import { locales, localeLabels, route, type Locale } from '../lib/routes';
 import { strings } from '../lib/strings.mjs';
+import site from '../../config/site.json';
 import publications from '../data/publications.json';
 import lightLockup from '../assets/operator/relux-lockup-horizontal.svg?raw';
 import darkLockup from '../assets/operator/relux-lockup-horizontal-dark.svg?raw';
@@ -14,7 +15,7 @@ interface Props { title: string; description: string; lang: Locale; id?: string 
 const { title, description, lang, id } = Astro.props;
 const pages = await getCollection('pages');
 const home = pages.find(page => page.id === `${lang}/index`);
-const primarySlugs = ['platform', 'principles', 'werkstatt', 'status', 'book', 'papers'];
+const primarySlugs = ['platform', 'principles', 'open-source', 'status', 'book', 'papers'];
 const navigation = pages.filter(page => primarySlugs.some(slug => page.id === `${lang}/${slug}`) && page.data.nav)
   .sort((a, b) => a.data.order - b.data.order || a.id.localeCompare(b.id));
 const slug = id?.split('/').slice(1).join('/') ?? 'index';
@@ -23,7 +24,7 @@ const counterparts = locales.flatMap(locale => {
   return page ? [{ locale, page }] : [];
 });
 const labels = strings[lang];
-const footerPages = ['book', 'papers', 'status'].flatMap(slug => {
+const footerPages = ['book', 'papers', 'status', 'privacy'].flatMap(slug => {
   const page = pages.find(page => page.id === `${lang}/${slug}`);
   return page ? [page] : [];
 });
@@ -75,11 +76,12 @@ const footerPages = ['book', 'papers', 'status'].flatMap(slug => {
             <span class="lockup-mono" aria-hidden="true" set:html={monoLockup.replace('<svg ', '<svg aria-hidden="true" ')} />
           </a>
           <p>{publications.book.authors.join(', ')}</p>
+          <p class="contact"><a href={`mailto:${site.contact_email}`} dir="ltr">{site.contact_email}</a></p>
         </div>
         <nav aria-label={lang === 'ru' ? 'Публикации и состояние' : 'Publications and status'}>
           <ul>{footerPages.map(page => <li><a href={route(page.id)}>{page.data.title}</a></li>)}</ul>
         </nav>
-        {counterparts.length > 1 && <nav class="language-switch" aria-label={labels.languages}>
+        {counterparts.length > 1 && <nav class="language-switch" aria-label={labels.footerLanguages}>
           <ul>{counterparts.map(({ locale, page }) => <li><a href={route(page.id)} lang={locale} hreflang={locale} aria-current={lang === locale ? 'true' : undefined}>{localeLabels[locale]}</a></li>)}</ul>
         </nav>}
       </div>

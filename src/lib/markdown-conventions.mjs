@@ -1,6 +1,7 @@
 import { readFileSync, existsSync } from 'node:fs';
 import Slugger from 'github-slugger';
 import { loadData, escape, renderStatus } from './status-render.mjs';
+import { repositoryEntries } from './repository-render.mjs';
 import { strings, designSlugs } from './strings.mjs';
 const textOf = node => node.value ?? (node.children ?? []).map(textOf).join('');
 const html = value => ({ type: 'html', value });
@@ -10,10 +11,11 @@ export function chapterReferences(text, lang) {
   const values = text.slice(prefix.length).split('; ');
   if (!values.length) throw new Error('malformed-reference');
   return `<p class="chapter-reference">${prefix}${values.map(value => {
-    const match = /^глава (\d{2}) "([^"]+)"(?:, раздел "([^"]+)")?$/.exec(value);
+    const pattern = lang === 'en' ? /^chapter (\d{2}) "([^"]+)"(?:, section "([^"]+)")?$/ : /^глава (\d{2}) "([^"]+)"(?:, раздел "([^"]+)")?$/;
+    const match = pattern.exec(value);
     if (!match) throw new Error('malformed-reference');
     const chapter = chapters.find(chapter => chapter.number === match[1]);
-    if (!chapter || chapter.title !== match[2] || (match[3] && !chapter.sections.includes(match[3]))) throw new Error('chapter-reference-mismatch');
+    if (!chapter || (lang === 'en' ? chapter.title_en : chapter.title) !== match[2] || (match[3] && !chapter.sections.some(section => section[lang] === match[3]))) throw new Error('chapter-reference-mismatch');
     return `<a href="/${lang}/book/#ch${match[1]}">${escape(value)}</a>`;
   }).join('; ')}</p>`;
 }
@@ -47,7 +49,7 @@ export default function conventions({ figures = false } = {}) {
     const bodyOffset = body ? source.lastIndexOf(body) : 0;
     const prefix = bodyOffset >= 0 ? source.slice(0, bodyOffset) : '';
     const lineOffset = prefix.split('\n').length - 1;
-    let markers = 0, limitIndex = 0;
+    let markers = 0, limitIndex = 0, tableIndex = 0, sectionId = '';
     function fail(error, node) {
       if (error.conventionSource) throw error;
       const diagnostic = new Error(`${path}:${(node?.position?.start?.line ?? 1) + lineOffset}: ${error.message}`);
@@ -60,7 +62,12 @@ export default function conventions({ figures = false } = {}) {
           if (node.type === 'heading' && [2, 3].includes(node.depth)) {
             const text = textOf(node), id = slugger.slug(text);
             node.data = { ...node.data, hProperties: { ...node.data?.hProperties, id } };
+            sectionId = id;
             if (node.depth === 2) headings.push({ text, id });
+          }
+          if (node.type === 'table') {
+            visit(node);
+            return [html(`<div class="table-region" role="region" aria-label="${lang === 'en' ? 'Table' : 'Таблица'} ${++tableIndex}" tabindex="0">`), node, html('</div>')];
           }
           if (node.type === 'paragraph') {
             const text = textOf(node);
@@ -68,18 +75,19 @@ export default function conventions({ figures = false } = {}) {
             if (text === '[[status]]') {
               markers++;
               if ((!frontmatter.status_rows && !frontmatter.status_table) || markers > 1) throw new Error('status-marker-without-data');
-              return html(renderStatus({ ids: frontmatter.status_rows, full: frontmatter.status_table === 'full' }) + `<p class="status-link"><a href="${statusHref}">${labels.status}</a></p>`);
+              return html(renderStatus({ ids: frontmatter.status_rows, full: frontmatter.status_table === 'full', lang }) + `<p class="status-link"><a href="${statusHref}">${labels.status}</a></p>`);
             }
+            if (text === '[[repos]]') return html(repositoryEntries(lang));
             const figure = /^\[\[figure ([a-z0-9-]+)\]\]$/.exec(text);
             if (figure) { const rendered = bookFigure(figure[1], lang, figures); return rendered ? html(rendered) : []; }
             const publication = /^\[\[publications (book|papers)\]\]$/.exec(text);
             if (publication) return html(publicationEntries(publication[1], lang));
-            if (/\[\[(?:status|figure|publications)\b/.test(text)) throw new Error('malformed-marker');
+            if (/\[\[(?:status|figure|publications|repos)\b/.test(text)) throw new Error('malformed-marker');
           }
           if (node.type === 'blockquote' && node.children?.[0]?.type === 'paragraph' && node.children[0].children?.[0]?.type === 'strong' && /^(?:Предел\.|Limit\.)/.test(textOf(node.children[0].children[0]))) {
             const id = `limits-${++limitIndex}`;
             visit(node);
-            return [html(`<aside class="limits" aria-labelledby="${id}"><h3 id="${id}">${labels.limits}</h3>`), ...node.children, html('</aside>')];
+            return [html(`<aside class="limits" aria-labelledby="${sectionId ? escape(sectionId) + ' ' : ''}${id}"><h3 id="${id}">${labels.limits}</h3>`), ...node.children, html('</aside>')];
           }
           if (node.children) visit(node);
           return node;

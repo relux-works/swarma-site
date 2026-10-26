@@ -34,21 +34,24 @@ function build(root, figures = false, diagnostic) {
   evidence.push({ figures, buildExit: result.status, diagnostic: diagnostic ?? 'valid conventions' });
 }
 const metadata = 'status_rows: [swarma, part-001, part-002, part-003]';
-const richBody = `Проектное описание по книге.\n\n## Три слоя\n\nSwarma Runtime, Swarma Protocol, Swarma Chain.\n\nИсточник: глава 02 "Swarma целиком", раздел "Имена и участники"; глава 08 "Допуск к носителю"\n\n### Граница\n\n> **Предел.** Описание границы.\n\n> Обычная цитата.\n\n[[status]]\n\n[[figure three-layers]]\n\n[[figure protocol-topology]]\n\n[[figure sublayers]]\n\n[[publications book]]\n\n[[publications papers]]\n`;
+const richBody = `Проектное описание по книге.\n\n## Три слоя\n\nSwarma Runtime, Swarma Protocol, Swarma Chain.\n\nИсточник: глава 02 "Swarma целиком", раздел "Имена и участники"; глава 08 "Допуск к носителю"\n\n### Граница\n\n> **Предел.** Описание границы.\n\n### Ещё одна граница\n\n> **Предел.** Другая граница.\n\n> Обычная цитата.\n\n| Часть | Вопрос |\n| --- | --- |\n| Runtime | Граница |\n\n[[status]]\n\n[[figure three-layers]]\n\n[[figure protocol-topology]]\n\n[[figure sublayers]]\n\n[[publications book]]\n\n[[publications papers]]\n\n[[repos]]\n`;
 function content(extra = metadata, body = richBody) { return page(extra ? extra + '\n' : '', body); }
 function nodes(node) { return [node, ...(node.childNodes ?? []).flatMap(nodes)]; }
 const attr = (node, name) => node.attrs?.find(attr => attr.name === name)?.value;
 // Both real builds exercise all six conventions, unchanged cell text and the figure publication switch.
 for (const figures of [false, true]) test(`conventions: complete valid fixture, figures ${figures}`, async t => {
   const root = await sourceFixture(t, content());
+  // Real counterparts expose both language landmarks, catching duplicate header/footer names.
+  await put(root, 'src/content/pages/en/platform.md', page('', 'Page in preparation.'));
   build(root, figures);
   const html = await readFile(join(root, 'dist/ru/platform/index.html'), 'utf8');
   const all = nodes(document(html));
   assert.equal(all.filter(node => node.tagName === 'h1').length, 1);
   assert.equal(all.filter(node => attr(node, 'class') === 'design-frame').length, 1);
   assert.equal(all.filter(node => attr(node, 'class') === 'section-index').length, 1);
-  assert.equal(all.filter(node => attr(node, 'class') === 'limits').length, 1);
+  assert.equal(all.filter(node => attr(node, 'class') === 'limits').length, 2);
   assert.equal(all.filter(node => node.tagName === 'blockquote').length, 1);
+  assert.ok(all.some(node => attr(node, 'aria-label') === 'Таблица 1' && attr(node, 'tabindex') === '0'));
   assert.equal(all.filter(node => attr(node, 'class') === 'publication').length, 5);
   assert.equal(all.filter(node => attr(node, 'class') === 'book-figure').length, figures ? 3 : 0);
   assert.equal(all.filter(node => node.tagName === 'img' && attr(node, 'src')?.startsWith('data:image/svg+xml;base64,')).length, figures ? 3 : 0);
@@ -86,6 +89,7 @@ for (const [name, extra, body, diagnostic] of [
   ['marker without data', '', '[[status]]', 'status-marker-without-data'],
   ['data without marker', metadata, 'Описание.', 'status-data-without-marker'],
   ['duplicate marker', metadata, '[[status]]\n\n[[status]]', 'status-marker-without-data'],
+  ['malformed repository marker', '', '[[repos extra]]', 'malformed-marker'],
   ['unknown figure when disabled', '', '[[figure missing-figure]]', 'unknown-figure'],
 ]) test(`conventions: ${name}`, async t => { const root = await sourceFixture(t, content(extra, body)); build(root, false, diagnostic); });
 // Full table frontmatter renders every source row and vocabulary once without a hardcoded duplicate.
@@ -142,4 +146,34 @@ test('a11y: known bad fixture fails for image-alt', () => {
   assert.equal(result.status, 1, result.stdout + result.stderr);
   assert.match(result.stderr, /a11y: \/control\/ 390 light default: image-alt/);
   assert.match(result.stdout, /1 scans, 1 violations/);
+});
+
+// A real English build renders approved sources, all repository rows and Russian quoted cells, with live anchors.
+test('conventions: English sources and repository rows', async t => {
+  const root = await sourceFixture(t, content('', 'Описание.'));
+  await put(root, 'src/content/pages/en/platform.md', page('', 'Architecture.\n\n## Sources\n\nSource: chapter 02 "Swarma as a whole", section "Names and participants"\n\n[[repos]]'));
+  await put(root, 'src/content/pages/en/book.md', page('', 'The book.'));
+  build(root);
+  const html = await readFile(join(root, 'dist/en/platform/index.html'), 'utf8');
+  assert.equal(nodes(document(html)).filter(node => attr(node, 'class') === 'repository-row').length, 13);
+  assert.ok(html.includes('Quoted cells from the Russian edition'));
+  assert.ok(html.includes('href="/en/book/#ch02"'));
+  assert.ok((await readFile(join(root, 'dist/en/book/index.html'), 'utf8')).includes('id="ch02"'));
+  const ids = nodes(document(html)).flatMap(node => attr(node, 'id') ? [attr(node, 'id')] : []);
+  assert.equal(new Set(ids).size, ids.length);
+  run('status-language', root); run('identifiers', root); run('names', root);
+  assert.equal(html.includes('/werkstatt/'), false);
+  assert.ok(html.includes('mailto:ivan@swarma.si'));
+  // A same-checkout organisation move must refresh cached Markdown, with matching exact scan permissions.
+  const configPath = join(root, 'config/site.json');
+  const site = JSON.parse(await readFile(configPath, 'utf8'));
+  await writeFile(configPath, JSON.stringify({ ...site, github_org: 'public-example' }));
+  build(root);
+  const moved = await readFile(join(root, 'dist/en/platform/index.html'), 'utf8');
+  assert.ok(moved.includes('https://github.com/public-example/curator'));
+  assert.equal(moved.includes('https://github.com/relux-works/'), false);
+  run('identifiers', root);
+  const bad = join(root, 'src/content/pages/en/platform.md');
+  await writeFile(bad, page('', 'Source: chapter 02 "Wrong"'));
+  build(root, false, 'chapter-reference-mismatch');
 });

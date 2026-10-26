@@ -13,7 +13,8 @@ export async function fixture(t, entries = {}) {
   await mkdir(scratch, { recursive: true });
   const root = await mkdtemp(join(scratch, 'case-'));
   t.after(() => rm(root, { recursive: true, force: true }));
-  await put(root, 'config/public-repos.json', '{"repositories":[],"emails":[]}');
+  await put(root, 'config/site.json', '{"github_org":"relux-works","contact_email":"contact@example.org"}');
+  await put(root, 'config/repos.json', '[]');
   await put(root, 'config/publication-surface.json', '{"allow":[]}');
   for (const [path, value] of Object.entries(entries)) await put(root, path, value);
   return root;
