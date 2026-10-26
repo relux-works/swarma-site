@@ -8,7 +8,7 @@ import { denyTokens, redactor } from './scanner-policy.mjs';
 import { includesToken } from './publication/normalization.mjs';
 
 export async function check(root) {
-  let redact = redactor((process.env.IDENT_DENY_TOKENS ?? '').split(/[,\r\n]+/u).filter(Boolean));
+  let redact = redactor([]);
   const reader = await publicationReader(root);
   const errors = [];
   try {

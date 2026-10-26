@@ -16,11 +16,13 @@ It implements the structural scanner approach independently; no design-system im
   titles, descriptions, decoded attributes and accessible names enter the same policy values as inline SVG.
 - `css.mjs`: cssValues validates complete syntax through PostCSS, then uses css-tree's grammar and decoded values.
   Incomplete strings/comments fail rather than relying on EOF recovery. decodePercent performs one URL decode.
-- `policy.mjs`: readDenyTokens(file, environment) reads an externally supplied policy. redactor(tokens)
+- `policy.mjs`: readDenyTokens(file, environment) reads an externally supplied ASCII-only policy. Tokens must match
+  `[a-z0-9][a-z0-9._-]{2,}` in full after ASCII whitespace trimming; any invalid entry rejects with a fixed code.
+  CI requires the explicit environment list and never reads local fallback. redactor(tokens)
   sanitizes all diagnostics; failure(code) and safeError(error, fallback) carry fixed rule codes.
 - `normalization.mjs`: normalizeText collapses Unicode whitespace/separators and removes soft hyphens,
   U+180E, U+200B–U+200D, U+2060 and U+FEFF. Generic rules use this spaced form. includesToken also compares
-  literals without separators; tokenRanges maps overlapping matches back to original text for redaction.
+  literals without separators with ASCII-only case folding; Unicode letters retain their case. tokenRanges maps overlapping matches back to original text for redaction.
   Browser line breaks, including br and block elements, are whitespace in the comparison. Syntax in code
   examples is never recursively decoded by normalization.
 

@@ -83,12 +83,12 @@ test('identifiers decoded attributes positive control', async t => {
 
 // The same synthetic plant fails only when configured; matching is literal and case-insensitive.
 test('identifiers external tokens', async t => {
-  const root = await fixture(t, { 'src/sample.txt': 'ZZ-HOST-ALPHA and zz.host+alpha' });
+  const root = await fixture(t, { 'src/sample.txt': 'ZZ-HOST-ALPHA and zz.host_alpha' });
   run('identifiers', root, 'deny-token');
   run('identifiers', root, undefined, { IDENT_DENY_TOKENS: 'zz-host-beta' });
-  run('identifiers', root, 'deny-token', { IDENT_DENY_TOKENS: ' , zz.host+alpha, ' });
+  run('identifiers', root, 'deny-token', { IDENT_DENY_TOKENS: ' , zz.host_alpha, ' });
   await put(root, 'src/sample.txt', 'zzXhosttalpha');
-  run('identifiers', root, undefined, { IDENT_DENY_TOKENS: 'zz.host+alpha' });
+  run('identifiers', root, undefined, { IDENT_DENY_TOKENS: 'zz.host_alpha' });
 });
 
 // External tokens also cover policy/test sources, configuration, hidden CI files and decoded output.
@@ -104,16 +104,16 @@ test('identifiers external filename redaction', async t => {
   assert.ok(!result.stderr.toLowerCase().includes('zz-host-alpha'));
 });
 
-// File fallback works in CI; a nonempty environment list takes precedence over that file.
+// Local file fallback works; a nonempty environment list takes precedence over that file.
 test('identifiers external file fallback', async t => {
   const home = await fixture(t, {
     '.config/swarma-site/deny-tokens.txt': 'zz-host-alpha\nzz-host-beta\n',
   });
   const root = await fixture(t, { 'src/sample.txt': 'zz-host-alpha' });
-  run('identifiers', root, 'deny-token', { HOME: home, IDENT_DENY_TOKENS: '', CI: 'true' });
+  run('identifiers', root, 'deny-token', { HOME: home, IDENT_DENY_TOKENS: '', CI: '' });
   run('identifiers', root, undefined, { HOME: home, IDENT_DENY_TOKENS: 'zz-host-gamma', CI: 'true' });
   await put(root, 'src/sample.txt', 'Ordinary text');
-  run('identifiers', root, undefined, { HOME: home, IDENT_DENY_TOKENS: '', CI: 'true' });
+  run('identifiers', root, undefined, { HOME: home, IDENT_DENY_TOKENS: '', CI: '' });
 });
 
 // CI cannot opt out of the missing-source failure; empty input is not a valid source.

@@ -48,6 +48,7 @@ The source's inline Markdown notation remains literal in generated cell strings.
 | Command | Claim checked | Output |
 | --- | --- | --- |
 | `npm run check:browser` | Chromium launches and returns actual rendered text; safe diagnostics identify startup problems | Console; transient browser artifacts |
+| `node scripts/checks/deny-policy.mjs` | Validate the explicit CI policy without local fallback | Fixed diagnostics; nonzero on invalid configuration |
 | `npm test` | Clean controls pass; planted violations fail for the intended diagnostic | Console; isolated fixtures in `.temp/check-fixtures/` are removed after each test |
 | `npm run check:publication-surface` | Only supported HTML publication features occur in source and output | Console; nonzero on a violation |
 | `npm run check:identifiers` | Publication files contain no prohibited identifiers, paths, session links, unlisted repository links or emails | Console; nonzero on a violation |
@@ -66,7 +67,10 @@ The tracked identifier policies and test controls contain only generic shapes an
 Real internal names are supplied outside the repository through `IDENT_DENY_TOKENS`
 (comma-separated literals), or the untracked local file `$HOME/.config/swarma-site/deny-tokens.txt`
 (one literal per line; commas are also accepted). A nonempty environment list takes precedence.
-Matches are case-insensitive literal substrings after Unicode whitespace/separator normalization, including
+Each token must fully match `[a-z0-9][a-z0-9._-]{2,}` after trimming ASCII whitespace. One invalid entry
+or an empty configured file rejects with fixed `identifier-deny-tokens` diagnostics without echoing the value.
+Matching folds ASCII uppercase only; Unicode case folding is not performed. Literal substrings match
+after Unicode whitespace/separator normalization, including
 the separator-free variant. Soft hyphens, U+180E, U+200B–U+200D, U+2060 and U+FEFF are removed for comparison.
 Generic identifier, name and availability rules use normalized whitespace without removing word boundaries.
 Browser line breaks from `br` and block elements count as whitespace. Diagnostics name the rule and redact
@@ -106,8 +110,9 @@ scratch/cache directories (`.temp/`, `.astro/`, `.val/`) are omitted; built `dis
 Never add real tokens to source, fixtures, documentation, command arguments or logs.
 
 Set the repository secret `IDENT_DENY_TOKENS` before running CI; the workflow passes it only to the checks step.
-That step rejects an empty or delimiter-only secret before running checks, without using a local-file fallback.
-CI requires a nonempty repository secret, even if `IDENT_DENY_TOKENS_OPTIONAL=1`.
+That step runs `node scripts/checks/deny-policy.mjs`, requiring a nonempty explicit list using the same ASCII
+grammar before running checks. Greek letters, invisible characters, NBSP and uppercase entries reject.
+CI never falls back to the local file, even if `IDENT_DENY_TOKENS_OPTIONAL=1`.
 Locally, missing tokens print a warning and run generic checks, but still exit nonzero.
 Only an explicit local `IDENT_DENY_TOKENS_OPTIONAL=1 npm run check` permits a generic-only pass.
 The isolated controls inject synthetic lists and temporary home directories; they do not need the real list.

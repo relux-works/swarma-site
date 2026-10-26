@@ -3,7 +3,8 @@ const invisible = /[\u00ad\u180e\u200b-\u200d\u2060\ufeff]/gu;
 const whitespace = /[\s\p{Z}]+/gu;
 const separator = /[\s\p{Z}\u00ad\u180e\u200b-\u200d\u2060\ufeff]/u;
 export const normalizeText = value => String(value).replace(invisible, '').replace(whitespace, ' ').trim();
-export const compactText = value => normalizeText(value).replaceAll(' ', '').toLowerCase();
+export const asciiFold = value => String(value).replace(/[A-Z]/gu, letter => letter.toLowerCase());
+export const compactText = value => asciiFold(normalizeText(value).replaceAll(' ', ''));
 export function includesToken(value, token) {
   const expected = compactText(token);
   return Boolean(expected) && compactText(value).includes(expected);
@@ -16,13 +17,12 @@ export function tokenRanges(value, tokens) {
   for (const character of value) {
     const end = offset + character.length;
     if (!separator.test(character)) {
-      const lower = character.toLowerCase();
-      compact += character;
+      const lower = asciiFold(character);
+      compact += lower;
       for (let index = 0; index < lower.length; index += 1) positions.push([offset, end]);
     }
     offset = end;
   }
-  compact = compact.toLowerCase();
   const ranges = [];
   for (const token of tokens) {
     const expected = compactText(token);

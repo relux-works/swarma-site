@@ -21,8 +21,5 @@ jobs:
         env:
           IDENT_DENY_TOKENS: ${{ secrets.IDENT_DENY_TOKENS }}
         run: |
-          if [[ -z "${IDENT_DENY_TOKENS//[[:space:],]/}" ]]; then
-            echo "IDENT_DENY_TOKENS must contain a nonempty token list" >&2
-            exit 1
-          fi
+          node scripts/checks/deny-policy.mjs
           npm run check

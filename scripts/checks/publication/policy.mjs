@@ -1,12 +1,16 @@
 import { readFile } from 'node:fs/promises';
 import { tokenRanges } from './normalization.mjs';
 
-export const splitTokens = text => text.split(/[,\r\n]+/u).map(token => token.trim()).filter(Boolean);
-export async function readDenyTokens(file, environment = process.env.IDENT_DENY_TOKENS ?? '') {
-  const tokens = splitTokens(environment);
-  if (tokens.length) return tokens;
+export const tokenPattern = /^[a-z0-9][a-z0-9._-]{2,}$/u;
+export const splitTokens = text => {
+  const tokens = text.split(/[,\r\n]+/u).map(token => token.replace(/^[ \t\r\n\v\f]+|[ \t\r\n\v\f]+$/gu, '')).filter(Boolean);
+  if (!tokens.length || tokens.some(token => tokenPattern.exec(token)?.[0] !== token)) throw failure('identifier-deny-tokens');
+  return tokens;
+};
+export async function readDenyTokens(file, environment = process.env.IDENT_DENY_TOKENS ?? '', ci = process.env.CI) {
+  if (environment || (ci && !['0', 'false'].includes(ci.toLowerCase()))) return splitTokens(environment);
   try { return splitTokens(await readFile(file, 'utf8')); }
-  catch (error) { if (error.code === 'ENOENT') return []; throw new Error('identifier-deny-tokens'); }
+  catch (error) { if (error.code === 'ENOENT') return []; throw failure('identifier-deny-tokens'); }
 }
 export function redactor(tokens) {
   return value => {

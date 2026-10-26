@@ -11,9 +11,10 @@ test('normalization: comparison and redaction controls', () => {
   assert.equal(includesToken('Swarma Runtime', 'zz reviewer omega'), false);
   assert.equal(includesToken('Swarma Runtime', '\u200d '), false);
   assert.equal(redactor(['zz reviewer', 'reviewer omega'])('before zz\u202freviewer\u200d\tOMEGA after'), 'before [redacted] after');
-  assert.equal(redactor(['платформа'])('ПЛАТ\u00adФОРМА'), '[redacted]');
-  assert.equal(includesToken('Ο Σ', 'ΟΣ'), true);
-  assert.equal(redactor(['ΟΣ'])('Ο Σ'), '[redacted]');
+  assert.equal(redactor(['платформа'])('ПЛАТ\u00adФОРМА'), 'ПЛАТ\u00adФОРМА');
+  assert.equal(includesToken('before Ο Σ after', 'ΟΣ'), true);
+  assert.equal(includesToken('ος', 'ΟΣ'), false);
+  assert.equal(redactor(['ΟΣ'])('before Ο Σ after'), 'before [redacted] after');
   assert.equal(redactor(['zz reviewer omega'])('Swarma Runtime'), 'Swarma Runtime');
 });
 
@@ -34,7 +35,7 @@ test('normalization: invisible identifier separators', async t => {
 // The actual browser's line breaks and Unicode spaces match the same external multiword literal.
 test('normalization: rendered line breaks and separator-free literals', async t => {
   const root = await fixture(t);
-  const env = { IDENT_DENY_TOKENS: 'zz reviewer omega' };
+  const env = { IDENT_DENY_TOKENS: 'zzrevieweromega' };
   await put(root, 'dist/index.html', '<p>Swarma Runtime — документация.</p>');
   run('identifiers', root, undefined, env);
   for (const html of ['<p>zz reviewer<br>omega</p>', '<div>zz reviewer</div><div>omega</div>', '<p>zz\u202freviewer\u3000omega</p>', '<p>zzrevieweromega</p>']) {
@@ -89,7 +90,7 @@ test('standalone SVG: rendered text blocks', async t => {
   const svg = (first, second) => `<svg xmlns="http://www.w3.org/2000/svg"><style>/* available now */</style><text x="0" y="20">${first}</text><text x="0" y="40">${second}</text></svg>`;
   const root = await fixture(t, { 'dist/badge.svg': svg('Swarma', 'In preparation') });
   run('status-language', root);
-  const env = { IDENT_DENY_TOKENS: 'zz reviewer omega' };
+  const env = { IDENT_DENY_TOKENS: 'zzrevieweromega' };
   run('identifiers', root, undefined, env);
   await put(root, 'dist/badge.svg', svg('zz reviewer', 'omega'));
   run('identifiers', root, 'deny-token', env);
