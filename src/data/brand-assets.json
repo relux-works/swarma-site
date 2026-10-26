@@ -1,0 +1,125 @@
+{
+  "repository": "relux-works/swarma-brand-assets",
+  "commit": "e750345410ccee402acc159e8e1edb8f0687a83d",
+  "manifest": "assets/manifest.json",
+  "assets": [
+    {
+      "path": "assets/icons/apple-touch-icon.png",
+      "bytes": 2457,
+      "sha256": "91f3fae3ffc9190e9d3c06ed45b130244042bb7511c1bbf5ffc6071fddcd949e",
+      "width": 180,
+      "height": 180
+    },
+    {
+      "path": "assets/icons/favicon-16.png",
+      "bytes": 347,
+      "sha256": "f2a25cfdd1e020b751799bcba6f25fcd1b0b0a4ec85e069d86c132d4b4c6dfcd",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "path": "assets/icons/favicon-24.png",
+      "bytes": 470,
+      "sha256": "050fe34fcf88b00f696dc12fe221ded3147d9c20a9421f5be6285bed83aed29a",
+      "width": 24,
+      "height": 24
+    },
+    {
+      "path": "assets/icons/favicon-32.png",
+      "bytes": 593,
+      "sha256": "4d53b1ab39596ddda1e38da531329abdfddeb4a990d53c76c974f348f3e038a6",
+      "width": 32,
+      "height": 32
+    },
+    {
+      "path": "assets/icons/favicon-48.png",
+      "bytes": 788,
+      "sha256": "59d88300adf26d528bab8c8509cb2f8c8e1a89e2828a56ed4b0c9f33f8be607e",
+      "width": 48,
+      "height": 48
+    },
+    {
+      "path": "assets/icons/favicon-64.png",
+      "bytes": 1013,
+      "sha256": "03c0a5e5027197bbc7d9b1348eebcf05dd53680120e20557bc50964741d7404a",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "path": "assets/icons/favicon-dark.svg",
+      "bytes": 261,
+      "sha256": "05687d7ee9c36805d997230fd5441bd0c76296d2050671cd16b3d7f80534ec1d"
+    },
+    {
+      "path": "assets/icons/favicon.ico",
+      "bytes": 1782,
+      "sha256": "e868974c38a6b333c8e2b7d36806e000de93fd41af29ec58350999e704c006a2"
+    },
+    {
+      "path": "assets/icons/favicon.svg",
+      "bytes": 261,
+      "sha256": "4b017a00793a1d058d46b97725601fc4fb8041c3eeb66202a01f2a7c0cf5dfed"
+    },
+    {
+      "path": "assets/icons/icon-192.png",
+      "bytes": 2575,
+      "sha256": "2b428e059fb524601f50f9e1090e2bc764d5a60e0fdb3731613cb957c0108edf",
+      "width": 192,
+      "height": 192
+    },
+    {
+      "path": "assets/icons/icon-512.png",
+      "bytes": 6774,
+      "sha256": "303db489adb26fd566888cae47910a599299c6b0777fc6ffa130aaebc0fe0550",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "path": "assets/icons/icon-maskable-512.png",
+      "bytes": 6299,
+      "sha256": "e45c99900f731a6eb55cf17140cc22764d67c2bcf1cfd75d154959b941e65128",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "path": "assets/svg/swarma-lockup-horizontal-dark.svg",
+      "bytes": 5165,
+      "sha256": "497d6c766390758aa02eae6ef648fdf7023585be3167a4cfc77fb3bc207dd7ba"
+    },
+    {
+      "path": "assets/svg/swarma-lockup-horizontal-mono.svg",
+      "bytes": 5165,
+      "sha256": "b4b503e97ddf86c5c396cdffac4daa5e092e3502098897af0708d55ea3cf124c"
+    },
+    {
+      "path": "assets/svg/swarma-lockup-horizontal-white.svg",
+      "bytes": 5165,
+      "sha256": "64f0f278c0330c556ed5cb7bc317281e69d641ecfe516cad7e2939772bf3349f"
+    },
+    {
+      "path": "assets/svg/swarma-lockup-horizontal.svg",
+      "bytes": 5165,
+      "sha256": "07e0f6164f67c048deee2c36eb7841069be399656dfd3eee8d26996054386b19"
+    },
+    {
+      "path": "assets/svg/swarma-symbol-dark.svg",
+      "bytes": 261,
+      "sha256": "05687d7ee9c36805d997230fd5441bd0c76296d2050671cd16b3d7f80534ec1d"
+    },
+    {
+      "path": "assets/svg/swarma-symbol-mono.svg",
+      "bytes": 261,
+      "sha256": "cc8392a33e48ee0572005a5c2af997bae58ad8b59e0b801c55042f7ad1fef4cb"
+    },
+    {
+      "path": "assets/svg/swarma-symbol-white.svg",
+      "bytes": 261,
+      "sha256": "05c0e77e058408c0da824dee17da83ae47f092708dfba4208e438d67d3f69a37"
+    },
+    {
+      "path": "assets/svg/swarma-symbol.svg",
+      "bytes": 261,
+      "sha256": "4b017a00793a1d058d46b97725601fc4fb8041c3eeb66202a01f2a7c0cf5dfed"
+    }
+  ]
+}

@@ -1,8 +1,8 @@
 import { readFileSync, existsSync } from 'node:fs';
 import Slugger from 'github-slugger';
-import { loadData, escape, renderStatus } from './status-render.mjs';
+import { loadData, escape } from './content-data.mjs';
 import { repositoryEntries } from './repository-render.mjs';
-import { strings, designSlugs } from './strings.mjs';
+import { strings } from './strings.mjs';
 const textOf = node => node.value ?? (node.children ?? []).map(textOf).join('');
 const html = value => ({ type: 'html', value });
 export function chapterReferences(text, lang) {
@@ -38,18 +38,19 @@ export function bookFigure(name, lang, enabled = process.env.SWARMA_BOOK_FIGURES
 export default function conventions({ figures = false } = {}) {
   return (tree, file) => {
     const frontmatter = file.data.astro?.frontmatter ?? {};
+    if ('status_rows' in frontmatter || 'status_table' in frontmatter) throw new Error('status-forbidden');
     const path = String(file.path ?? file.history?.[0] ?? 'content.md');
     const match = /\/(ru|en)\/(.+)\.md$/.exec(path);
     const lang = match?.[1] ?? 'ru', slug = match?.[2] ?? '';
     const labels = strings[lang], slugger = new Slugger(), headings = [];
     const base = path.split(`/${lang}/`)[0];
-    const statusHref = existsSync(`${base}/${lang}/status.md`) ? `/${lang}/status/` : '/ru/status/';
     const source = readFileSync(path, 'utf8');
+    if (/\[\[status\b/.test(source) || slug === 'status') throw new Error(`${path}:1: status-forbidden`);
     const body = String(file.value);
     const bodyOffset = body ? source.lastIndexOf(body) : 0;
     const prefix = bodyOffset >= 0 ? source.slice(0, bodyOffset) : '';
     const lineOffset = prefix.split('\n').length - 1;
-    let markers = 0, limitIndex = 0, tableIndex = 0, sectionId = '';
+    let limitIndex = 0, tableIndex = 0, sectionId = '';
     function fail(error, node) {
       if (error.conventionSource) throw error;
       const diagnostic = new Error(`${path}:${(node?.position?.start?.line ?? 1) + lineOffset}: ${error.message}`);
@@ -72,11 +73,7 @@ export default function conventions({ figures = false } = {}) {
           if (node.type === 'paragraph') {
             const text = textOf(node);
             if (text.startsWith('Источник: ') || text.startsWith('Source: ')) return html(chapterReferences(text, text.startsWith('Source: ') ? 'en' : 'ru'));
-            if (text === '[[status]]') {
-              markers++;
-              if ((!frontmatter.status_rows && !frontmatter.status_table) || markers > 1) throw new Error('status-marker-without-data');
-              return html(renderStatus({ ids: frontmatter.status_rows, full: frontmatter.status_table === 'full', lang }) + `<p class="status-link"><a href="${statusHref}">${labels.status}</a></p>`);
-            }
+            if (text.includes('[[status')) throw new Error('status-forbidden');
             if (text === '[[repos]]') return html(repositoryEntries(lang));
             const figure = /^\[\[figure ([a-z0-9-]+)\]\]$/.exec(text);
             if (figure) { const rendered = bookFigure(figure[1], lang, figures); return rendered ? html(rendered) : []; }
@@ -95,10 +92,8 @@ export default function conventions({ figures = false } = {}) {
       });
     }
     visit(tree);
-    if ((frontmatter.status_rows || frontmatter.status_table) && !markers) fail(new Error('status-data-without-marker'), tree);
     const lead = tree.children.find(node => node.type === 'paragraph');
     if (lead) lead.data = { ...lead.data, hProperties: { className: ['lead'] } };
-    const frame = designSlugs.has(slug) ? `<p class="design-frame">${labels.frame}<a href="${statusHref}">${labels.status}</a>.</p>` : '';
     const data = loadData('publications').book;
     const version = `<p class="version-context">${labels.version}, <bdi class="technical">${data.version}</bdi>, ${escape(data.date)}</p>`;
     const links = headings.map(heading => `<li><a href="#${escape(heading.id)}">${escape(heading.text)}</a></li>`).join('');
@@ -108,8 +103,8 @@ export default function conventions({ figures = false } = {}) {
     const layers = slug === 'index' && introduction.find(node => node.type === 'paragraph' && ['Swarma Runtime', 'Swarma Protocol', 'Swarma Chain'].every(name => textOf(node).includes(name)));
     const insertion = layers ? tree.children.indexOf(layers) + 1 : lead ? tree.children.indexOf(lead) + 1 : 0;
     const bookHref = existsSync(`${base}/${lang}/book.md`) ? `/${lang}/book/` : '/ru/book/';
-    const actions = slug === 'index' ? `<p class="home-actions"><a href="${bookHref}">${labels.book}</a><a href="${statusHref}">${labels.status}</a></p>` : '';
-    tree.children.splice(insertion, 0, html(frame + version + actions + index));
+    const actions = slug === 'index' ? `<p class="home-actions"><a href="${bookHref}">${labels.book}</a></p>` : '';
+    tree.children.splice(insertion, 0, html(version + actions + index));
     if (slug === 'index' && !introduction.some(node => textOf(node).includes(data.subtitle))) tree.children.unshift(html(`<p class="category">${escape(data.subtitle)}</p>`));
   };
 }

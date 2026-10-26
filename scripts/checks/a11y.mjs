@@ -2,6 +2,7 @@ import { createServer } from 'node:http';
 import { readFile, mkdir, writeFile } from 'node:fs/promises';
 import { resolve, join, extname, sep, relative } from 'node:path';
 import { chromium } from 'playwright';
+import { headerGeometry } from './header-geometry.mjs';
 import AxeBuilder from '@axe-core/playwright';
 import { filesAt } from './lib.mjs';
 
@@ -13,6 +14,8 @@ process.env.TMPDIR = browserTemporary;
 process.env.TMP = browserTemporary;
 process.env.TEMP = browserTemporary;
 const control = process.argv.includes('--control');
+const geometryControl = process.argv.includes('--geometry-control');
+const geometry = process.argv.includes('--geometry') || geometryControl;
 const matrix = process.argv.includes('--matrix');
 const server = createServer(async (request, response) => {
   try {
@@ -50,7 +53,17 @@ try {
     { name: 'forced-colors', colorScheme: 'light', forcedColors: 'active' },
     { name: 'reduced-transparency', colorScheme: 'light', transparency: true },
   ] : (control ? ['light'] : ['light', 'dark']).map(name => ({ name, colorScheme: name }));
-  for (const width of control ? [390] : matrix ? [390, 768, 1440, 1920] : [390, 1440]) for (const appearance of appearances) {
+  if (geometry) {
+    const page = await browser.newPage({ viewport: { width: 1920, height: 900 }, reducedMotion: 'reduce' });
+    const selected = ['ru', 'en'].flatMap(lang => { const route = routes.find(route => route === `/${lang}/platform/`) ?? routes.find(route => route === `/${lang}/`); return route ? [route] : []; });
+    if (!selected.length) throw new Error('header-geometry: no locale route');
+    const observations = [];
+    for (const route of selected) observations.push(await headerGeometry(page, origin, route, geometryControl));
+    await writeFile(join(output, 'geometry.json'), JSON.stringify(observations, null, 2) + '\n');
+    console.log(`header-geometry: ${observations.reduce((n, value) => n + value.observations, 0)} observations, 0 overlaps`);
+    await page.close();
+  }
+  for (const width of geometry ? [] : control ? [390] : matrix ? [390, 768, 1440, 1920] : [390, 1440]) for (const appearance of appearances) {
     const theme = appearance.name;
     const context = await browser.newContext({ viewport: { width, height: 900 }, colorScheme: appearance.colorScheme, contrast: appearance.contrast, forcedColors: appearance.forcedColors, reducedMotion: 'reduce' });
     const page = await context.newPage();
@@ -66,18 +79,16 @@ try {
         if (overflow > 1) throw new Error(`a11y-geometry: ${route} ${width} overflow ${overflow}`);
         const titleCount = await page.locator('h1').count();
         if (titleCount !== 1) throw new Error(`a11y-heading: ${route} h1 count ${titleCount}`);
-        const frame = page.locator('.design-frame');
-        if (await frame.count() && (await frame.boundingBox()).y + (await frame.boundingBox()).height > 900) throw new Error(`a11y-frame: ${route} outside first viewport`);
-        if (width >= 1100) {
+        if (await page.locator('[data-site-nav]').isVisible()) {
           const offset = await page.locator('[data-site-nav]').evaluate(node => { const box = node.getBoundingClientRect(); return Math.abs(box.left + box.width / 2 - document.documentElement.clientWidth / 2); });
           if (offset > 1) throw new Error(`a11y-header: ${route} centre offset ${offset}`);
         }
-        if (width < 1100) {
+        if (await page.locator('.menu-trigger').isVisible()) {
           const trigger = page.locator('.menu-trigger');
-          const before = await page.locator('.wordmark').boundingBox();
+          const before = await page.locator('.product-lockup').boundingBox();
           await trigger.click();
           await page.waitForFunction(() => { const dialog = document.querySelector('#site-menu'); return dialog.open && getComputedStyle(dialog).opacity === '1'; });
-          const after = await page.locator('.wordmark').boundingBox();
+          const after = await page.locator('.product-lockup').boundingBox();
           if (Math.abs(before.x - after.x) > 1) throw new Error(`a11y-menu: ${route} scroll lock shifted page`);
           await scan(page, route, width, theme, 'menu-open');
           await page.locator('.menu-close').focus();
@@ -88,14 +99,14 @@ try {
           await page.waitForFunction(() => getComputedStyle(document.querySelector('#site-menu')).display === 'none');
           if (!await trigger.evaluate(node => document.activeElement === node) || await trigger.getAttribute('aria-expanded') !== 'false') throw new Error(`a11y-menu: ${route} focus return`);
         }
-        if (['/ru/', '/ru/platform/', '/ru/status/', '/ru/book/'].includes(route)) await page.screenshot({ path: join(output, `${route.replaceAll('/', '_')}-${width}-${theme}.png`), fullPage: false });
+        if (['/ru/', '/ru/platform/', '/ru/book/'].includes(route)) await page.screenshot({ path: join(output, `${route.replaceAll('/', '_')}-${width}-${theme}.png`), fullPage: false });
       }
     }
     await context.close();
   }
-  await writeFile(join(output, control ? 'control.json' : matrix ? 'matrix.json' : 'report.json'), JSON.stringify({ browser: browser.version(), control, scans: reports }, null, 2) + '\n');
+  await writeFile(join(output, geometry ? 'geometry-run.json' : control ? 'control.json' : matrix ? 'matrix.json' : 'report.json'), JSON.stringify({ browser: browser.version(), control, scans: reports }, null, 2) + '\n');
   if (control && !reports.some(report => report.violations.some(violation => violation.id === 'image-alt'))) throw new Error('a11y-control: expected image-alt was not detected');
   if (reports.some(report => report.violations.length)) process.exitCode = 1;
-  console.log(`a11y: ${reports.length} scans, ${reports.reduce((sum, report) => sum + report.violations.length, 0)} violations`);
+  if (!geometry) console.log(`a11y: ${reports.length} scans, ${reports.reduce((sum, report) => sum + report.violations.length, 0)} violations`);
 } catch (error) { console.error(error.message); process.exitCode = 1; }
-finally { await writeFile(join(output, control ? 'control.json' : matrix ? 'matrix.json' : 'report.json'), JSON.stringify({ browser: browser?.version(), platform: process.platform, architecture: process.arch, control, scans: reports }, null, 2) + '\n'); if (browser) await browser.close(); await new Promise(resolve => server.close(resolve)); }
+finally { await writeFile(join(output, geometry ? 'geometry-run.json' : control ? 'control.json' : matrix ? 'matrix.json' : 'report.json'), JSON.stringify({ browser: browser?.version(), platform: process.platform, architecture: process.arch, control, scans: reports }, null, 2) + '\n'); if (browser) await browser.close(); await new Promise(resolve => server.close(resolve)); }

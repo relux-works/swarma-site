@@ -10,7 +10,7 @@ export function publicConfig(root) {
     || !Array.isArray(repositories)
     || repositories.some(repo => typeof repo?.name !== 'string' || !/^[a-z\d][a-z\d._-]*$/.test(repo.name)
       || typeof repo.description_key !== 'string' || !repo.description_key
-      || !Array.isArray(repo.status_rows) || repo.status_rows.some(id => typeof id !== 'string'))
+      || Object.keys(repo).some(key => !['name', 'description_key'].includes(key)))
     || new Set(repositories.map(repo => repo.name)).size !== repositories.length) throw new Error('identifier-allowlist: invalid configuration');
   return { site, repositories, allowlist: { repositories: repositories.map(repo => `https://github.com/${site.github_org}/${repo.name}`), emails: [site.contact_email] } };
 }

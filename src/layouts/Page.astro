@@ -15,7 +15,7 @@ interface Props { title: string; description: string; lang: Locale; id?: string 
 const { title, description, lang, id } = Astro.props;
 const pages = await getCollection('pages');
 const home = pages.find(page => page.id === `${lang}/index`);
-const primarySlugs = ['platform', 'principles', 'open-source', 'status', 'book', 'papers'];
+const primarySlugs = ['platform', 'principles', 'open-source', 'book', 'papers'];
 const navigation = pages.filter(page => primarySlugs.some(slug => page.id === `${lang}/${slug}`) && page.data.nav)
   .sort((a, b) => a.data.order - b.data.order || a.id.localeCompare(b.id));
 const slug = id?.split('/').slice(1).join('/') ?? 'index';
@@ -24,7 +24,7 @@ const counterparts = locales.flatMap(locale => {
   return page ? [{ locale, page }] : [];
 });
 const labels = strings[lang];
-const footerPages = ['book', 'papers', 'status', 'privacy'].flatMap(slug => {
+const footerPages = ['book', 'papers', 'privacy'].flatMap(slug => {
   const page = pages.find(page => page.id === `${lang}/${slug}`);
   return page ? [page] : [];
 });
@@ -37,12 +37,22 @@ const footerPages = ['book', 'papers', 'status', 'privacy'].flatMap(slug => {
     <title>{title === 'Swarma' ? title : `${title} | Swarma`}</title>
     <meta name="description" content={description} />
     <script type="application/ld+json" set:html={JSON.stringify({ '@context': 'https://schema.org', '@type': 'Organization', name: 'Relux Works', url: 'https://relux.works/', logo: '/brand/relux-symbol.svg' })} />
+    <link rel="icon" href="/brand/favicon.ico" sizes="16x16 32x32 48x48" />
+    <link rel="icon" type="image/svg+xml" href="/brand/favicon.svg" media="(prefers-color-scheme: light)" />
+    <link rel="icon" type="image/svg+xml" href="/brand/favicon-dark.svg" media="(prefers-color-scheme: dark)" />
+    <link rel="apple-touch-icon" href="/brand/apple-touch-icon.png" sizes="180x180" />
+    <link rel="manifest" href="/site.webmanifest" />
   </head>
   <body>
     <a class="skip-link" href="#main">{labels.skip}</a>
     <header class="site-header">
       <div class="container header-inner">
-        <a class="wordmark" dir="ltr" href={home ? route(home.id) : '/'}>Swarma</a>
+        <a class="product-lockup" dir="ltr" href={home ? route(home.id) : '/'} aria-label={lang === 'ru' ? 'Swarma, главная' : 'Swarma home'}>
+          <picture>
+            <source media="(prefers-color-scheme: dark)" srcset="/brand/swarma-lockup-horizontal-dark.svg" />
+            <img src="/brand/swarma-lockup-horizontal.svg" alt="Swarma" width="344" height="120" />
+          </picture>
+        </a>
         <nav class="desktop-nav" data-site-nav aria-label={labels.navigation}>
           <ul>{navigation.map(page => <li><a href={route(page.id)} aria-current={id === page.id ? 'page' : undefined}>{page.data.title}</a></li>)}</ul>
         </nav>
@@ -78,7 +88,7 @@ const footerPages = ['book', 'papers', 'status', 'privacy'].flatMap(slug => {
           <p>{publications.book.authors.join(', ')}</p>
           <p class="contact"><a href={`mailto:${site.contact_email}`} dir="ltr">{site.contact_email}</a></p>
         </div>
-        <nav aria-label={lang === 'ru' ? 'Публикации и состояние' : 'Publications and status'}>
+        <nav aria-label={lang === 'ru' ? 'Публикации' : 'Publications'}>
           <ul>{footerPages.map(page => <li><a href={route(page.id)}>{page.data.title}</a></li>)}</ul>
         </nav>
         {counterparts.length > 1 && <nav class="language-switch" aria-label={labels.footerLanguages}>
@@ -114,7 +124,27 @@ const footerPages = ['book', 'papers', 'status', 'privacy'].flatMap(slug => {
           document.documentElement.classList.remove('menu-open');
           trigger.focus();
         });
-        matchMedia('(min-width: 1100px)').addEventListener('change', event => { if (event.matches && dialog.open) close(); });
+        const header = document.querySelector<HTMLElement>('.header-inner')!;
+        const nav = document.querySelector<HTMLElement>('.desktop-nav')!;
+        const identity = document.querySelector<HTMLElement>('.product-lockup')!;
+        const end = document.querySelector<HTMLElement>('.header-end')!;
+        const sync = () => {
+          const style = getComputedStyle(header);
+          const available = header.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+          const languages = end.querySelector<HTMLElement>('.language-switch');
+          const service = languages?.getBoundingClientRect().width ?? 0;
+          const gap = 16;
+          const needed = 2 * Math.max(identity.getBoundingClientRect().width, service) + nav.getBoundingClientRect().width + 2 * gap;
+          const expanded = available >= needed;
+          header.dataset.desktop = String(expanded);
+          nav.inert = !expanded;
+          if (expanded && dialog.open) close();
+        };
+        const observer = new ResizeObserver(sync);
+        [header, nav, identity, end].forEach(node => observer.observe(node));
+        document.fonts.ready.then(sync);
+        window.addEventListener('resize', sync);
+        sync();
       }
       const disclosure = document.querySelector<HTMLDetailsElement>('.section-index details');
       if (disclosure) {

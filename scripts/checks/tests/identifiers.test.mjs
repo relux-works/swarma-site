@@ -49,7 +49,7 @@ test('identifiers decoded text', async t => {
 
 // Exact allowlist entries pass; a similar repository and a different email remain forbidden.
 test('identifiers exact allowlist', async t => {
-  const root = await fixture(t, { 'config/site.json': '{"github_org":"relux-works","contact_email":"public@example.org"}', 'config/repos.json': '[{"name":"public-example","description_key":"module","status_rows":[]}]', 'README.md': 'https://github.com/relux-works/public-example public@example.org' });
+  const root = await fixture(t, { 'config/site.json': '{"github_org":"relux-works","contact_email":"public@example.org"}', 'config/repos.json': '[{"name":"public-example","description_key":"module"}]', 'README.md': 'https://github.com/relux-works/public-example public@example.org' });
   run('identifiers', root);
   await put(root, 'README.md', 'https://github.com/relux-works/public-example-extra other@example.org');
   run('identifiers', root, 'private-repository');
@@ -75,7 +75,7 @@ for (const [index, [html, rule]] of [
 // Entity decoding preserves valid public values and exact allowlist behavior.
 test('identifiers decoded attributes positive control', async t => {
   const root = await fixture(t, {
-    'config/site.json': '{"github_org":"relux-works","contact_email":"public@example.org"}', 'config/repos.json': '[{"name":"public-example","description_key":"module","status_rows":[]}]',
+    'config/site.json': '{"github_org":"relux-works","contact_email":"public@example.org"}', 'config/repos.json': '[{"name":"public-example","description_key":"module"}]',
     'dist/index.html': '<a href="https://github.com/relux-works/&#112;ublic-example" title="Swarma">Source</a><img src="/image.png" srcset="/image.png 1x, /large.png 2x" alt="Swarma"><meta name="description" content="Страница готовится."><a href="mailto:public&#64;example.org" aria-label="Contact" aria-description="Public contact">Contact</a>',
   });
   run('identifiers', root);

@@ -39,15 +39,6 @@ function verdict(name, check, root, rule) {
   evidence.push({ name, check, buildExit: 0, checkExit: result.status, diagnostic: result.stderr.trim() || result.stdout.trim() });
 }
 
-// A real build accepts the complete canonical StatusTable and an independent StatusRow component use.
-test('build: canonical table and standalone row controls', async t => {
-  const root = await sourceFixture(t);
-  await layoutPlant(root, '<table><tbody><StatusRow id="swarma" /></tbody></table>', "import StatusRow from '../components/StatusRow.astro';\n");
-  build(root);
-  verdict('canonical table and standalone row', 'status-language', root);
-  verdict('supported publication surface', 'publication-surface', root);
-});
-
 // All unsupported features and reviewer witnesses survive the real public-to-dist build and fail by file/rule.
 test('build: unsupported publication surfaces are rejected', async t => {
   const root = await sourceFixture(t);
@@ -67,28 +58,8 @@ test('build: forged layout marker is rejected', async t => {
   const root = await sourceFixture(t);
   await layoutPlant(root, '<p data-status-source="book-1.6.1">Swarma Chain is available now.</p>');
   build(root);
-  verdict('forged layout marker', 'status-language', root, 'status-provenance');
-  run('status-language', root, 'status-marker-location');
-});
-
-// Changing a marked component cell fails even though the marker remains in an allowed source file.
-test('build: changed marked cell is rejected', async t => {
-  const root = await sourceFixture(t);
-  await layoutPlant(root, '<table><tbody><StatusRow id="swarma" /></tbody></table>', "import StatusRow from '../components/StatusRow.astro';\n");
-  const path = join(root, 'src/components/StatusRow.astro');
-  await writeFile(path, (await readFile(path, 'utf8')).replace('<td>{row.works_today}</td>', '<td>available now</td>'));
-  build(root);
-  verdict('changed marked cell', 'status-language', root, 'status-provenance');
-});
-
-// An extra neutral descendant in a marked cell fails structural provenance, independently of availability language.
-test('build: extra marked descendant is rejected', async t => {
-  const root = await sourceFixture(t);
-  await layoutPlant(root, '<table><tbody><StatusRow id="swarma" /></tbody></table>', "import StatusRow from '../components/StatusRow.astro';\n");
-  const path = join(root, 'src/components/StatusRow.astro');
-  await writeFile(path, (await readFile(path, 'utf8')).replace('<td>{row.not_yet}</td>', '<td><span>{row.not_yet}</span></td>'));
-  build(root);
-  verdict('extra marked descendant', 'status-language', root, 'status-provenance');
+  verdict('forged layout marker', 'status-language', root, 'status-language');
+  run('no-status', root, 'status-forbidden');
 });
 
 // An availability claim adjacent to the genuine table remains outside its validated exemption.
@@ -133,7 +104,7 @@ const attr = (node, name) => node.attrs?.find(attr => attr.name === name)?.value
 async function verifyHomeLinks(root, expected) {
   const html = await readFile(join(root, 'dist/en/platform/runtime/index.html'), 'utf8');
   const parsed = nodes(document(html));
-  const wordmark = parsed.find(node => node.tagName === 'a' && attr(node, 'class') === 'wordmark');
+  const wordmark = parsed.find(node => node.tagName === 'a' && attr(node, 'class') === 'product-lockup');
   assert.equal(attr(wordmark, 'href'), expected);
   assert.equal(attr(parsed.find(node => node.tagName === 'html'), 'lang'), 'en');
   for (const path of (await filesAt(root, 'dist')).filter(path => path.endsWith('.html'))) {

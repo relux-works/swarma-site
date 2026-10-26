@@ -3,6 +3,7 @@ import { join, relative, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { parse } from 'parse5';
 import { denyTokens, redactor, safeError } from './scanner-policy.mjs';
+import { approvedBrand } from './brand-assets.mjs';
 import { approvedFont } from './font-approved.mjs';
 
 export async function filesAt(root, path) {
@@ -32,6 +33,8 @@ export async function scanText(root, inspect) {
   for (const file of await scanFiles(root)) {
     const data = await readFile(file);
     if (await approvedFont(root, relative(root, file), data)) continue;
+    const brandPath = relative(root, file).replace(/^dist\//, 'public/');
+    if (await approvedBrand(root, brandPath, data)) continue;
     const text = data.toString('utf8');
     for (const rule of inspect(text)) errors.push(`${relative(root, file)}: ${rule}`);
   }

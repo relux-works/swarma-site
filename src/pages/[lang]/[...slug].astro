@@ -1,7 +1,6 @@
 ---
 import { getCollection, render } from 'astro:content';
 import Page from '../../layouts/Page.astro';
-import { renderStatus } from '../../lib/status-render.mjs';
 import chapters from '../../data/book-chapters.json';
 import type { Locale } from '../../lib/routes';
 
@@ -18,10 +17,6 @@ const { Content } = await render(page);
 ---
 <Page title={page.data.title} description={page.data.description} lang={lang as Locale} id={page.id}>
   <Content />
-  {page.id === 'ru/status' && !page.data.status_table && !page.data.status_rows && <>
-    <p>Книга Swarma, версия 1.6.1, глава 30: Где мы и что дальше. Карта по слоям.</p>
-    <Fragment set:html={renderStatus({ full: true })} />
-  </>}
   {page.id === `${lang}/book` && <section class="book-chapters" aria-labelledby="book-contents">
     <h2 id="book-contents">{lang === 'en' ? 'Book chapters' : 'Главы книги'}</h2>
     <ol start="0">{chapters.map(chapter => <li id={`ch${chapter.number}`}><span class="technical">{chapter.number}</span> {lang === 'en' && chapter.title_en ? chapter.title_en : <span lang="ru">{chapter.title}</span>}</li>)}</ol>

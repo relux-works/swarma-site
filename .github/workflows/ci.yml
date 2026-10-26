@@ -35,6 +35,7 @@ jobs:
           name: accessibility-figures-${{ matrix.figures }}
           path: |
             .temp/a11y/
+            .temp/contrast/
             .temp/conventions-evidence.json
             .temp/conventions-a11y-*.json
             .temp/build-regression-evidence.json

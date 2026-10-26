@@ -1,4 +1,4 @@
-// Descriptions use book terms; development state comes exclusively from the status rows.
+// Descriptions use the book terminology and describe each repository's role.
 export const repositoryDescriptions = {
   'curator': {
     ru: 'Swarma Curator: профили, управляемые дома агентов, скиллы, оверлеи и MCP.',

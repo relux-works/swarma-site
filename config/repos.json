@@ -1,96 +1,54 @@
 [
   {
     "name": "curator",
-    "description_key": "curator",
-    "status_rows": [
-      "runtime-curator",
-      "runtime-mcp"
-    ]
+    "description_key": "curator"
   },
   {
     "name": "curator-spec",
-    "description_key": "curator-spec",
-    "status_rows": [
-      "runtime-curator"
-    ]
+    "description_key": "curator-spec"
   },
   {
     "name": "curator-agent-launcher",
-    "description_key": "curator-agent-launcher",
-    "status_rows": [
-      "runtime-curator"
-    ]
+    "description_key": "curator-agent-launcher"
   },
   {
     "name": "swarma-keymaker",
-    "description_key": "swarma-keymaker",
-    "status_rows": [
-      "runtime-keys"
-    ]
+    "description_key": "swarma-keymaker"
   },
   {
     "name": "swarma-registrar",
-    "description_key": "swarma-registrar",
-    "status_rows": [
-      "runtime-admission"
-    ]
+    "description_key": "swarma-registrar"
   },
   {
     "name": "swarma-owner-registry",
-    "description_key": "swarma-owner-registry",
-    "status_rows": [
-      "runtime-grants",
-      "runtime-keys"
-    ]
+    "description_key": "swarma-owner-registry"
   },
   {
     "name": "swarma-witness",
-    "description_key": "swarma-witness",
-    "status_rows": [
-      "runtime-grants"
-    ]
+    "description_key": "swarma-witness"
   },
   {
     "name": "swarma-credential-broker",
-    "description_key": "swarma-credential-broker",
-    "status_rows": [
-      "runtime-credentials"
-    ]
+    "description_key": "swarma-credential-broker"
   },
   {
     "name": "swarma-user-manager",
-    "description_key": "swarma-user-manager",
-    "status_rows": [
-      "runtime-launcher"
-    ]
+    "description_key": "swarma-user-manager"
   },
   {
     "name": "swarma-dispatcher",
-    "description_key": "swarma-dispatcher",
-    "status_rows": [
-      "runtime-dispatcher"
-    ]
+    "description_key": "swarma-dispatcher"
   },
   {
     "name": "swarma-session-host",
-    "description_key": "swarma-session-host",
-    "status_rows": [
-      "runtime-sessions"
-    ]
+    "description_key": "swarma-session-host"
   },
   {
     "name": "swarma-pool",
-    "description_key": "swarma-pool",
-    "status_rows": [
-      "part-023",
-      "part-024"
-    ]
+    "description_key": "swarma-pool"
   },
   {
     "name": "swarma-memory",
-    "description_key": "swarma-memory",
-    "status_rows": [
-      "runtime-memory"
-    ]
+    "description_key": "swarma-memory"
   }
 ]
