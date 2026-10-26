@@ -93,7 +93,7 @@ test('identifiers external tokens', async t => {
 
 // External tokens also cover policy/test sources, configuration, hidden CI files and decoded output.
 for (const path of ['scripts/checks/identifier-rules.mjs', 'scripts/checks/tests/probe.mjs', 'config/probe.json', '.github/probe.yml', 'dist/index.html', 'LICENSE']) test(`identifiers external scope ${path}`, async t => {
-  const root = await fixture(t, { [path]: '<p>zz-host-&#97;lpha</p>' });
+  const root = await fixture(t, { [path]: path.endsWith('.json') ? JSON.stringify({ label: 'zz-host-alpha' }) : '<p>zz-host-&#97;lpha</p>' });
   run('identifiers', root, 'deny-token');
 });
 
@@ -132,4 +132,89 @@ test('identifiers local optional tokens', async t => {
   assert.match(optional.stderr, /Warning: external deny tokens are missing/);
   await put(root, 'src/sample.txt', '@reader:example.org');
   run('identifiers', root, 'matrix-user', { ...env, IDENT_DENY_TOKENS_OPTIONAL: '1' });
+});
+
+// Parsing and genuine file-read failures reject without exposing any configured value on either stream.
+test('identifiers exception diagnostics are safe', async t => {
+  const { chmod, readFile } = await import('node:fs/promises');
+  const { join } = await import('node:path');
+  const tokens = ['zz-host-alpha', 'zz-host-beta'];
+  const environment = { IDENT_DENY_TOKENS: tokens.join(',') };
+  const safe = result => {
+    for (const token of tokens) assert.ok(!(result.stdout + result.stderr).toLowerCase().includes(token));
+  };
+  const root = await fixture(t);
+  safe(run('identifiers', root, undefined, environment));
+  await put(root, 'config/public-repos.json', tokens.join(' '));
+  safe(run('identifiers', root, 'identifier-allowlist', environment));
+  await put(root, 'config/public-repos.json', '{"repositories":[],"emails":[]}');
+  const path = join(root, 'public/zz-host-alpha.txt');
+  await put(root, 'public/zz-host-alpha.txt', 'Ordinary text');
+  safe(run('identifiers', root, 'deny-token', environment));
+  await chmod(path, 0);
+  try {
+    await assert.rejects(readFile(path), { code: 'EACCES' });
+    safe(run('identifiers', root, 'identifier-scan', environment));
+  } finally { await chmod(path, 0o600); }
+  safe(run('identifiers', root, 'deny-token', environment));
+});
+
+// Malformed configurations reject by a fixed rule, independently of parser exception wording.
+for (const value of ['{', 'null', '[]', '{"repositories":[1],"emails":[]}', '{"repositories":[],"emails":"all"}']) test(`identifiers invalid allowlist ${value}`, async t => {
+  const root = await fixture(t, { 'config/public-repos.json': value });
+  run('identifiers', root, 'identifier-allowlist');
+});
+
+const { encodedIdentifiers } = await import('./identifier-fixture.mjs');
+// Every supported encoding rejects both an external literal and a generic identifier in source and output, beside valid controls.
+for (const [name, suffix, external, generic, clean, genericRule = 'matrix-user'] of encodedIdentifiers) test(`identifiers publication decoding: ${name}`, async t => {
+  const paths = [`src/probe.${suffix}`, `dist/probe.${suffix}`];
+  const root = await fixture(t, Object.fromEntries(paths.map(path => [path, clean])));
+  run('identifiers', root);
+  for (const [value, rule] of [[external, 'deny-token'], [generic, genericRule]]) {
+    for (const path of paths) {
+      await put(root, path, value);
+      const result = run('identifiers', root, rule);
+      assert.ok(result.stderr.split('\n').includes(`${path}: ${rule}`), result.stderr);
+      assert.ok(!(result.stdout + result.stderr).toLowerCase().includes('zz-host-alpha'));
+      await put(root, path, clean);
+    }
+  }
+  run('identifiers', root);
+});
+
+// Consumer decoding runs once; entity-looking JSON/CSS strings and double entities remain literal.
+for (const [suffix, source] of [
+  ['md', '&amp;#64;reader:example.org'],
+  ['html', '<p>&amp;#64;reader:example.org</p>'],
+  ['svg', '<svg><text>&amp;#64;reader:example.org</text></svg>'],
+  ['json', '{"label":"&#64;reader:example.org"}'],
+  ['css', String.raw`p {content:"\26 #64;reader:example.org"}`],
+]) test(`identifiers decoding boundary ${suffix}`, async t => {
+  const root = await fixture(t, { [`public/probe.${suffix}`]: source });
+  run('identifiers', root);
+});
+
+// Malformed JSON/CSS and unsupported custom XML entities cannot silently skip the decoded scan.
+for (const [suffix, source] of [['json', '{"label":'], ['css', 'p {content:"unfinished}'], ['css', '/* unfinished'],
+  ['svg', '<!DOCTYPE svg [<!ENTITY private "zz-host-alpha">]><svg><text>&private;</text></svg>']]) test(`identifiers decode failure ${suffix}: ${source}`, async t => {
+  const root = await fixture(t, { [`public/probe.${suffix}`]: source });
+  run('identifiers', root, 'publication-decode');
+});
+
+// Even a throw before check() starts reaches the actual identifier CLI's fixed diagnostic instead of an exception message.
+test('identifiers CLI boundary suppresses thrown values', async t => {
+  const { spawnSync } = await import('node:child_process');
+  const { join } = await import('node:path');
+  const { fileURLToPath } = await import('node:url');
+  const root = await fixture(t, { 'preload.mjs': 'process.cwd = () => { throw new Error("zz-host-alpha"); };' });
+  const script = fileURLToPath(new URL('../identifiers.mjs', import.meta.url));
+  const result = spawnSync(process.execPath, ['--import', join(root, 'preload.mjs'), script], {
+    cwd: root, encoding: 'utf8', timeout: 15000,
+    env: { ...process.env, HOME: root, IDENT_DENY_TOKENS: 'zz-host-alpha', CI: 'true' },
+  });
+  assert.ifError(result.error);
+  assert.equal(result.status, 1, result.stdout + result.stderr);
+  assert.equal(result.stderr.trim(), 'identifier-scan: cannot run identifier check');
+  assert.ok(!(result.stdout + result.stderr).includes('zz-host-alpha'));
 });

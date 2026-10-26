@@ -65,6 +65,20 @@ Real internal names are supplied outside the repository through `IDENT_DENY_TOKE
 (comma-separated literals), or the untracked local file `$HOME/.config/swarma-site/deny-tokens.txt`
 (one literal per line; commas are also accepted). A nonempty environment list takes precedence.
 Matches are case-insensitive literal substrings; diagnostics name the rule and redact matching filenames.
+Both raw source and decoded publication values receive the generic and external-token checks. JSON keys and
+string values are parsed, including Unicode escapes. CSS decoding covers character escapes, escaped string
+newlines, adjacent generated-content strings and URL targets. HTML/SVG text and attributes decode entities;
+embedded style elements and attributes receive CSS decoding. Markdown entities and link targets are decoded
+outside code spans/fences. Raw code examples remain subject to identifier rules. URL targets also receive
+percent decoding. Entity-looking text in JSON/CSS strings is not recursively HTML-decoded.
+
+Malformed JSON and CSS lexical input fail with `publication-decode`. SVG custom entity declarations/DTDs are
+rejected by that rule because the HTML parser does not implement XML DTD expansion. The scanner uses static
+format-specific decoding; it does not execute JavaScript or arbitrary application transformations.
+Configuration parse failures return `identifier-allowlist`; external-source read failures return
+`identifier-deny-tokens`; file/traversal failures return `identifier-scan`. These fixed diagnostics and the
+identifier CLI fallback never print underlying exception messages or file contents. Normal findings pass through
+the same configured-token redaction. The allowlist requires arrays of strings for both fields.
 External tokens scan all repository files, including policy sources, tests, configuration and CI files,
 without the generic-rule exemptions. Only Git metadata, dependency directories, local context and generated
 scratch/cache directories (`.temp/`, `.astro/`, `.val/`) are omitted; built `dist/` files remain checked.
@@ -75,6 +89,9 @@ CI fails when neither source supplies a nonempty list, even if `IDENT_DENY_TOKEN
 Locally, missing tokens print a warning and run generic checks, but still exit nonzero.
 Only an explicit local `IDENT_DENY_TOKENS_OPTIONAL=1 npm run check` permits a generic-only pass.
 The isolated controls inject synthetic lists and temporary home directories; they do not need the real list.
+They assert safe output for malformed configuration and actual unreadable files, and pair encoded identifier
+plants with valid controls in source and output. Real Astro builds verify that encoded public files reach `dist/`
+and are rejected there, alongside clean public-to-dist controls.
 
 Status-language checks inspect all authored content and decoded rendered HTML text;
 the source marker alone grants no exemption. Each marked DOM table is compared with

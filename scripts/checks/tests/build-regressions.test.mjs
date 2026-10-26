@@ -7,6 +7,7 @@ import { spawnSync } from 'node:child_process';
 import { document, filesAt } from '../lib.mjs';
 import { fixture, put, run, page } from './fixture.mjs';
 import { plants, reviewPlants } from './publication-fixture.mjs';
+import { encodedIdentifiers } from './identifier-fixture.mjs';
 
 const repository = fileURLToPath(new URL('../../..', import.meta.url));
 const evidence = [];
@@ -159,4 +160,30 @@ test('build: complete English home uses its own route', async t => {
   const main = rootNodes.find(node => node.tagName === 'main');
   assert.deepEqual(nodes(main).filter(node => node.tagName === 'a').map(node => attr(node, 'href')), ['/ru/', '/en/']);
   evidence.push({ name: 'English home and counterpart', buildExit: 0, wordmark: '/en/', internalLinks: 'all resolved' });
+});
+
+// Actual public-to-dist builds preserve encoded JSON/CSS/markup witnesses; the production identifier CLI rejects every output file.
+test('build: decoded publication identifiers fail after clean controls', async t => {
+  const root = await sourceFixture(t);
+  for (const [index, [, suffix, , , clean]] of encodedIdentifiers.entries()) {
+    await put(root, `public/policy-${index}.${suffix}`, clean);
+    await put(root, `public/generic-${index}.${suffix}`, clean);
+  }
+  build(root);
+  verdict('encoded publication clean controls', 'identifiers', root);
+  for (const [index, [, suffix, external, generic]] of encodedIdentifiers.entries()) {
+    await put(root, `public/policy-${index}.${suffix}`, external);
+    await put(root, `public/generic-${index}.${suffix}`, generic);
+  }
+  build(root);
+  const result = run('identifiers', root, 'deny-token');
+  assert.ok(!(result.stdout + result.stderr).toLowerCase().includes('zz-host-alpha'));
+  for (const [index, [name, suffix, external, generic, , genericRule = 'matrix-user']] of encodedIdentifiers.entries()) {
+    for (const [prefix, value, rule] of [['policy', external, 'deny-token'], ['generic', generic, genericRule]]) {
+      const path = `dist/${prefix}-${index}.${suffix}`;
+      assert.equal(await readFile(join(root, path), 'utf8'), value);
+      assert.ok(result.stderr.split('\n').includes(`${path}: ${rule}`), result.stderr);
+      evidence.push({ name, check: 'identifiers', buildExit: 0, checkExit: result.status, diagnostic: `${path}: ${rule}` });
+    }
+  }
 });
