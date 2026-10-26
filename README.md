@@ -46,7 +46,7 @@ locale home links the product identity to the root selector.
 | parse5: `npm run check:publication-surface` | Only supported publication HTML features in source/output | Console |
 | `npm run check:brand` | Copied artwork bytes match the pinned owner's manifest | Console |
 | `npm run check:fonts` | Licensed local font assets match their manifest | Console |
-| Python / Chromium: `npm run check:contrast` | Effective built CSS passes 2816 numeric token pairs across 16 appearances, including forced colors and reduced transparency | `.temp/contrast/report.json` |
+| Python / Chromium: `npm run check:contrast` | Every built screen document passes 2816 numeric token pairs across 16 appearances, including forced colors and reduced transparency | `.temp/contrast/report.json` |
 | Python: `python3 -B scripts/check_contrast.py src/styles/tokens.css` | Chromium resolves the copied tokens; 2816 numeric pairs and forced system-color roles | Console |
 | Python: `python3 -B scripts/check_contrast.py src/styles/tokens.css --control` | Known low-contrast control must fail | Console; exit 1 |
 | `npm run check:figures` | With figures off, no copied, inline, base64, geometry or hash representation of a book SVG reaches output | Console |
@@ -94,7 +94,25 @@ require exact SHA-256 matches; changed shipped assets fail those gates.
 - `[[repos]]` renders configured repository entries. Unknown descriptions fail.
 - Legacy delivery-state keys, markers and routes are forbidden. They are not content conventions.
 
-Build diagnostics use `src/lib/diagnostics.mjs`: configured values from `IDENT_DENY_TOKENS` or the
+All supported build and check commands start through `scripts/run.mjs`. npm scripts use it
+automatically. To run Astro directly with the same diagnostic boundary:
+
+```sh
+node scripts/run.mjs node node_modules/astro/bin/astro.mjs build
+```
+
+Use `node scripts/run.mjs node scripts/checks/<checker>.mjs` for a direct Node checker.
+The documented Python CLIs enter this supervisor before importing checker code or parsing
+arguments. The parent filters stdout and stderr line by line, including unterminated tails,
+and preserves child exit codes. Policy/bootstrap failures stop with a fixed safe diagnostic.
+Raw framework or checker executables bypass this supported entrypoint.
+
+The contrast gate loads every built HTML document unchanged in Chromium screen media, with
+local resources routed at their original URLs. The browser decides stylesheet media, order,
+relative imports and base-URL behavior; the gate does not concatenate or reapply stylesheets.
+CSS-only controls load an ordinary linked stylesheet fixture.
+
+In-process diagnostics also use `src/lib/diagnostics.mjs`: configured values from `IDENT_DENY_TOKENS` or the
 untracked local policy file are replaced case-insensitively before output. Convention errors are
 redacted at creation; Astro and check entry points also filter both streams so framework paths,
 frames and split writes cannot echo a configured value. An unreadable policy stops output with a

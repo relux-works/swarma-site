@@ -39,7 +39,7 @@ test('build: convention diagnostics never print configured policy values', async
   const path = 'src/content/pages/ru/probe-' + token + '.md';
   const environment = { ...process.env, IDENT_DENY_TOKENS: token, SWARMA_BOOK_FIGURES: '0' };
   const entries = [
-    ['direct Astro', [process.execPath, [join(repository, 'node_modules/astro/bin/astro.mjs'), 'build', '--root', root]]],
+    ['direct Astro', [process.execPath, [join(root, 'scripts/run.mjs'), process.execPath, join(repository, 'node_modules/astro/bin/astro.mjs'), 'build', '--root', root]]],
     ['npm build', ['npm', ['run', 'build']]],
   ];
   const cases = [
@@ -137,4 +137,94 @@ test('controls: default and pressed styles match their semantic pairs', async t 
       await button.evaluate(node => node.removeAttribute('aria-pressed'));
     }
   } finally { await session.close(); }
+});
+
+// The supervisor covers framework loading before config code executes, including dependency and config syntax failures.
+test('build: early configuration failures are supervised for both entrypoints', async t => {
+  const root = await sourceFixture(t);
+  const token = 'zz-bootstrap-canary';
+  const config = await readFile(join(root, 'astro.config.mjs'), 'utf8');
+  const module = `src/lib/${token}.mjs`;
+  const env = { ...process.env, IDENT_DENY_TOKENS: token, SWARMA_BOOK_FIGURES: '0' };
+  const entries = [
+    [process.execPath, ['scripts/run.mjs', process.execPath, 'node_modules/astro/bin/astro.mjs', 'build']],
+    ['npm', ['run', 'build']],
+  ];
+  const observations = [];
+  for (const [command, args] of entries) {
+    for (const kind of ['valid', 'missing-import', 'dependency-parse', 'config-parse']) {
+      await put(root, module, kind === 'dependency-parse' ? 'export const value = ;' : 'export const value = 1;');
+      const importPath = kind === 'missing-import' ? `./src/lib/missing-${token}.mjs` : `./${module}`;
+      await put(root, 'astro.config.mjs', `import '${importPath}';\n` + config + (kind === 'config-parse' ? `\nconst value = "${token}" ; const broken = ;` : ''));
+      const result = spawnSync(command, args, { cwd: root, env, encoding: 'utf8', timeout: 60000 });
+      assert.ifError(result.error);
+      const output = result.stdout + result.stderr;
+      assert.equal(result.status, kind === 'valid' ? 0 : 1, output);
+      assert.equal(output.toLowerCase().includes(token), false, 'early output contains configured token');
+      if (kind !== 'valid') {
+        assert.match(output, /\[redacted\]/);
+        assert.match(output, /failed|error|ERROR/i);
+      }
+      observations.push({ command, kind, exit: result.status, redacted: !output.toLowerCase().includes(token) });
+    }
+  }
+  await put(repository, '.temp/bootstrap-evidence.json', JSON.stringify(observations, null, 2));
+});
+
+// Parent pipes retain exit codes, UTF-8, literal redaction and unterminated tails; supervisor failures emit only safe text.
+test('supervisor: streams, child exit and broken policy module fail safely', async t => {
+  const root = await fixture(t);
+  const wrapper = join(repository, 'scripts/run.mjs');
+  const token = 'zz-cli-canary';
+  const env = { ...process.env, IDENT_DENY_TOKENS: token };
+  const source = "process.stdout.write('safe Пример\\nZZ-CLI-'); process.stdout.write('CANARY'); process.stderr.write('zz-cli-canary\\n'); process.exitCode=42;";
+  let result = spawnSync(process.execPath, [wrapper, process.execPath, '-e', source], { cwd: root, env, encoding: 'utf8' });
+  assert.equal(result.status, 42);
+  assert.equal(result.stdout, 'safe Пример\n[redacted]');
+  assert.equal(result.stderr, '[redacted]\n');
+  await put(root, 'scripts/run.mjs', await readFile(wrapper));
+  await put(root, 'scripts/checks/publication/policy.mjs', `export const ${token.replaceAll('-', '_')} = ;`);
+  result = spawnSync(process.execPath, ['scripts/run.mjs', process.execPath, '-e', `console.log('${token}')`], { cwd: root, env, encoding: 'utf8' });
+  assert.equal(result.status, 1);
+  assert.equal(result.stdout, '');
+  assert.equal(result.stderr, 'diagnostic-boundary: command unavailable\n');
+  // The documented Python entrypoint enters the supervisor before argparse can format a user argument.
+  result = spawnSync('python3', ['-B', 'scripts/check_contrast.py', 'src/styles/tokens.css', token], { cwd: repository, env, encoding: 'utf8', timeout: 60000 });
+  assert.equal(result.status, 2);
+  assert.match(result.stderr, /unrecognized arguments: \[redacted\]/);
+  assert.equal((result.stdout + result.stderr).includes(token), false);
+  // Even a syntax error in the Python implementation is compiled inside the child boundary.
+  for (const name of ['check_contrast.py', 'check_computed_contrast.py']) {
+    await put(root, `scripts/${name}`, await readFile(join(repository, `scripts/${name}`)));
+  }
+  await put(root, 'scripts/checks/publication/policy.mjs', await readFile(join(repository, 'scripts/checks/publication/policy.mjs')));
+  for (const [launcher, implementation] of [['check_contrast.py', 'contrast_contract.py'], ['check_computed_contrast.py', 'computed_contrast.py']]) {
+    await put(root, `scripts/${implementation}`, `print('${token}') ; invalid =`);
+    result = spawnSync('python3', ['-B', `scripts/${launcher}`], { cwd: root, env, encoding: 'utf8' });
+    assert.equal(result.status, 1);
+    assert.match(result.stderr, /SyntaxError/);
+    assert.match(result.stderr, /\[redacted\]/);
+    assert.equal((result.stdout + result.stderr).includes(token), false);
+  }
+});
+
+// Browser stylesheet applicability survives unchanged HTML: print-only repairs cannot mask a broken screen palette.
+test('contrast: link and style media preserve the screen cascade and local imports', async t => {
+  const root = await fixture(t);
+  const tokens = await readFile(join(repository, 'src/styles/tokens.css'), 'utf8');
+  const broken = '\n@media (forced-colors:none) { :root { --color-role-human-text:var(--color-role-human-fill); } }';
+  const link = '<link rel="stylesheet" href="/styles/main.css">';
+  await put(root, 'dist/styles/tokens.css', tokens);
+  await put(root, 'dist/styles/main.css', '@import url("./tokens.css");');
+  await put(root, 'dist/index.html', `<!doctype html><html><head>${link}</head><body>Control</body></html>`);
+  await contrast(root);
+  // An intentionally broken print sheet must have no effect on a passing screen document.
+  await put(root, 'dist/print.css', tokens + broken);
+  await put(root, 'dist/index.html', `<!doctype html><html><head>${link}<link rel="stylesheet" href="/print.css" media="print"></head><body>Control</body></html>`);
+  await contrast(root);
+  await put(root, 'dist/styles/main.css', '@import url("./tokens.css");' + broken);
+  await put(root, 'dist/print.css', tokens);
+  await assert.rejects(() => contrast(root), /FAIL light role-human-text on role-human-fill 1\.00/);
+  await put(root, 'dist/index.html', `<!doctype html><html><head>${link}<style media="print">${tokens}</style></head><body>Control</body></html>`);
+  await assert.rejects(() => contrast(root), /FAIL light role-human-text on role-human-fill 1\.00/);
 });
