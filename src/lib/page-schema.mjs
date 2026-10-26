@@ -7,4 +7,6 @@ export const pageSchema = z.object({
   description: z.string().trim().min(1),
   order: z.number().finite(),
   nav: z.boolean(),
-}).strict();
+  status_rows: z.array(z.string().min(1)).min(1).optional(),
+  status_table: z.literal('full').optional(),
+}).strict().refine(data => !(data.status_rows && data.status_table), { message: 'Choose status_rows or status_table' });

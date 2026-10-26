@@ -1,6 +1,12 @@
 ---
 import { getCollection } from 'astro:content';
 import { locales, localeLabels, route, type Locale } from '../lib/routes';
+import { strings } from '../lib/strings.mjs';
+import publications from '../data/publications.json';
+import lightLockup from '../assets/operator/relux-lockup-horizontal.svg?raw';
+import darkLockup from '../assets/operator/relux-lockup-horizontal-dark.svg?raw';
+import monoLockup from '../assets/operator/relux-lockup-horizontal-one-color.svg?raw';
+import '../styles/fonts.css';
 import '../styles/tokens.css';
 import '../styles/site.css';
 
@@ -8,16 +14,19 @@ interface Props { title: string; description: string; lang: Locale; id?: string 
 const { title, description, lang, id } = Astro.props;
 const pages = await getCollection('pages');
 const home = pages.find(page => page.id === `${lang}/index`);
-const navigation = pages.filter(page => page.id.startsWith(`${lang}/`) && page.data.nav)
+const primarySlugs = ['platform', 'principles', 'werkstatt', 'status', 'book', 'papers'];
+const navigation = pages.filter(page => primarySlugs.some(slug => page.id === `${lang}/${slug}`) && page.data.nav)
   .sort((a, b) => a.data.order - b.data.order || a.id.localeCompare(b.id));
 const slug = id?.split('/').slice(1).join('/') ?? 'index';
 const counterparts = locales.flatMap(locale => {
   const page = pages.find(page => page.id === `${locale}/${slug}`);
   return page ? [{ locale, page }] : [];
 });
-const labels = lang === 'ru'
-  ? { skip: 'К содержимому', navigation: 'Основная навигация', languages: 'Язык' }
-  : { skip: 'Skip to content', navigation: 'Main navigation', languages: 'Language' };
+const labels = strings[lang];
+const footerPages = ['book', 'papers', 'status'].flatMap(slug => {
+  const page = pages.find(page => page.id === `${lang}/${slug}`);
+  return page ? [page] : [];
+});
 ---
 <!doctype html>
 <html lang={lang} dir="ltr">
@@ -26,24 +35,93 @@ const labels = lang === 'ru'
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title === 'Swarma' ? title : `${title} | Swarma`}</title>
     <meta name="description" content={description} />
+    <script type="application/ld+json" set:html={JSON.stringify({ '@context': 'https://schema.org', '@type': 'Organization', name: 'Relux Works', url: 'https://relux.works/', logo: '/brand/relux-symbol.svg' })} />
   </head>
   <body>
     <a class="skip-link" href="#main">{labels.skip}</a>
-    <header>
+    <header class="site-header">
       <div class="container header-inner">
-        <a class="wordmark" href={home ? route(home.id) : '/'}>Swarma</a>
-        <nav aria-label={labels.navigation}>
+        <a class="wordmark" dir="ltr" href={home ? route(home.id) : '/'}>Swarma</a>
+        <nav class="desktop-nav" data-site-nav aria-label={labels.navigation}>
           <ul>{navigation.map(page => <li><a href={route(page.id)} aria-current={id === page.id ? 'page' : undefined}>{page.data.title}</a></li>)}</ul>
         </nav>
-        <nav aria-label={labels.languages}>
-          <ul>{counterparts.map(({ locale, page }) => <li><a href={route(page.id)} lang={locale} hreflang={locale} aria-current={lang === locale ? 'page' : undefined}>{localeLabels[locale]}</a></li>)}</ul>
-        </nav>
+        <div class="header-end">
+          {counterparts.length > 1 && <nav class="language-switch" aria-label={labels.languages}>
+            <ul>{counterparts.map(({ locale, page }) => <li><a href={route(page.id)} lang={locale} hreflang={locale} aria-current={lang === locale ? 'true' : undefined}>{localeLabels[locale]}</a></li>)}</ul>
+          </nav>}
+          <button class="menu-trigger" aria-expanded="false" aria-controls="site-menu">{labels.menu}</button>
+        </div>
       </div>
+      <dialog id="site-menu" aria-label={labels.navigation}>
+        <div class="drawer-content">
+          <button class="menu-close">{labels.close}</button>
+          <nav aria-label={labels.navigation}>
+            <ul>{navigation.map(page => <li><a href={route(page.id)} aria-current={id === page.id ? 'page' : undefined}>{page.data.title}</a></li>)}</ul>
+          </nav>
+        </div>
+      </dialog>
     </header>
     <main id="main" class="container" tabindex="-1">
-      <h1>{title}</h1>
+      <h1 class:list={{ 'home-title': slug === 'index' }}>{title}</h1>
       <slot />
     </main>
-    <footer class="container"><bdi>Relux Works</bdi></footer>
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <div>
+          <p class="relationship"><bdi dir="ltr">Relux Works · Swarma</bdi></p>
+          <a class="operator-lockup" href="https://relux.works/" aria-label="Relux Works" dir="ltr">
+            <span class="lockup-light" aria-hidden="true" set:html={lightLockup.replace('<svg ', '<svg aria-hidden="true" ')} />
+            <span class="lockup-dark" aria-hidden="true" set:html={darkLockup.replace('<svg ', '<svg aria-hidden="true" ')} />
+            <span class="lockup-mono" aria-hidden="true" set:html={monoLockup.replace('<svg ', '<svg aria-hidden="true" ')} />
+          </a>
+          <p>{publications.book.authors.join(', ')}</p>
+        </div>
+        <nav aria-label={lang === 'ru' ? 'Публикации и состояние' : 'Publications and status'}>
+          <ul>{footerPages.map(page => <li><a href={route(page.id)}>{page.data.title}</a></li>)}</ul>
+        </nav>
+        {counterparts.length > 1 && <nav class="language-switch" aria-label={labels.languages}>
+          <ul>{counterparts.map(({ locale, page }) => <li><a href={route(page.id)} lang={locale} hreflang={locale} aria-current={lang === locale ? 'true' : undefined}>{localeLabels[locale]}</a></li>)}</ul>
+        </nav>}
+      </div>
+    </footer>
+    <script>
+      const dialog = document.querySelector<HTMLDialogElement>('#site-menu');
+      const trigger = document.querySelector<HTMLButtonElement>('.menu-trigger');
+      const closeButton = document.querySelector<HTMLButtonElement>('.menu-close');
+      if (dialog && trigger && closeButton) {
+        const close = () => dialog.close();
+        trigger.addEventListener('click', () => {
+          dialog.showModal();
+          trigger.setAttribute('aria-expanded', 'true');
+          document.documentElement.classList.add('menu-open');
+          closeButton.focus();
+        });
+        closeButton.addEventListener('click', close);
+        dialog.addEventListener('keydown', event => {
+          if (event.key !== 'Tab') return;
+          const controls = [...dialog.querySelectorAll<HTMLElement>('button, a[href]')].filter(node => node.getClientRects().length > 0);
+          const first = controls[0], last = controls.at(-1);
+          if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+          else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+        });
+        dialog.addEventListener('click', event => { if (event.target === dialog) close(); });
+        dialog.querySelectorAll('a').forEach(link => link.addEventListener('click', close));
+        dialog.addEventListener('close', () => {
+          if (dialog.open) return;
+          trigger.setAttribute('aria-expanded', 'false');
+          document.documentElement.classList.remove('menu-open');
+          trigger.focus();
+        });
+        matchMedia('(min-width: 1100px)').addEventListener('change', event => { if (event.matches && dialog.open) close(); });
+      }
+      const disclosure = document.querySelector<HTMLDetailsElement>('.section-index details');
+      if (disclosure) {
+        const query = matchMedia('(min-width: 640px)');
+        const sync = () => { disclosure.open = query.matches; disclosure.querySelector('summary')!.tabIndex = query.matches ? -1 : 0; };
+        sync();
+        query.addEventListener('change', sync);
+        disclosure.addEventListener('toggle', () => { if (query.matches && !disclosure.open) disclosure.open = true; });
+      }
+    </script>
   </body>
 </html>

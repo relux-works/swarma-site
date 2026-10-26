@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="690.8" height="573" viewBox="0 0 690.8 573">
+<title>Топология Swarma Protocol: рабочие ноды предлагают действия, кор-ноды подтверждают допустимость записей, единая пассивная среда исполняет разрешённое.</title>
+<rect width="690.8" height="573" fill="#ffffff"/>
+<g transform="translate(12 12)">
+<g transform="translate(0 -8)">
+<!-- graphviz 14.0.4 -->
+<!-- group contrib -->
+<rect x="51" y="8" width="294" height="180.9" rx="16" fill="none" stroke="#d9690f" stroke-width="2" stroke-dasharray="8 6" class="group" data-id="contrib"/>
+<!-- node work -->
+<rect x="69.3" y="61" width="257.3" height="109.9" rx="12" fill="#f3effd" stroke="#7c4ddb" stroke-width="2" class="box" data-id="work"/>
+<text x="141.3" y="87.1" font-size="18" fill="#1f2328"><tspan font-family="PT Sans, sans-serif" font-weight="bold">Рабочие ноды</tspan></text>
+<text x="85.3" y="115.6" font-size="15" fill="#4b5260"><tspan font-family="PT Sans, sans-serif">агентские циклы контрибьюторов,</tspan></text>
+<text x="92.7" y="135.1" font-size="15" fill="#4b5260"><tspan font-family="PT Sans, sans-serif">свои модели и учётные данные;</tspan></text>
+<text x="128.7" y="154.6" font-size="15" fill="#4b5260"><tspan font-family="PT Sans, sans-serif">плоскость мышления</tspan></text>
+<!-- node core -->
+<rect x="0" y="257.9" width="177.9" height="109.9" rx="12" fill="#ebf2ff" stroke="#2f6fdb" stroke-width="2" class="box" data-id="core"/>
+<text x="49.3" y="284" font-size="18" fill="#1f2328"><tspan font-family="PT Sans, sans-serif" font-weight="bold">Кор-ноды</tspan></text>
+<text x="32.9" y="312.6" font-size="15" fill="#4b5260"><tspan font-family="PT Sans, sans-serif">журнал, правила,</tspan></text>
+<text x="17.2" y="332.1" font-size="15" fill="#4b5260"><tspan font-family="PT Sans, sans-serif">аренда оркестратора;</tspan></text>
+<text x="16" y="351.6" font-size="15" fill="#4b5260"><tspan font-family="PT Sans, sans-serif">плоскость управления</tspan></text>
+<!-- node env -->
+<rect x="165.9" y="437.5" width="240" height="109.9" rx="12" fill="#ebf2ff" stroke="#2f6fdb" stroke-width="2" class="box" data-id="env"/>
+<text x="184.8" y="463.6" font-size="18" fill="#1f2328"><tspan font-family="PT Sans, sans-serif" font-weight="bold">Одна авторитетная среда</tspan></text>
+<text x="181.9" y="492.1" font-size="15" fill="#4b5260"><tspan font-family="PT Sans, sans-serif">рабочее дерево, области задач,</tspan></text>
+<text x="193.1" y="511.6" font-size="15" fill="#4b5260"><tspan font-family="PT Sans, sans-serif">слоты, проверки, пассивный</tspan></text>
+<text x="184.8" y="531.1" font-size="15" fill="#4b5260"><tspan font-family="PT Sans, sans-serif">раннер; плоскость исполнения</tspan></text>
+<!-- note env -->
+<rect x="449.1" y="427.8" width="217.8" height="129.2" rx="10" fill="#f6f7f9" stroke="#d5d9df" stroke-width="1.2" class="note" data-id="note_env"/>
+<text x="479.1" y="451.1" font-size="14" fill="#4b5260"><tspan font-family="PT Sans, sans-serif">Через сеть идут команды,</tspan></text>
+<text x="484.6" y="469.3" font-size="14" fill="#4b5260"><tspan font-family="PT Sans, sans-serif">вывод, хэши и подписи;</tspan></text>
+<text x="486.2" y="487.5" font-size="14" fill="#4b5260"><tspan font-family="PT Sans, sans-serif">среда к контрибьютору</tspan></text>
+<text x="508.8" y="505.7" font-size="14" fill="#4b5260"><tspan font-family="PT Sans, sans-serif">не переносится.</tspan></text>
+<text x="483.3" y="523.9" font-size="14" fill="#4b5260"><tspan font-family="PT Sans, sans-serif">Подписи не доказывают</tspan></text>
+<text x="461.1" y="542.1" font-size="14" fill="#4b5260"><tspan font-family="PT Sans, sans-serif">содержательное качество кода.</tspan></text>
+<path d="M 406 492.4 L 449.1 492.4" fill="none" stroke="#d5d9df" stroke-width="1.5" stroke-dasharray="4 4" class="connector" data-from="env" data-to="note_env"/>
+<!-- link core -> work -->
+<path d="M 91.6 257.6 C 94.4 237.6 99.8 215.3 110 196.9 C 114 189.7 118.8 182.8 124.2 176.3 L 124.9 175.5" fill="none" stroke="#3a3f47" stroke-width="2" class="edge" data-from="core" data-to="work" data-edge="e0"/>
+<polygon points="128.9,170.9 118.9,175.6 125.7,181.4" fill="#3a3f47"/>
+<g class="label" data-edge="e0">
+<text x="113.8" y="213.1" font-size="15" fill="#1f2328"><tspan font-family="PT Sans, sans-serif" font-weight="bold">назначения, вердикты,</tspan></text>
+<text x="113.8" y="232.6" font-size="15" fill="#1f2328"><tspan font-family="PT Sans, sans-serif" font-weight="bold">продолжение работы</tspan></text>
+</g>
+<!-- link work -> core -->
+<path d="M 68.8 157.5 C 52.6 167.9 38.2 180.8 28 196.9 C 17 214.2 21.4 233.7 31.8 251.6 L 32.3 252.5" fill="none" stroke="#3a3f47" stroke-width="2" class="edge" data-from="work" data-to="core" data-edge="e1"/>
+<polygon points="35.5,257.6 34.1,246.8 26.4,251.5" fill="#3a3f47"/>
+<g class="label" data-edge="e1">
+<text x="32.1" y="220.2" font-size="15" fill="#1f2328"><tspan font-family="PT Sans, sans-serif" font-weight="bold">ревизии</tspan></text>
+</g>
+<!-- link core -> env -->
+<path d="M 78.4 367.8 C 78.3 382.5 80.8 397.6 89 409.8 C 105.6 434.7 131.4 452.1 159 464.1 L 160.1 464.6" fill="none" stroke="#3a3f47" stroke-width="2" class="edge" data-from="core" data-to="env" data-edge="e2"/>
+<polygon points="165.7,466.9 158.2,458.9 154.7,467.2" fill="#3a3f47"/>
+<g class="label" data-edge="e2">
+<text x="92.9" y="402.3" font-size="15" fill="#1f2328"><tspan font-family="PT Sans, sans-serif" font-weight="bold">совершённые записи с QC</tspan></text>
+</g>
+<!-- link work -> env -->
+<path d="M 255.2 171.3 C 261 179.3 266.2 187.9 269.9 196.9 C 301.3 272.4 299.8 368.4 294.2 429.9 L 294 431.2" fill="none" stroke="#3a3f47" stroke-width="2" class="edge" data-from="work" data-to="env" data-edge="e3"/>
+<polygon points="293.5,437.2 298.9,427.7 289.9,426.8" fill="#3a3f47"/>
+<g class="label" data-edge="e3">
+<text x="305" y="313.4" font-size="15" fill="#1f2328"><tspan font-family="PT Sans, sans-serif" font-weight="bold">удалённые команды</tspan></text>
+<text x="305" y="332.9" font-size="15" fill="#1f2328"><tspan font-family="PT Sans, sans-serif" font-weight="bold">в границах задачи</tspan></text>
+</g>
+<!-- link env -> work -->
+<path d="M 385.1 437.1 C 409.4 418.5 432.4 395.4 445.9 367.8 C 467.5 324 470.5 300.1 445.9 257.9 C 421 214.9 377.4 184 333.8 162.3 L 332.5 161.6" fill="none" stroke="#3a3f47" stroke-width="2" class="edge" data-from="env" data-to="work" data-edge="e4"/>
+<polygon points="327.1,159 334.1,167.4 338,159.3" fill="#3a3f47"/>
+<g class="label" data-edge="e4">
+<text x="471.2" y="316.8" font-size="15" fill="#1f2328"><tspan font-family="PT Sans, sans-serif" font-weight="bold">вывод и свидетельства</tspan></text>
+</g>
+<!-- group label contrib -->
+<rect x="63" y="18" width="228.9" height="18.9" fill="#ffffff" class="plate"/>
+<text x="69" y="32.4" font-size="13" fill="#b9580b" letter-spacing="2.1"><tspan font-family="PT Sans, sans-serif" font-weight="bold">МАШИНЫ КОНТРИБЬЮТОРОВ</tspan></text>
+</g>
+</g>
+</svg>

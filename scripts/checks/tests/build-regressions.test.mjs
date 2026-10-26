@@ -18,7 +18,7 @@ after(async () => {
 
 async function sourceFixture(t) {
   const root = await fixture(t);
-  for (const path of ['src', 'config', 'astro.config.mjs', 'package.json', 'tsconfig.json']) await cp(join(repository, path), join(root, path), { recursive: true });
+  for (const path of ['src', 'config', 'scripts', 'astro.config.mjs', 'package.json', 'tsconfig.json']) await cp(join(repository, path), join(root, path), { recursive: true });
   await symlink(join(repository, 'node_modules'), join(root, 'node_modules'), 'dir');
   return root;
 }
@@ -72,6 +72,7 @@ test('build: forged layout marker is rejected', async t => {
 // Changing a marked component cell fails even though the marker remains in an allowed source file.
 test('build: changed marked cell is rejected', async t => {
   const root = await sourceFixture(t);
+  await layoutPlant(root, '<table><tbody><StatusRow id="swarma" /></tbody></table>', "import StatusRow from '../components/StatusRow.astro';\n");
   const path = join(root, 'src/components/StatusRow.astro');
   await writeFile(path, (await readFile(path, 'utf8')).replace('<td>{row.works_today}</td>', '<td>available now</td>'));
   build(root);
@@ -81,6 +82,7 @@ test('build: changed marked cell is rejected', async t => {
 // An extra neutral descendant in a marked cell fails structural provenance, independently of availability language.
 test('build: extra marked descendant is rejected', async t => {
   const root = await sourceFixture(t);
+  await layoutPlant(root, '<table><tbody><StatusRow id="swarma" /></tbody></table>', "import StatusRow from '../components/StatusRow.astro';\n");
   const path = join(root, 'src/components/StatusRow.astro');
   await writeFile(path, (await readFile(path, 'utf8')).replace('<td>{row.not_yet}</td>', '<td><span>{row.not_yet}</span></td>'));
   build(root);

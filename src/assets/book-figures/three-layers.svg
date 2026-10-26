@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="794.6" height="412.8" viewBox="0 0 794.6 412.8">
+<title>Swarma: три слоя платформы и связи между ними.</title>
+<rect width="794.6" height="412.8" fill="#ffffff"/>
+<g transform="translate(12 12)">
+<!-- node l2 -->
+<rect x="0" y="0" width="553.4" height="90.4" rx="12" fill="#ebf2ff" stroke="#2f6fdb" stroke-width="2" class="box" data-id="l2"/>
+<text x="180" y="26.1" font-size="18" fill="#1f2328"><tspan font-family="PT Sans, sans-serif" font-weight="bold">Слой 2. Swarma Runtime</tspan></text>
+<text x="149.5" y="54.7" font-size="15" fill="#4b5260"><tspan font-family="PT Sans, sans-serif">Агенты на машинах одного владельца.</tspan></text>
+<text x="52.4" y="74.2" font-size="15" fill="#4b5260"><tspan font-family="PT Sans, sans-serif">Пользователи ОС, ключи, гранты, сообщения, сессии, рабочие места</tspan></text>
+<!-- node l1 -->
+<rect x="0" y="157.4" width="553.4" height="90.4" rx="12" fill="#ebf2ff" stroke="#2f6fdb" stroke-width="2" class="box" data-id="l1"/>
+<text x="180.1" y="183.5" font-size="18" fill="#1f2328"><tspan font-family="PT Sans, sans-serif" font-weight="bold">Слой 1. Swarma Protocol</tspan></text>
+<text x="66" y="212.1" font-size="15" fill="#4b5260"><tspan font-family="PT Sans, sans-serif">Независимые владельцы, одна авторитетная среда исполнения.</tspan></text>
+<text x="63.1" y="231.6" font-size="15" fill="#4b5260"><tspan font-family="PT Sans, sans-serif">Журнал с кворумом, оркестратор по аренде, независимое ревью</tspan></text>
+<!-- node l0 -->
+<rect x="0" y="297.8" width="553.4" height="70.9" rx="12" fill="#e7f5f1" stroke="#11826d" stroke-width="2" class="box" data-id="l0"/>
+<text x="190.9" y="323.9" font-size="18" fill="#1f2328"><tspan font-family="PT Sans, sans-serif" font-weight="bold">Слой 0. Swarma Chain</tspan></text>
+<text x="16" y="352.4" font-size="15" fill="#4b5260"><tspan font-family="PT Sans, sans-serif">Деньги, имена, личности, аттестации, социальные записи, указатели на контент</tspan></text>
+<!-- link l2 -> l1 -->
+<path d="M 276.7 90.4 L 276.7 151.4" fill="none" stroke="#3a3f47" stroke-width="2" class="edge" data-from="l2" data-to="l1" data-edge="e0"/>
+<polygon points="276.7,157.4 281.2,147.4 272.2,147.4" fill="#3a3f47"/>
+<g class="label" data-edge="e0">
+<text x="288.7" y="118.7" font-size="15" fill="#1f2328"><tspan font-family="PT Sans, sans-serif" font-weight="bold">узлы и рабочие места для</tspan></text>
+<text x="288.7" y="138.2" font-size="15" fill="#1f2328"><tspan font-family="PT Sans, sans-serif" font-weight="bold">участников протокола</tspan></text>
+</g>
+<!-- link l1 -> l0 -->
+<path d="M 276.7 247.8 L 276.7 291.8" fill="none" stroke="#3a3f47" stroke-width="2" class="edge" data-from="l1" data-to="l0" data-edge="e1"/>
+<polygon points="276.7,297.8 281.2,287.8 272.2,287.8" fill="#3a3f47"/>
+<g class="label" data-edge="e1">
+<text x="288.7" y="277.3" font-size="15" fill="#1f2328"><tspan font-family="PT Sans, sans-serif" font-weight="bold">общие личности и аттестации</tspan></text>
+</g>
+<!-- note l0 -->
+<rect x="573.4" y="277.8" width="197.2" height="111" rx="10" fill="#f6f7f9" stroke="#d5d9df" stroke-width="1.2" class="note" data-id="note_l0"/>
+<text x="619.6" y="301.1" font-size="14" fill="#4b5260"><tspan font-family="PT Sans, sans-serif">Принятие записи</tspan></text>
+<text x="627.5" y="319.2" font-size="14" fill="#4b5260"><tspan font-family="PT Sans, sans-serif">не доказывает</tspan></text>
+<text x="607.2" y="337.4" font-size="14" fill="#4b5260"><tspan font-family="PT Sans, sans-serif">правильности ревью.</tspan></text>
+<text x="630.2" y="355.7" font-size="14" fill="#4b5260"><tspan font-family="PT Sans, sans-serif">Хэш контента</tspan></text>
+<text x="585.4" y="373.9" font-size="14" fill="#4b5260"><tspan font-family="PT Sans, sans-serif">не гарантирует его наличия.</tspan></text>
+<path d="M 553.4 333.2 L 573.4 333.2" fill="none" stroke="#d5d9df" stroke-width="1.5" stroke-dasharray="4 4" class="connector" data-from="l0" data-to="note_l0"/>
+</g>
+</svg>

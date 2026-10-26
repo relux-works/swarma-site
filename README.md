@@ -2,7 +2,8 @@
 
 The static website of the Swarma platform, built with Astro and plain CSS.
 Russian pages come first; an English route exists only when its Markdown file exists.
-The current pages are preparation notices, with the book's layer map on the status page.
+The content collection supplies page prose. The shared layout implements the Swarma design system,
+with book-sourced status tables and publication conventions.
 
 ## Development
 
@@ -18,6 +19,7 @@ npm run check
 `npm run dev` starts the local development server; stop it when finished.
 `npm run build` writes static HTML and assets to `dist/`.
 Its `prebuild` gate rejects invalid localization metadata and stale or inconsistent status data.
+Configuration loading also rejects prohibited identifiers and names in every vendored status source.
 `npm run check` runs the checks' positive and planted negative controls, builds the site,
 then checks both source and output. CI runs the same command on self-hosted Linux x64 runners with Node 22 already on PATH.
 The job asserts the Node major version and installs Chromium for browser checks before running the checks.
@@ -25,19 +27,21 @@ The job asserts the Node major version and installs Chromium for browser checks 
 Pages live in `src/content/pages/ru/` and `src/content/pages/en/`.
 Each Markdown page needs `title`, `description`, numeric `order` and boolean `nav` frontmatter.
 The file path determines its slug: `index.md` is the locale home, and nested files retain
-nested routes. Navigation follows `order`; the language switch lists only existing counterparts.
+nested routes. Navigation follows `order`; the language switch appears only when another counterpart exists.
 The static root page lists only locales with a home page, Russian first.
 On a translated page without a locale home, the wordmark links to the root selector;
 it links to the locale home once that file exists.
 
 ## Status data
 
-Status text comes only from the vendored layer-map table of the Swarma book, version 1.6.1,
-chapter 29, through generated JSON and the provenance-marked `StatusTable` and `StatusRow` components.
+Status text comes only from the vendored layer map, vocabulary and complete part tables of book
+1.6.1, printed chapter 30. Provenance-marked tables and rows render their literal cell strings.
 The check rejects stale JSON, changed row order or count, and availability claims in authored
 content or rendered prose outside the marked table.
 
-The source table is `src/data/status/source/layer-map.book-1.6.1.ru.md`.
+The source tables are `src/data/status/source/layer-map.book-1.6.1.ru.md` and
+`src/data/status/source/parts.book-1.6.1.ru.md`. Part rows retain their section and ordered stable
+key in `part-ids.json`; vocabulary is generated separately. No source section is excluded.
 `src/data/status/row-ids.json` binds stable slugs to exact capability cells in table order.
 After an intentional source update, run `npm run status:generate`, review the source,
 mapping and JSON together, then run `npm run check:status-data`.
@@ -55,6 +59,10 @@ The source's inline Markdown notation remains literal in generated cell strings.
 | `npm run check:status-language` | Page prose contains no availability claims outside rendered book status regions | Console; nonzero on a violation |
 | `npm run check:names` | Publication files use canonical names and avoid prohibited metaphors | Console; nonzero on a violation |
 | `npm run check:i18n` | Metadata is complete, slugs are canonical and every English page has a Russian counterpart | Console; nonzero on a violation |
+| `npm run check:status-parts` | Part tables and vocabulary match the complete vendored source and mapping | Console; read-only |
+| `npm run check:contrast` | All 704 declared foreground/background pairs pass in four palettes | Console; nonzero on failure |
+| `npm run check:fonts` | Shipped WOFF2 and OFL files match locked font packages byte for byte | Console; read-only |
+| `npm run check:a11y` | Every built route at 390/1440px in light/dark, plus open mobile menus, has no axe violation | `.temp/a11y/` JSON and representative screenshots; server and browser close on completion |
 | `npm run check:status-data` | Generated JSON matches the vendored table and ordered mapping | Console; read-only |
 | `npm run status:generate` | Regenerate JSON after a reviewed source change | `src/data/status/layer-map.ru.json` |
 
@@ -122,10 +130,12 @@ and are rejected there, alongside clean public-to-dist controls.
 
 Status-language checks inspect all authored content, decoded rendered HTML text and public/built SVG documents;
 the source marker alone grants no exemption. Each marked DOM table is compared with
-the complete expected table from canonical JSON; each marked row is compared by
-`data-status-row` with its expected ID, four exact cell strings, element structure and attributes.
+the expected table from canonical JSON, with exact source captions and headers; full tables retain
+source order and excerpts retain their selected keys. Each marked row is compared by
+`data-status-row` with its expected ID, literal cells, element structure, attributes and permitted
+one-word status chip. No other cell can gain a chip.
 Changed cells, extra descendants or attributes, unknown IDs and arbitrary marked prose fail
-`status-provenance`. Literal markers in `src/` or `public/` outside `StatusTable.astro` and `StatusRow.astro`
+`status-provenance`. Literal markers in `src/` or `public/` outside `StatusTable.astro`, `StatusRow.astro` and `src/lib/status-render.mjs`
 fail `status-marker-location`. Only verified DOM regions are omitted from the prose check.
 Decoded attributes are always checked for identifiers, including links, image sources,
 source sets and metadata. Decoded `alt`, `aria-label`, `aria-description`, `title` and
@@ -209,5 +219,31 @@ Neutral `запуск агента`, `готовность`, `готовност
 pass. The test suite probes the inflected forms in authored and rendered prose, decoded
 accessible attributes, and real builds with forged status markers and partial translations.
 
-No deployment workflow is included. See `docs/design-contract.md` for the minimal design
-contract and the separate browser and assistive technology release validation scope.
+No deployment workflow is included. See `docs/design-contract.md` for the design
+contract and `UNRESOLVED_QUESTIONS.md` for remaining publication and assistive-technology gates.
+
+## Markdown conventions
+
+Page files stay plain Markdown. Second- and third-level headings form the outline; the section index
+uses second-level headings. The title, lead, fixed design frame and version context share one layout.
+
+- A standalone paragraph beginning exactly `Источник: ` (or `Source: `) contains references separated
+  by `; `. Each reference is `глава NN "Chapter title"`, optionally followed by
+  `, раздел "Section title"`. Names and printed numbers must match `src/data/book-chapters.json`;
+  mismatches fail the build with the file and line. Links resolve to `/ru/book/#chNN` on Russian pages.
+- A blockquote whose first child starts with `**Предел.**` (or `**Limit.**`) becomes a named limits
+  aside. Other blockquotes remain ordinary quotes.
+- `status_rows: [swarma, part-002]` in frontmatter plus a standalone `[[status]]` selects exact source
+  rows. `status_table: full` plus that marker renders all tables and vocabulary. Unknown keys,
+  missing data, duplicate markers and unused data fail the build. Do not put status prose in content.
+- A standalone `[[figure three-layers]]`, `[[figure protocol-topology]]` or `[[figure sublayers]]`
+  uses `src/data/figures.json`. Default builds render nothing for these markers. Private builds use
+  `SWARMA_BOOK_FIGURES=1 npm run check`, preserving the source SVG, caption, alternative and printed
+  chapter reference. Private and default content stores are separate under `.temp/astro-cache/`.
+- `[[publications book]]` or `[[publications papers]]` renders the publication metadata and excerpt
+  from `src/data/publications.json`. PDF placeholders are text; they cannot download a file.
+
+The tokens, contrast checker and operator artwork derive from the pinned Swarma Platform Design
+System; its MIT notice is preserved in `docs/licenses/design-system-MIT.txt`. The font OFL files
+are beside their WOFF2 files. Book SVGs are kept only for the explicitly switched private rendering;
+publishing those diagrams and the PDFs requires the owner's decision.

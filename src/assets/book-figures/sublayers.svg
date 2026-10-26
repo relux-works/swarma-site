@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="823" height="777.1" viewBox="0 0 823 777.1">
+<title>Цепочка упорядочивает записи, p2p-память переносит контент, а социальный граф направляет его распространение.</title>
+<rect width="823" height="777.1" fill="#ffffff"/>
+<g transform="translate(12 12)">
+<g transform="translate(-8 0)">
+<!-- graphviz 14.0.4 -->
+<!-- group chain -->
+<rect x="31" y="95.4" width="502" height="184.8" rx="16" fill="none" stroke="#11826d" stroke-width="2" stroke-dasharray="8 6" class="group" data-id="chain"/>
+<!-- group graph -->
+<rect x="8" y="320.2" width="613" height="141.9" rx="16" fill="none" stroke="#2f6fdb" stroke-width="2" stroke-dasharray="8 6" class="group" data-id="graph"/>
+<!-- group p2p -->
+<rect x="351" y="607.5" width="456" height="145.6" rx="16" fill="none" stroke="#d9690f" stroke-width="2" stroke-dasharray="8 6" class="group" data-id="p2p"/>
+<!-- node author -->
+<rect x="497" y="0" width="100" height="45.4" rx="12" fill="#f1f2f4" stroke="#8b929c" stroke-width="2" class="box" data-id="author"/>
+<text x="523.6" y="26.1" font-size="18" fill="#1f2328"><tspan font-family="PT Sans, sans-serif" font-weight="bold">Автор</tspan></text>
+<!-- node cons -->
+<rect x="48.8" y="169.9" width="238.4" height="70.9" rx="12" fill="#e7f5f1" stroke="#11826d" stroke-width="2" class="box" data-id="cons"/>
+<text x="64.8" y="196" font-size="18" fill="#1f2328"><tspan font-family="PT Sans, sans-serif" font-weight="bold">Деньги, имена и личности</tspan></text>
+<text x="134.8" y="224.5" font-size="15" fill="#4b5260"><tspan font-family="PT Sans, sans-serif">консенсус</tspan></text>
+<!-- node soc -->
+<rect x="308.8" y="148.4" width="206.5" height="113.8" rx="12" fill="#e7f5f1" stroke="#11826d" stroke-width="2" class="box" data-id="soc"/>
+<text x="331.8" y="174.5" font-size="18" fill="#1f2328"><tspan font-family="PT Sans, sans-serif" font-weight="bold">Социальные записи,</tspan></text>
+<text x="324.8" y="197.9" font-size="18" fill="#1f2328"><tspan font-family="PT Sans, sans-serif" font-weight="bold">аттестации, указатели</tspan></text>
+<text x="340.5" y="226.5" font-size="15" fill="#4b5260"><tspan font-family="PT Sans, sans-serif">конверт: тип, подпись</tspan></text>
+<text x="367.2" y="246" font-size="15" fill="#4b5260"><tspan font-family="PT Sans, sans-serif">пачки, оплата</tspan></text>
+<!-- node indexer -->
+<rect x="26" y="373.2" width="200" height="70.9" rx="12" fill="#ebf2ff" stroke="#2f6fdb" stroke-width="2" class="box" data-id="indexer"/>
+<text x="72.9" y="399.3" font-size="18" fill="#1f2328"><tspan font-family="PT Sans, sans-serif" font-weight="bold">Индексаторы</tspan></text>
+<text x="42" y="427.9" font-size="15" fill="#4b5260"><tspan font-family="PT Sans, sans-serif">граф, ленты, поиск и веса</tspan></text>
+<!-- node curator -->
+<rect x="389.2" y="373.2" width="213.7" height="70.9" rx="12" fill="#ebf2ff" stroke="#2f6fdb" stroke-width="2" class="box" data-id="curator"/>
+<text x="405.2" y="399.3" font-size="18" fill="#1f2328"><tspan font-family="PT Sans, sans-serif" font-weight="bold">Кураторы и архивисты</tspan></text>
+<text x="435.7" y="427.9" font-size="15" fill="#4b5260"><tspan font-family="PT Sans, sans-serif">выбор и хранение</tspan></text>
+<!-- node p2p -->
+<rect x="368.5" y="662.4" width="229" height="70.9" rx="12" fill="#fff2e6" stroke="#d9690f" stroke-width="2" class="box" data-id="p2p"/>
+<text x="389.7" y="688.5" font-size="18" fill="#1f2328"><tspan font-family="PT Sans, sans-serif" font-weight="bold">Трекеры и рои раздачи</tspan></text>
+<text x="384.5" y="717" font-size="15" fill="#4b5260"><tspan font-family="PT Sans, sans-serif">тяжёлый контент вне цепочки</tspan></text>
+<!-- node reader -->
+<rect x="224" y="512.1" width="103.9" height="45.4" rx="12" fill="#f1f2f4" stroke="#8b929c" stroke-width="2" class="box" data-id="reader"/>
+<text x="240" y="538.2" font-size="18" fill="#1f2328"><tspan font-family="PT Sans, sans-serif" font-weight="bold">Читатель</tspan></text>
+<!-- note p2p -->
+<rect x="640.8" y="660.5" width="148.3" height="74.6" rx="10" fill="#f6f7f9" stroke="#d5d9df" stroke-width="1.2" class="note" data-id="note_p2p"/>
+<text x="652.8" y="683.8" font-size="14" fill="#4b5260"><tspan font-family="PT Sans, sans-serif">Принятый указатель</tspan></text>
+<text x="668.7" y="702" font-size="14" fill="#4b5260"><tspan font-family="PT Sans, sans-serif">не гарантирует</tspan></text>
+<text x="653.7" y="720.2" font-size="14" fill="#4b5260"><tspan font-family="PT Sans, sans-serif">сохранности файла.</tspan></text>
+<path d="M 597.5 697.8 L 640.8 697.8" fill="none" stroke="#d5d9df" stroke-width="1.5" stroke-dasharray="4 4" class="connector" data-from="p2p" data-to="note_p2p"/>
+<!-- link author -> soc -->
+<path d="M 508.5 45.9 C 492.7 55 478 63.4 478 63.4 C 478 63.4 458.9 104.1 441.3 141.7 L 440.8 142.8" fill="none" stroke="#3a3f47" stroke-width="2" class="edge" data-from="author" data-to="soc" data-edge="e0"/>
+<polygon points="438.3,148.2 446.6,141.1 438.5,137.2" fill="#3a3f47"/>
+<g class="label" data-edge="e0">
+<text x="481.9" y="79.9" font-size="15" fill="#1f2328"><tspan font-family="PT Sans, sans-serif" font-weight="bold">подписанный указатель</tspan></text>
+</g>
+<!-- link author -> p2p -->
+<path d="M 597.4 44.1 C 621.5 53.9 645 63.4 645 63.4 C 645 63.4 661 204.3 661 204.3 C 661 204.3 661 204.3 661 535.8 C 661 535.8 640 557.5 640 557.5 C 640 557.5 574.2 615.9 527.8 657.1 L 526.7 658" fill="none" stroke="#3a3f47" stroke-width="2" class="edge" data-from="author" data-to="p2p" data-edge="e1"/>
+<polygon points="522.2,662 532.7,658.8 526.7,652" fill="#3a3f47"/>
+<g class="label" data-edge="e1">
+<text x="669" y="412.4" font-size="15" fill="#1f2328"><tspan font-family="PT Sans, sans-serif" font-weight="bold">раздача файла</tspan></text>
+</g>
+<!-- link soc -> indexer -->
+<path d="M 331.9 262.7 C 284 296.4 224.2 338.5 181.4 368.7 L 180.4 369.4" fill="none" stroke="#3a3f47" stroke-width="2" class="edge" data-from="soc" data-to="indexer" data-edge="e2"/>
+<polygon points="175.5,372.8 186.2,370.7 181.1,363.4" fill="#3a3f47"/>
+<g class="label" data-edge="e2">
+<text x="298.7" y="304.7" font-size="15" fill="#1f2328"><tspan font-family="PT Sans, sans-serif" font-weight="bold">порядок записей</tspan></text>
+</g>
+<!-- link indexer -> reader -->
+<path d="M 168.2 444.6 C 192.1 464.3 221.4 488.6 243.5 506.9 L 244.6 507.8" fill="none" stroke="#3a3f47" stroke-width="2" class="edge" data-from="indexer" data-to="reader" data-edge="e3"/>
+<polygon points="249.2,511.6 244.4,501.8 238.6,508.7" fill="#3a3f47"/>
+<g class="label" data-edge="e3">
+<text x="231.4" y="486.6" font-size="15" fill="#1f2328"><tspan font-family="PT Sans, sans-serif" font-weight="bold">лента</tspan></text>
+</g>
+<!-- link indexer -> curator -->
+<path d="M 226.1 408.7 C 274.2 408.7 331.9 408.7 381.7 408.7 L 383 408.7" fill="none" stroke="#3a3f47" stroke-width="2" class="edge" data-from="indexer" data-to="curator" data-edge="e4"/>
+<polygon points="389,408.7 379,404.2 379,413.2" fill="#3a3f47"/>
+<g class="label" data-edge="e4">
+<text x="240.5" y="397.4" font-size="15" fill="#1f2328"><tspan font-family="PT Sans, sans-serif" font-weight="bold">поток и окрестность</tspan></text>
+</g>
+<!-- link curator -> soc -->
+<path d="M 481.5 372.8 C 469.6 344.4 452.6 303.5 438.3 269.4 L 437.8 268.2" fill="none" stroke="#3a3f47" stroke-width="2" class="edge" data-from="curator" data-to="soc" data-edge="e5"/>
+<polygon points="435.5,262.7 435.2,273.6 443.5,270.2" fill="#3a3f47"/>
+<g class="label" data-edge="e5">
+<text x="457.9" y="304.7" font-size="15" fill="#1f2328"><tspan font-family="PT Sans, sans-serif" font-weight="bold">категоризации</tspan></text>
+</g>
+<!-- link curator -> p2p -->
+<path d="M 494.4 444.6 C 492 497.5 487.5 597.9 484.9 654.7 L 484.8 656.1" fill="none" stroke="#3a3f47" stroke-width="2" class="edge" data-from="curator" data-to="p2p" data-edge="e6"/>
+<polygon points="484.6,662.1 489.5,652.3 480.5,651.9" fill="#3a3f47"/>
+<g class="label" data-edge="e6">
+<text x="498.9" y="537.2" font-size="15" fill="#1f2328"><tspan font-family="PT Sans, sans-serif" font-weight="bold">раздача выбранного</tspan></text>
+</g>
+<!-- link reader -> p2p -->
+<path d="M 293.2 557.7 C 307.7 576.2 326 599.5 326 599.5 C 326 599.5 376.8 631 420.6 658.2 L 421.7 658.8" fill="none" stroke="#3a3f47" stroke-width="2" class="edge" data-from="reader" data-to="p2p" data-edge="e7"/>
+<polygon points="426.8,662 420.6,652.9 415.9,660.5" fill="#3a3f47"/>
+<g class="label" data-edge="e7">
+<text x="329.9" y="592" font-size="15" fill="#1f2328"><tspan font-family="PT Sans, sans-serif" font-weight="bold">скачать и раздавать</tspan></text>
+</g>
+<!-- group label chain -->
+<rect x="43" y="105.4" width="81" height="18.9" fill="#ffffff" class="plate"/>
+<text x="49" y="119.8" font-size="13" fill="#0e6f5d" letter-spacing="2.1"><tspan font-family="PT Sans, sans-serif" font-weight="bold">ЦЕПОЧКА</tspan></text>
+<!-- group label graph -->
+<rect x="20" y="330.2" width="160.5" height="18.9" fill="#ffffff" class="plate"/>
+<text x="26" y="344.6" font-size="13" fill="#2a62c4" letter-spacing="2.1"><tspan font-family="PT Sans, sans-serif" font-weight="bold">СОЦИАЛЬНЫЙ ГРАФ</tspan></text>
+<!-- group label p2p -->
+<rect x="688.5" y="617.5" width="106.5" height="18.9" fill="#ffffff" class="plate"/>
+<text x="694.5" y="631.9" font-size="13" fill="#b9580b" letter-spacing="2.1"><tspan font-family="PT Sans, sans-serif" font-weight="bold">P2P-ПАМЯТЬ</tspan></text>
+</g>
+</g>
+</svg>

@@ -2,4 +2,4 @@ export const rows = [{ id: 'layer-a', capability: 'Слой A', works_today: 'р
 export const statusFiles = { 'src/data/status/layer-map.ru.json': `${JSON.stringify(rows)}\n` };
 // These literal expectations are independent of the verifier's DOM builder.
 export const row = '<tr data-status-source="book-1.6.1" data-status-row="layer-a"><th scope="row">Слой A</th><td>работает сегодня</td><td>Следующая граница</td><td>Глава A</td></tr>';
-export const table = '<table data-status-source="book-1.6.1"><caption>Карта по слоям</caption><thead><tr><th scope="col">Слой и возможность</th><th scope="col">Работает сегодня</th><th scope="col">Чего ещё нет</th><th scope="col">Глава</th></tr></thead><tbody>' + row + '</tbody></table>';
+export const table = '<table data-status-source="book-1.6.1"><caption id="status-layer-map">Карта по слоям. Книга Swarma, версия 1.6.1, октябрь 2026, глава 30 &quot;Где мы и что дальше&quot;</caption><thead><tr><th scope="col">Слой и возможность</th><th scope="col">Работает сегодня</th><th scope="col">Чего ещё нет</th><th scope="col">Глава</th></tr></thead><tbody>' + row + '</tbody></table>';

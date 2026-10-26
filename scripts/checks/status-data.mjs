@@ -5,7 +5,7 @@ import { cli } from './lib.mjs';
 export const sourcePath = 'src/data/status/source/layer-map.book-1.6.1.ru.md';
 export const mappingPath = 'src/data/status/row-ids.json';
 export const jsonPath = 'src/data/status/layer-map.ru.json';
-export const sourceHeader = '# Swarma book\n\n- Version: 1.6.1\n- Chapter: 29, Где мы и что дальше\n- Section: Карта по слоям\n\n';
+export const sourceHeader = '# Swarma book\n\n- Version: 1.6.1\n- Chapter: 30, Где мы и что дальше\n- Section: Карта по слоям\n\n';
 export const columnHeader = '| Слой и возможность | Работает сегодня | Чего ещё нет | Глава |';
 
 export function generate(source, mapping) {

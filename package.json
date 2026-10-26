@@ -8,22 +8,31 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "prebuild": "npm run check:publication-surface && npm run check:status-data && npm run check:i18n",
+    "prebuild": "npm run check:publication-surface && npm run check:status-data && npm run check:i18n && npm run check:status-parts",
     "build": "astro build",
     "test": "node --test scripts/checks/tests/*.test.mjs",
-    "check": "npm run check:browser && npm test && npm run build && npm run check:publication-surface && npm run check:identifiers && npm run check:status-language && npm run check:names && npm run check:i18n && npm run check:status-data",
+    "check": "npm run check:browser && npm test && npm run build && npm run check:publication-surface && npm run check:identifiers && npm run check:status-language && npm run check:names && npm run check:i18n && npm run check:status-data && npm run check:status-parts && npm run check:fonts && npm run check:contrast && npm run check:a11y",
     "check:identifiers": "node scripts/checks/identifiers.mjs",
     "check:status-language": "node scripts/checks/status-language.mjs",
     "check:names": "node scripts/checks/names.mjs",
     "check:i18n": "node scripts/checks/i18n.mjs",
     "check:status-data": "node scripts/checks/status-data.mjs",
-    "status:generate": "node scripts/checks/status-data.mjs --write",
+    "status:generate": "node scripts/checks/status-data.mjs --write && node scripts/checks/status-parts.mjs --write",
     "check:publication-surface": "node scripts/checks/publication-surface.mjs",
-    "check:browser": "node scripts/checks/browser-ready.mjs"
+    "check:browser": "node scripts/checks/browser-ready.mjs",
+    "check:status-parts": "node scripts/checks/status-parts.mjs",
+    "check:contrast": "python3 scripts/check_contrast.py src/styles/tokens.css",
+    "check:fonts": "node scripts/checks/font-assets.mjs",
+    "check:a11y": "node scripts/checks/a11y.mjs"
   },
   "dependencies": {
     "astro": "7.4.2",
-    "zod": "4.6.7"
+    "zod": "4.6.7",
+    "@astrojs/markdown-remark": "7.3.4",
+    "@fontsource/pt-mono": "5.3.0",
+    "@fontsource/pt-sans": "5.3.0",
+    "@fontsource/pt-serif": "5.3.0",
+    "github-slugger": "2.0.0"
   },
   "devDependencies": {
     "css-tree": "3.2.1",
@@ -31,6 +40,7 @@
     "markdown-it": "15.0.3",
     "parse5": "8.0.1",
     "playwright": "1.64.1",
-    "postcss": "8.5.31"
+    "postcss": "8.5.31",
+    "@axe-core/playwright": "4.14.0"
   }
 }

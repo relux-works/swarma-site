@@ -3,6 +3,7 @@ import { join, relative, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { parse } from 'parse5';
 import { denyTokens, redactor, safeError } from './scanner-policy.mjs';
+import { approvedFont } from './font-approved.mjs';
 
 export async function filesAt(root, path) {
   const absolute = join(root, path);
@@ -29,7 +30,9 @@ export async function scanFiles(root) {
 export async function scanText(root, inspect) {
   const errors = [];
   for (const file of await scanFiles(root)) {
-    const text = await readFile(file, 'utf8');
+    const data = await readFile(file);
+    if (await approvedFont(root, relative(root, file), data)) continue;
+    const text = data.toString('utf8');
     for (const rule of inspect(text)) errors.push(`${relative(root, file)}: ${rule}`);
   }
   return errors;
