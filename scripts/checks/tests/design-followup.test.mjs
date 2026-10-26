@@ -54,7 +54,7 @@ test('figures: disabled output gate with copied and embedded controls', async t 
 // Effective browser cascade and the source contract agree on a clean set; the reviewer's late alias fails at 1:1.
 test('contrast: late semantic override rejects in actual CSS cascade', async t => {
   const root = await fixture(t);
-  for (const name of ['check_computed_contrast.py', 'check_contrast.py', 'token_cascade.py', 'css_syntax.py']) await put(root, `scripts/${name}`, await readFile(join(repository, `scripts/${name}`)));
+  for (const name of ['check_computed_contrast.py', 'check_contrast.py']) await put(root, `scripts/${name}`, await readFile(join(repository, `scripts/${name}`)));
   const tokens = await readFile(join(repository, 'src/styles/tokens.css'), 'utf8');
   await contrast(root, { cssOverride: tokens });
   await assert.rejects(() => contrast(root, { cssOverride: tokens + '\n:root { --color-role-human-text: var(--color-role-human-fill); }' }), /FAIL light role-human-text on role-human-fill 1\.00/);

@@ -3,19 +3,20 @@ import Slugger from 'github-slugger';
 import { loadData, escape } from './content-data.mjs';
 import { repositoryEntries } from './repository-render.mjs';
 import { strings } from './strings.mjs';
+import { diagnostic } from './diagnostics.mjs';
 const textOf = node => node.value ?? (node.children ?? []).map(textOf).join('');
 const html = value => ({ type: 'html', value });
 export function chapterReferences(text, lang) {
   const chapters = loadData('book-chapters');
   const prefix = strings[lang].source;
   const values = text.slice(prefix.length).split('; ');
-  if (!values.length) throw new Error('malformed-reference');
+  if (!values.length) throw diagnostic('malformed-reference');
   return `<p class="chapter-reference">${prefix}${values.map(value => {
     const pattern = lang === 'en' ? /^chapter (\d{2}) "([^"]+)"(?:, section "([^"]+)")?$/ : /^глава (\d{2}) "([^"]+)"(?:, раздел "([^"]+)")?$/;
     const match = pattern.exec(value);
-    if (!match) throw new Error('malformed-reference');
+    if (!match) throw diagnostic('malformed-reference');
     const chapter = chapters.find(chapter => chapter.number === match[1]);
-    if (!chapter || (lang === 'en' ? chapter.title_en : chapter.title) !== match[2] || (match[3] && !chapter.sections.some(section => section[lang] === match[3]))) throw new Error('chapter-reference-mismatch');
+    if (!chapter || (lang === 'en' ? chapter.title_en : chapter.title) !== match[2] || (match[3] && !chapter.sections.some(section => section[lang] === match[3]))) throw diagnostic('chapter-reference-mismatch');
     return `<a href="/${lang}/book/#ch${match[1]}">${escape(value)}</a>`;
   }).join('; ')}</p>`;
 }
@@ -25,11 +26,11 @@ export function publicationEntries(kind, lang) {
 }
 export function bookFigure(name, lang, enabled = process.env.SWARMA_BOOK_FIGURES === '1') {
   const figure = loadData('figures')[name];
-  if (!figure) throw new Error(`unknown-figure: ${name}`);
+  if (!figure) throw diagnostic(`unknown-figure: ${name}`);
   if (!enabled) return '';
   const svg = readFileSync(new URL(`../assets/book-figures/${figure.file}`, import.meta.url), 'utf8');
   const viewBox = /viewBox="([^"]+)"/.exec(svg)?.[1]?.split(/\s+/).map(Number);
-  if (!viewBox || viewBox.length !== 4) throw new Error(`invalid-figure-viewbox: ${name}`);
+  if (!viewBox || viewBox.length !== 4) throw diagnostic(`invalid-figure-viewbox: ${name}`);
   // An image data URI preserves the exact SVG bytes and emits no artifact in default builds.
   const src = `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`;
   const source = lang === 'ru' ? `Источник: книга Swarma, версия 1.6.1, глава ${figure.chapter}, рисунок: ${figure.caption}` : `Source: Swarma book, version 1.6.1, chapter ${figure.chapter}, figure: ${figure.caption}`;
@@ -38,14 +39,14 @@ export function bookFigure(name, lang, enabled = process.env.SWARMA_BOOK_FIGURES
 export default function conventions({ figures = false } = {}) {
   return (tree, file) => {
     const frontmatter = file.data.astro?.frontmatter ?? {};
-    if ('status_rows' in frontmatter || 'status_table' in frontmatter) throw new Error('status-forbidden');
+    if ('status_rows' in frontmatter || 'status_table' in frontmatter) throw diagnostic('status-forbidden');
     const path = String(file.path ?? file.history?.[0] ?? 'content.md');
     const match = /\/(ru|en)\/(.+)\.md$/.exec(path);
     const lang = match?.[1] ?? 'ru', slug = match?.[2] ?? '';
     const labels = strings[lang], slugger = new Slugger(), headings = [];
     const base = path.split(`/${lang}/`)[0];
     const source = readFileSync(path, 'utf8');
-    if (/\[\[status\b/.test(source) || slug === 'status') throw new Error(`${path}:1: status-forbidden`);
+    if (/\[\[status\b/.test(source) || slug === 'status') throw diagnostic(`${path}:1: status-forbidden`);
     const body = String(file.value);
     const bodyOffset = body ? source.lastIndexOf(body) : 0;
     const prefix = bodyOffset >= 0 ? source.slice(0, bodyOffset) : '';
@@ -53,9 +54,9 @@ export default function conventions({ figures = false } = {}) {
     let limitIndex = 0, tableIndex = 0, sectionId = '';
     function fail(error, node) {
       if (error.conventionSource) throw error;
-      const diagnostic = new Error(`${path}:${(node?.position?.start?.line ?? 1) + lineOffset}: ${error.message}`);
-      diagnostic.conventionSource = true;
-      throw diagnostic;
+      const failure = diagnostic(`${path}:${(node?.position?.start?.line ?? 1) + lineOffset}: ${error.message}`);
+      failure.conventionSource = true;
+      throw failure;
     }
     function visit(parent) {
       parent.children = (parent.children ?? []).flatMap(node => {
@@ -73,13 +74,13 @@ export default function conventions({ figures = false } = {}) {
           if (node.type === 'paragraph') {
             const text = textOf(node);
             if (text.startsWith('Источник: ') || text.startsWith('Source: ')) return html(chapterReferences(text, text.startsWith('Source: ') ? 'en' : 'ru'));
-            if (text.includes('[[status')) throw new Error('status-forbidden');
+            if (text.includes('[[status')) throw diagnostic('status-forbidden');
             if (text === '[[repos]]') return html(repositoryEntries(lang));
             const figure = /^\[\[figure ([a-z0-9-]+)\]\]$/.exec(text);
             if (figure) { const rendered = bookFigure(figure[1], lang, figures); return rendered ? html(rendered) : []; }
             const publication = /^\[\[publications (book|papers)\]\]$/.exec(text);
             if (publication) return html(publicationEntries(publication[1], lang));
-            if (/\[\[(?:status|figure|publications|repos)\b/.test(text)) throw new Error('malformed-marker');
+            if (/\[\[(?:status|figure|publications|repos)\b/.test(text)) throw diagnostic('malformed-marker');
           }
           if (node.type === 'blockquote' && node.children?.[0]?.type === 'paragraph' && node.children[0].children?.[0]?.type === 'strong' && /^(?:Предел\.|Limit\.)/.test(textOf(node.children[0].children[0]))) {
             const id = `limits-${++limitIndex}`;

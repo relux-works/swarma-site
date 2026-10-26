@@ -1,4 +1,4 @@
-/* Swarma Platform Design System, assets/tokens.css, revision 4eeab5c43f54ef700dfae62e73e2f15bc63baaf5. */
+/* Versioned copy: relux-works/swarma-platform-design-system at d39d98efb898fa2609bed4d48c83edb85d02b349, assets/tokens.css. */
 :root {
   color-scheme: light dark;
 
@@ -74,6 +74,7 @@
   --color-control-hover: #eef1f5;
   --color-control-pressed: #e8ecf1;
   --color-control-text: #1d2126;
+  --color-control-text-pressed: #1d2126;
   --color-strong-action: #1d2126;
   --color-strong-action-hover: #2f3640;
   --color-on-strong-action: #f5f7fa;
@@ -160,6 +161,7 @@
     --color-control-hover: #222931;
     --color-control-pressed: #151a20;
     --color-control-text: #e5e8ec;
+    --color-control-text-pressed: #e5e8ec;
     --color-strong-action: #e5e8ec;
     --color-strong-action-hover: #f0f2f5;
     --color-on-strong-action: #14181d;
@@ -247,6 +249,7 @@
     --color-control-hover: #e3e8ee;
     --color-control-pressed: #ebeef3;
     --color-control-text: #0f1216;
+    --color-control-text-pressed: #0f1216;
     --color-strong-action: #0f1216;
     --color-strong-action-hover: #222831;
     --color-on-strong-action: #f7f9fb;
@@ -334,6 +337,7 @@
     --color-control-hover: #222931;
     --color-control-pressed: #12161b;
     --color-control-text: #f2f4f6;
+    --color-control-text-pressed: #f2f4f6;
     --color-strong-action: #f2f4f6;
     --color-strong-action-hover: #f9fafb;
     --color-on-strong-action: #0f1216;
@@ -428,6 +432,8 @@
     --color-control-hover: ButtonFace;
     --color-control-pressed: Highlight;
     --color-control-text: ButtonText;
+    /* Pressed controls pair Highlight with HighlightText rather than ButtonText. */
+    --color-control-text-pressed: HighlightText;
     --color-strong-action: ButtonFace;
     --color-strong-action-hover: ButtonFace;
     --color-on-strong-action: ButtonText;

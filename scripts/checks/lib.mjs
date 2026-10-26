@@ -5,6 +5,7 @@ import { parse } from 'parse5';
 import { denyTokens, redactor, safeError } from './scanner-policy.mjs';
 import { approvedBrand } from './brand-assets.mjs';
 import { approvedFont } from './font-approved.mjs';
+import { installDiagnostics } from '../../src/lib/diagnostics.mjs';
 
 export async function filesAt(root, path) {
   const absolute = join(root, path);
@@ -75,6 +76,7 @@ export async function cli(url, check, args = process.argv.slice(2), diagnostic =
   let redact;
   try { redact = redactor(await denyTokens()); }
   catch { console.error('identifier-deny-tokens: cannot read external deny tokens'); process.exitCode = 1; return; }
+  installDiagnostics();
   try {
     const root = process.cwd();
     const errors = await check(root, args);

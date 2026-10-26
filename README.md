@@ -44,8 +44,8 @@ locale home links the product identity to the root selector.
 | parse5: `npm run check:publication-surface` | Only supported publication HTML features in source/output | Console |
 | `npm run check:brand` | Copied artwork bytes match the pinned owner's manifest | Console |
 | `npm run check:fonts` | Licensed local font assets match their manifest | Console |
-| Python / Chromium: `npm run check:contrast` | Effective built CSS passes all declared numeric token pairs in four appearances and reduced transparency | `.temp/contrast/report.json` |
-| Python: `python3 -B scripts/check_contrast.py src/styles/tokens.css` | Source design-system token contract, 1408 pairs and forced system-color roles | Console |
+| Python / Chromium: `npm run check:contrast` | Effective built CSS passes 2816 numeric token pairs across 16 appearances, including forced colors and reduced transparency | `.temp/contrast/report.json` |
+| Python: `python3 -B scripts/check_contrast.py src/styles/tokens.css` | Chromium resolves the copied tokens; 2816 numeric pairs and forced system-color roles | Console |
 | Python: `python3 -B scripts/check_contrast.py src/styles/tokens.css --control` | Known low-contrast control must fail | Console; exit 1 |
 | `npm run check:figures` | With figures off, no copied, inline, base64, geometry or hash representation of a book SVG reaches output | Console |
 | Playwright / axe: `npm run check:a11y` | Every built route in light/dark, desktop/mobile and open drawer; overflow and focus contract | `.temp/a11y/report.json`, screenshots |
@@ -92,7 +92,14 @@ only after exact SHA-256 verification. Changed bytes cannot obtain an exemption.
 - `[[repos]]` renders configured repository entries. Unknown descriptions fail.
 - Legacy delivery-state keys, markers and routes are forbidden. They are not content conventions.
 
-Markdown rendering caches include renderer, configuration, catalog and figure hashes and separate
+Build diagnostics use `src/lib/diagnostics.mjs`: configured values from `IDENT_DENY_TOKENS` or the
+untracked local policy file are replaced case-insensitively before output. Convention errors are
+redacted at creation; Astro and check entry points also filter both streams so framework paths,
+frames and split writes cannot echo a configured value. An unreadable policy stops output with a
+fixed diagnostic. Uncaught exceptions and rejected promises terminate with a fixed failure message,
+bypassing Node's raw source-frame formatter. Expected failures retain safe rule identifiers and locations.
+
+Markdown rendering caches include renderer, diagnostics, configuration, catalog and figure hashes and separate
 figure-on/off stores. A configuration move or flag change cannot reuse stale private markup.
 
 ## Identity and provenance
@@ -105,13 +112,16 @@ Favicons, Apple touch and manifest icons are the supplied exports. The product a
 retyped, filtered or recolored. `src/data/brand-assets.json` records the source repository,
 revision and unchanged entries of its `assets/manifest.json`.
 
-The owner artwork comes from `relux-works/swarma-brand-assets` at `e750345`. Tokens and unchanged
-operator artwork derive from the Swarma Platform Design System at `4eeab5c`. The unchanged source
-contrast checker and its `token_cascade.py` / `css_syntax.py` dependencies come from `abe1eea`.
-The site adds a Chromium evaluator of the complete built stylesheet, so late component overrides
-and CSS ignored by the browser cannot mislead the restricted source evaluator. Numeric pair
-selection, luminance and alpha compositing reuse the source checker. Forced-color system roles
-are validated separately by the source contract; their actual colors belong to the OS.
+The owner artwork comes from `relux-works/swarma-brand-assets` at `e750345`. Tokens are an exact
+versioned copy from the Swarma Platform Design System at `d39d98efb898fa2609bed4d48c83edb85d02b349`;
+unchanged operator artwork remains from `4eeab5c`. Pair selection, forced-color roles, luminance and
+alpha compositing are adapted from the same token revision. Chromium resolves the complete built
+stylesheet in all 16 appearance combinations. The former handwritten CSS evaluator is removed.
+Forced-color roles are compared with browser-resolved system colors; their numerical foreground /
+background pairs pass the same targets after alpha compositing. Pressed buttons use
+`--color-control-text-pressed` over `--color-control-pressed`, including HighlightText over Highlight.
+In forced colors, these system-colored buttons suppress automatic adjustment so Chromium does not
+paint a Canvas text backplate over the pressed label. Other interface elements retain normal adjustment.
 
 Fonts are local PT Sans, PT Serif and PT Mono from Fontsource 5.3.0 with original OFL files.
 The reading/UI/technical roles and operator footer preserve the shared design system.

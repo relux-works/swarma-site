@@ -8,7 +8,7 @@ button, summary { font: inherit; }
 button, .header-inner a, .site-footer nav a, .section-index a { min-block-size: 44px; min-inline-size: 44px; display: inline-flex; align-items: center; }
 button { padding: var(--space-2) var(--space-4); border: 1px solid var(--color-border-strong); border-radius: var(--radius-control); color: var(--color-control-text); background: var(--color-control); cursor: pointer; font-family: var(--font-ui); }
 button:hover { background: var(--color-control-hover); }
-button:active { background: var(--color-control-pressed); }
+button:active, button[aria-pressed="true"] { color: var(--color-control-text-pressed); background: var(--color-control-pressed); }
 .container { max-inline-size: calc(var(--layout-max) + 2 * var(--layout-gutter)); padding-inline: var(--layout-gutter); margin-inline: auto; min-inline-size: 0; }
 .skip-link { position: absolute; z-index: 3; inset-block-start: var(--space-2); inset-inline-start: var(--layout-gutter); transform: translateY(-200%); padding: var(--space-3) var(--space-4); background: var(--color-strong-action); color: var(--color-on-strong-action); font-family: var(--font-ui); }
 .skip-link:focus { transform: none; color: var(--color-on-strong-action); }
@@ -108,6 +108,8 @@ figcaption .chapter-reference { margin-block: var(--space-2) 0; }
 }
 @media (prefers-reduced-transparency: reduce) { #site-menu { background: var(--color-bg); } }
 @media (forced-colors: active) {
+  /* System-color pairs already follow the user palette; suppress Chromium text backplates on pressed buttons. */
+  button { forced-color-adjust: none; }
   .operator-lockup .lockup-light, .operator-lockup .lockup-dark { display: none; }
   .operator-lockup .lockup-mono { display: block; }
   .lockup-mono svg path { fill: CanvasText; }

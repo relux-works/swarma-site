@@ -5,6 +5,8 @@ import { chromium } from 'playwright';
 import { headerGeometry } from './header-geometry.mjs';
 import AxeBuilder from '@axe-core/playwright';
 import { filesAt } from './lib.mjs';
+import { installDiagnostics } from '../../src/lib/diagnostics.mjs';
+installDiagnostics();
 
 const root = process.cwd(), output = join(root, '.temp/a11y');
 await mkdir(output, { recursive: true });

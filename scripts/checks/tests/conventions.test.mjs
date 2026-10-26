@@ -115,9 +115,9 @@ test('fonts: immutable binary and changed-file control', async t => {
 test('contrast: shipped pairs and low-pair control', () => {
   const args = ['-B', 'scripts/check_contrast.py', 'src/styles/tokens.css'];
   const good = spawnSync('python3', args, { cwd: repository, encoding: 'utf8' });
-  assert.equal(good.status, 0, good.stdout + good.stderr); assert.match(good.stdout, /pairs: 1408, failures: 0/);
+  assert.equal(good.status, 0, good.stdout + good.stderr); assert.match(good.stdout, /pairs: 2816, failures: 0/);
   const bad = spawnSync('python3', [...args, '--control'], { cwd: repository, encoding: 'utf8' });
-  assert.equal(bad.status, 1, bad.stdout + bad.stderr); assert.match(bad.stdout, /FAIL.*light.*text-faint/);
+  assert.equal(bad.status, 1, bad.stdout + bad.stderr); assert.match(bad.stdout + bad.stderr, /FAIL.*light.*text-faint/);
 });
 
 // The browser gate rejects a known missing alternative, rather than succeeding because no page was scanned.

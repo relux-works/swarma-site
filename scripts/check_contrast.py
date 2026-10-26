@@ -1,31 +1,16 @@
 #!/usr/bin/env python3
-"""Recompute every contrast ratio of the Swarma token set from assets/tokens.css.
+"""Browser contrast entry point and pure token-pair/WCAG contract.
 
-The restricted stylesheet evaluator applies source order, media conditions,
-!important and var() to the complete stylesheet, including unmarked overrides.
-Numeric ratios cover normal and reduced-transparency appearances; forced colors
-are checked against semantic system-color roles, whose numeric values belong
-to the browser and operating system.
-
-Usage, from the repository root:
-
-    python3 scripts/check_contrast.py assets/tokens.css
-    python3 scripts/check_contrast.py assets/tokens.css --report references/contrast-report.md
-    python3 scripts/check_contrast.py assets/tokens.css --control
-
-`--control` replaces `--color-text-faint` in the light palette with `#9aa1ab`,
-a value known to fail 4.5:1, and must exit 1. It proves that the checker detects
-a violation; it never writes the token file.
-
-Ratios use WCAG 2.x relative luminance. Translucent tokens are alpha-composited
-over `--color-bg` of the same palette before measuring.
+Pair selection, forced-color roles and luminance arithmetic are adapted from
+relux-works/swarma-platform-design-system at d39d98efb898fa2609bed4d48c83edb85d02b349.
+CSS values are always resolved in Chromium; no stylesheet parser decides a verdict.
 """
-
 import argparse
+import json
+from pathlib import Path
 import re
+import subprocess
 import sys
-from token_cascade import palettes as effective_palettes
-
 PALETTES = ["light", "dark", "light-contrast", "dark-contrast"]
 SURFACES = ["bg", "surface-subtle", "surface", "surface-raised", "surface-hover"]
 ROLES = ["human", "agent", "service", "store", "key", "external", "alert", "neutral"]
@@ -36,10 +21,6 @@ TEXT = (4.5, 7.0)
 NON_TEXT = (3.0, 3.0)
 
 
-def parse_palettes(css):
-    return effective_palettes(css)[0]
-
-
 def forced_roles():
     groups = {
         "Canvas": SURFACES + ["figure-ground", "text-inverse", "on-accent", "scrim", "material"],
@@ -48,7 +29,7 @@ def forced_roles():
         "ButtonFace": ["control", "control-hover", "strong-action", "strong-action-hover"],
         "ButtonText": ["control-text", "on-strong-action"],
         "Highlight": ["control-pressed", "focus", "selection-bg"],
-        "HighlightText": ["selection-text"],
+        "HighlightText": ["selection-text", "control-text-pressed"],
         "LinkText": ["accent", "accent-hover", "accent-pressed", "link", "link-hover"],
         "transparent": ["accent-soft"],
     }
@@ -73,11 +54,12 @@ def to_rgba(value):
     value = value.strip().lower()
     if re.fullmatch(r"#[0-9a-f]{6}", value):
         return tuple(int(value[i:i + 2], 16) / 255 for i in (1, 3, 5)) + (1.0,)
-    match = re.fullmatch(r"rgba\(\s*(\d+),\s*(\d+),\s*(\d+),\s*([\d.]+)\s*\)", value)
+    match = re.fullmatch(r"rgba?\(\s*([\d.]+),\s*([\d.]+),\s*([\d.]+)(?:,\s*([\d.]+))?\s*\)", value)
     if match:
         r, g, b, a = match.groups()
-        if all(0 <= int(channel) <= 255 for channel in (r, g, b)) and 0 <= float(a) <= 1:
-            return (int(r) / 255, int(g) / 255, int(b) / 255, float(a))
+        a = a or "1"
+        if all(0 <= float(channel) <= 255 for channel in (r, g, b)) and 0 <= float(a) <= 1:
+            return (float(r) / 255, float(g) / 255, float(b) / 255, float(a))
     raise ValueError("unsupported or invalid color value")
 
 
@@ -114,8 +96,9 @@ def pairs():
     yield "on-accent on accent-hover", "on-accent", "accent-hover", TEXT
     yield "on-strong-action on strong-action", "on-strong-action", "strong-action", TEXT
     yield "on-strong-action on strong-action-hover", "on-strong-action", "strong-action-hover", TEXT
-    for bg in ["control", "control-hover", "control-pressed"]:
+    for bg in ["control", "control-hover"]:
         yield f"control-text on {bg}", "control-text", bg, TEXT
+    yield "control-text-pressed on control-pressed", "control-text-pressed", "control-pressed", TEXT
     yield "selection-text on selection-bg", "selection-text", "selection-bg", TEXT
     yield "text on accent-soft", "text", "accent-soft", TEXT
     yield "accent on accent-soft", "accent", "accent-soft", TEXT
@@ -131,91 +114,36 @@ def pairs():
                f"status-{status}-bg", TEXT)
 
 
-def check(palettes):
+def check(palettes, computed):
     results = []
     for name, tokens in palettes.items():
         bg = to_rgba(tokens["bg"])
         more = name.split("/")[0].endswith("contrast")
-        for label, fg_key, bg_key, targets in pairs():
+        for (label, fg_key, bg_key, targets), measured in zip(pairs(), computed[name], strict=True):
             target = targets[1] if more else targets[0]
-            back = to_rgba(tokens[bg_key])
+            back = to_rgba(measured["background"])
             back_rgb = over(back, bg) if back[3] < 1 else back[:3]
-            fore = to_rgba(tokens[fg_key])
+            fore = to_rgba(measured["foreground"])
             fore_rgb = over(fore, back_rgb + (1.0,)) if fore[3] < 1 else fore[:3]
             value = ratio(fore_rgb, back_rgb)
             results.append((name, label, value, target, value + 1e-9 >= target))
     return results
 
 
-def informational(palettes):
-    """Ratios that are recorded, not gated: they justify non-colour rules."""
-    rows = []
-    for name in PALETTES:
-        tokens = palettes[name]
-        rows.append((name, "link against text (links are underlined)",
-                     ratio(to_rgba(tokens["link"])[:3], to_rgba(tokens["text"])[:3])))
-        rows.append((name, "accent against info (info always carries a label)",
-                     ratio(to_rgba(tokens["accent"])[:3], to_rgba(tokens["info"])[:3])))
-    return rows
-
-
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("tokens", nargs="?", default="assets/tokens.css")
-    parser.add_argument("--report", help="write a Markdown report to this path")
-    parser.add_argument("--control", action="store_true",
-                        help="inject a known failing value; the run must exit 1")
+    parser.add_argument("tokens", nargs="?", default="src/styles/tokens.css")
+    parser.add_argument("--control", action="store_true")
     args = parser.parse_args()
-
+    bridge = Path(__file__).resolve().parent / "checks/contrast.mjs"
+    command = ["node", str(bridge), "--tokens=" + str(Path(args.tokens).resolve())]
+    if args.control:
+        command.append("--control")
     try:
-        palettes, reduced, forced = effective_palettes(open(args.tokens, encoding="utf-8").read())
-        validate({**palettes, **reduced})
-        if args.control:
-            palettes["light"]["text-faint"] = "#9aa1ab"
-        report_results = check(palettes)
-        results = report_results + check(reduced)
-    except (ValueError, KeyError) as error:
-        print(f"contrast-css: {error}")
+        return subprocess.run(command, timeout=90).returncode
+    except (OSError, subprocess.TimeoutExpired):
+        print("contrast-browser: measurement unavailable")
         return 1
-    failures = [r for r in results if not r[4]]
-    expected = forced_roles()
-    forced_failures = [name for name, tokens in forced.items()
-                       if any(tokens.get(key, "").lower() != value for key, value in expected.items())
-                       or any(value.lower() not in set(expected.values()) for value in tokens.values())]
-
-    lines = []
-    for name, label, value, target, ok in results:
-        lines.append(f"{'PASS' if ok else 'FAIL'} {name:15s} {label:45s} {value:6.2f} (target {target})")
-    for name, label, value in informational(palettes):
-        lines.append(f"INFO {name:15s} {label:45s} {value:6.2f}")
-    for name in forced:
-        lines.append(f"{'FAIL' if name in forced_failures else 'PASS'} {name + '/forced':24s} forced-color-role")
-    lines.append(f"pairs: {len(results)}, failures: {len(failures)}, forced-color failures: {len(forced_failures)}")
-    print("\n".join(lines))
-
-    if args.report and not args.control and not failures and not forced_failures:
-        import io
-        with io.StringIO() as out:
-            out.write("# Contrast report\n\n")
-            out.write("Generated by `python3 scripts/check_contrast.py assets/tokens.css "
-                      "--report references/contrast-report.md`. Do not edit by hand.\n\n")
-            out.write("WCAG 2.x relative luminance. Targets: text 4.5:1 (7:1 in the more-contrast "
-                      "palettes), non-text 3:1. Translucent tokens are composited over `--color-bg`.\n\n")
-            out.write(f"Pairs checked: {len(report_results)}. Failures: 0.\n\n")
-            for name in PALETTES:
-                out.write(f"## {name}\n\n| Pair | Ratio | Target | Result |\n| --- | ---: | ---: | --- |\n")
-                for p_name, label, value, target, ok in report_results:
-                    if p_name == name:
-                        out.write(f"| {label} | {value:.2f} | {target} | {'pass' if ok else 'FAIL'} |\n")
-                for p_name, label, value in informational(palettes):
-                    if p_name == name:
-                        out.write(f"| {label} | {value:.2f} | recorded | info |\n")
-                out.write("\n")
-            text = out.getvalue().rstrip("\n") + "\n"
-        with open(args.report, "w", encoding="utf-8") as handle:
-            handle.write(text)
-    return 1 if failures or forced_failures else 0
-
 
 if __name__ == "__main__":
     sys.exit(main())
