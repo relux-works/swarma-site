@@ -3,7 +3,10 @@ import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import assert from 'node:assert/strict';
+import { chromium } from 'playwright';
 
+// Resolve the installed browser before child HOME changes to isolate the external policy.
+const browserExecutable = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || chromium.executablePath();
 const repository = fileURLToPath(new URL('../../..', import.meta.url));
 export async function fixture(t, entries = {}) {
   const scratch = join(repository, '.temp/check-fixtures');
@@ -23,7 +26,7 @@ export async function put(root, path, value) {
 export function run(name, root, rule, env = {}) {
   const result = spawnSync(process.execPath, [resolve(repository, `scripts/checks/${name}.mjs`)], {
     cwd: root, encoding: 'utf8', timeout: 120000,
-    env: { ...process.env, HOME: root, CI: '', IDENT_DENY_TOKENS: 'zz-host-alpha', IDENT_DENY_TOKENS_OPTIONAL: '', ...env },
+    env: { ...process.env, HOME: root, PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH: browserExecutable, CI: '', IDENT_DENY_TOKENS: 'zz-host-alpha', IDENT_DENY_TOKENS_OPTIONAL: '', ...env },
   });
   assert.ifError(result.error);
   assert.equal(result.status, rule ? 1 : 0, result.stdout + result.stderr);

@@ -29,7 +29,7 @@ export async function publicationReader(root, { assetRoots = [] } = {}) {
     if (browser) return;
     const temp = join(root, '.temp/publication-browser');
     await mkdir(temp, { recursive: true });
-    scratch = await mkdtemp(join(temp, 'run-'));
+    if (!scratch) scratch = await mkdtemp(join(temp, 'run-'));
     const previousTemp = process.env.TMPDIR;
     try {
       process.env.TMPDIR = scratch;

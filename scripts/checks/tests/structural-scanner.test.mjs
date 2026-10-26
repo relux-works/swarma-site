@@ -124,3 +124,42 @@ test('structural browser loads unchanged local CSS', async t => {
   await put(root, 'dist/nested/theme.css', 'p::before {content:"In preparation"}');
   run('status-language', root);
 });
+
+// A real cached browser remains usable after HOME isolates policy files; an empty child cache rejects.
+test('structural installed browser survives policy HOME isolation', async t => {
+  const { chromium } = await import('playwright');
+  const { spawnSync } = await import('node:child_process');
+  const { mkdir, writeFile, access, readdir } = await import('node:fs/promises');
+  const { dirname, join } = await import('node:path');
+  const { fileURLToPath } = await import('node:url');
+  const repository = fileURLToPath(new URL('../../..', import.meta.url));
+  const home = await fixture(t);
+  const root = await fixture(t, { 'dist/index.html': '<p>Swarma</p>' });
+  const actual = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || chromium.executablePath();
+  await access(actual);
+  const env = { ...process.env, HOME: home, PROBE_ROOT: root };
+  delete env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
+  delete env.PLAYWRIGHT_BROWSERS_PATH;
+  delete env.XDG_CACHE_HOME;
+  const options = { cwd: repository, env, encoding: 'utf8', timeout: 30000 };
+  const lookup = spawnSync(process.execPath, ['--input-type=module', '-e', 'import {chromium} from "playwright"; console.log(chromium.executablePath())'], options);
+  assert.ifError(lookup.error);
+  assert.equal(lookup.status, 0, lookup.stderr);
+  const cached = lookup.stdout.trim();
+  assert.ok(cached.startsWith(home + '/'), 'The cache must remain inside the isolated fixture');
+  await mkdir(dirname(cached), { recursive: true });
+  // This launcher delegates to the actual installed engine; no browser output or scanner verdict is mocked.
+  await writeFile(cached, "#!/bin/sh\nexec '" + actual.replaceAll("'", "'\\''") + "' \"$@\"\n", { mode: 0o700 });
+  const helper = new URL('./fixture.mjs', import.meta.url).href;
+  const positive = spawnSync(process.execPath, ['--input-type=module', '-e', `import {run} from ${JSON.stringify(helper)}; run('identifiers', process.env.PROBE_ROOT);`], options);
+  assert.ifError(positive.error);
+  assert.equal(positive.status, 0, positive.stdout + positive.stderr);
+  const cli = fileURLToPath(new URL('../identifiers.mjs', import.meta.url));
+  await put(root, 'dist/neighbor.html', '<p>Swarma</p>');
+  const negative = spawnSync(process.execPath, [cli], { ...options, cwd: root, env: { ...env, HOME: root, IDENT_DENY_TOKENS: 'zz-host-alpha' } });
+  assert.ifError(negative.error);
+  assert.equal(negative.status, 1, negative.stdout + negative.stderr);
+  assert.match(negative.stderr, /publication-decode/u);
+  await assert.rejects(access(join(root, cached.slice(home.length))), { code: 'ENOENT' });
+  assert.deepEqual(await readdir(join(root, '.temp/publication-browser')), [], 'Repeated startup errors must leave no browser scratch');
+});
