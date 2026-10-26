@@ -171,3 +171,16 @@ test('structural browser preflight diagnoses missing engine safely', async t => 
   const result = run('browser-ready', root, 'publication-browser', { PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH: '/missing/zz-host-alpha' });
   assert.ok(!(result.stdout + result.stderr).includes('zz-host-alpha'));
 });
+
+// Real browser startup must not put its Unix socket under deeply nested publication roots.
+// Linux CI exercises the socket limit; other platforms retain the same rendered-text control.
+test('structural browser scratch is independent of publication depth', async t => {
+  const root = await fixture(t, { 'dist/index.html': '<p>Swarma</p>' });
+  run('identifiers', root);
+  const deep = root + '/' + ['nested'.repeat(12), 'nested'.repeat(12)].join('/');
+  await put(deep, 'config/public-repos.json', '{"repositories":[],"emails":[]}');
+  await put(deep, 'dist/index.html', '<p>Swarma</p>');
+  run('identifiers', deep);
+  await put(deep, 'dist/index.html', '<p>zz-host-alpha</p>');
+  run('identifiers', deep, 'deny-token');
+});

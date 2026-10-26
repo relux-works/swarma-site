@@ -77,7 +77,7 @@ decoded attributes, accessibility-tree names/descriptions and computed generated
 blocks external requests and script execution. Styled documents are sampled at 390px and 1440px in light, dark,
 increased-contrast and forced-color appearances. Unstyled documents need one equivalent observation.
 Percent decoding is applied once to URL values. JSON/CSS strings are never recursively HTML-decoded.
-Browser profiles and transient artifacts live under .temp/publication-browser/ and close after every check.
+Downloads and traces live under .temp/publication-browser/. Playwright manages and removes browser profiles in the caller's OS temporary directory (TMPDIR when supplied); keep that path short for Chromium's Unix socket limit.
 PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH can select an existing local Chromium executable; CI uses the pinned Playwright
 browser installed by the workflow.
 
@@ -160,7 +160,7 @@ the retired product prefix and prohibited metaphors remain covered by the names 
 | parse5 | Standards-based structural HTML validation for publication features and canonical book-region provenance | In-memory DOM |
 | markdown-it | CommonMark rendering used by scanner commands | In-memory HTML, then Chromium observations |
 | css-tree and PostCSS | Validate CSS syntax, then parse literals and URLs through scanner commands | In-memory syntax trees; no custom escape grammar |
-| Playwright and Chromium | Render publication values through identifier, name and status-language commands | Transient profiles under `.temp/publication-browser/`; no external resource requests |
+| Playwright and Chromium | Render publication values through identifier, name and status-language commands | Downloads/traces under `.temp/publication-browser/`; profiles in caller OS temp; no external requests |
 | GitHub Actions | The `check` job on pull requests and main pushes; runs `npm ci` and `npm run check` | Hosted check logs |
 
 ### Scanner threat model
