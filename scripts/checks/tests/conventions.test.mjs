@@ -14,7 +14,8 @@ const evidence = [];
 after(async () => { await mkdir(join(repository, '.temp'), { recursive: true }); await writeFile(join(repository, '.temp/conventions-evidence.json'), JSON.stringify(evidence, null, 2) + '\n'); });
 async function sourceFixture(t, content) {
   const root = await fixture(t);
-  for (const path of ['src', 'public', 'config', 'scripts', 'astro.config.mjs', 'package.json', 'tsconfig.json']) await cp(join(repository, path), join(root, path), { recursive: true });
+  // Production inputs include scanner modules, while test-only denied plants stay in their own fixtures.
+  for (const path of ['src', 'public', 'config', 'scripts', 'astro.config.mjs', 'package.json', 'tsconfig.json']) await cp(join(repository, path), join(root, path), { recursive: true, filter: path => path !== join(repository, 'scripts/checks/tests') });
   await symlink(join(repository, 'node_modules'), join(root, 'node_modules'), 'dir');
   await put(root, 'src/content/pages/ru/platform.md', content);
   return root;
@@ -97,19 +98,24 @@ for (const [name, extra, body, diagnostic] of [
   ['malformed repository marker', '', '[[repos extra]]', 'malformed-marker'],
   ['unknown figure when disabled', '', '[[figure missing-figure]]', 'unknown-figure'],
 ]) test(`conventions: ${name}`, async t => { const root = await sourceFixture(t, content(extra, body)); build(root, false, diagnostic); });
-// A recognised immutable font is binary data; a changed or disguised font cannot gain a text-policy exemption.
+// Valid fonts pass both gates; changed binary bytes fail integrity and disguised text fails structural decoding.
 test('fonts: immutable binary and changed-file control', async t => {
   const path = 'public/fonts/pt-mono/pt-mono-latin-400-normal.woff2';
   const manifest = JSON.parse(await readFile(join(repository, 'src/data/font-assets.json'), 'utf8'));
   const data = await readFile(join(repository, path));
-  const root = await fixture(t, { 'src/data/font-assets.json': JSON.stringify(manifest) });
+  const root = await fixture(t, { 'src/data/font-assets.json': JSON.stringify({ [path]: manifest[path] }) });
   await put(root, path, data);
+  await symlink(join(repository, 'node_modules'), join(root, 'node_modules'), 'dir');
+  await put(root, 'public/fonts/pt-mono/OFL.txt', await readFile(join(repository, 'public/fonts/pt-mono/OFL.txt')));
   assert.equal(await approvedFont(root, path, data), true);
+  run('font-assets', root);
   run('identifiers', root);
   const changed = Buffer.concat([data, Buffer.from('\n~/hidden\n')]);
   await put(root, path, changed);
   assert.equal(await approvedFont(root, path, changed), false);
-  run('identifiers', root, 'local-path');
+  run('font-assets', root, 'font-integrity');
+  await put(root, path, '~/hidden');
+  run('identifiers', root, 'publication-decode');
 });
 // The shipped token matrix passes and the design system's known low-contrast pair fails specifically.
 test('contrast: shipped pairs and low-pair control', () => {

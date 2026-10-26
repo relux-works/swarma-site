@@ -1,7 +1,7 @@
 import { createServer } from 'node:http';
 import { readFile, mkdir, writeFile } from 'node:fs/promises';
 import { resolve, join, extname, sep, relative } from 'node:path';
-import { chromium } from 'playwright';
+import { openBrowser } from './publication/browser.mjs';
 import { headerGeometry } from './header-geometry.mjs';
 import AxeBuilder from '@axe-core/playwright';
 import { filesAt } from './lib.mjs';
@@ -10,11 +10,6 @@ installDiagnostics();
 
 const root = process.cwd(), output = join(root, '.temp/a11y');
 await mkdir(output, { recursive: true });
-const browserTemporary = join(output, 'browser-tmp');
-await mkdir(browserTemporary, { recursive: true });
-process.env.TMPDIR = browserTemporary;
-process.env.TMP = browserTemporary;
-process.env.TEMP = browserTemporary;
 const control = process.argv.includes('--control');
 const geometryControl = process.argv.includes('--geometry-control');
 const geometry = process.argv.includes('--geometry') || geometryControl;
@@ -33,12 +28,12 @@ const server = createServer(async (request, response) => {
     response.writeHead(200, { 'Content-Type': type }); response.end(content);
   } catch { response.writeHead(404); response.end('Not found'); }
 });
-let browser;
+let browser, browserSession;
 const reports = [];
 try {
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
   const origin = `http://127.0.0.1:${server.address().port}`;
-  browser = await chromium.launch({ channel: 'chrome', headless: true });
+  browserSession = await openBrowser(root); browser = browserSession.browser;
   const requestedRoute = process.argv.find(arg => arg.startsWith('--route='))?.slice('--route='.length);
   let routes = control ? ['/control/'] : (await filesAt(root, 'dist')).filter(file => file.endsWith('.html')).map(file => '/' + relative(join(root, 'dist'), file).replace(/index\.html$/, ''));
   if (requestedRoute) routes = routes.filter(route => requestedRoute.split(',').includes(route));
@@ -111,4 +106,4 @@ try {
   if (reports.some(report => report.violations.length)) process.exitCode = 1;
   if (!geometry) console.log(`a11y: ${reports.length} scans, ${reports.reduce((sum, report) => sum + report.violations.length, 0)} violations`);
 } catch (error) { console.error(error.message); process.exitCode = 1; }
-finally { await writeFile(join(output, geometry ? 'geometry-run.json' : control ? 'control.json' : matrix ? 'matrix.json' : 'report.json'), JSON.stringify({ browser: browser?.version(), platform: process.platform, architecture: process.arch, control, scans: reports }, null, 2) + '\n'); if (browser) await browser.close(); await new Promise(resolve => server.close(resolve)); }
+finally { await writeFile(join(output, geometry ? 'geometry-run.json' : control ? 'control.json' : matrix ? 'matrix.json' : 'report.json'), JSON.stringify({ browser: browser?.version(), platform: process.platform, architecture: process.arch, control, scans: reports }, null, 2) + '\n'); if (browserSession) await browserSession.close(); await new Promise(resolve => server.close(resolve)); }

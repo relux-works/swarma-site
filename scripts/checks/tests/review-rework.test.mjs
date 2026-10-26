@@ -4,7 +4,7 @@ import { cp, readFile, symlink } from 'node:fs/promises';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
-import { chromium } from 'playwright';
+import { openBrowser } from '../publication/browser.mjs';
 import { fixture, put, page } from './fixture.mjs';
 import { check as contrast } from '../contrast.mjs';
 
@@ -24,8 +24,9 @@ test('contrast: former forced pressed foreground fails numerically', async t => 
 
 async function sourceFixture(t) {
   const root = await fixture(t);
+  // Convention builds need production scanner modules, not the suite's unrelated policy plants.
   for (const path of ['src', 'public', 'config', 'scripts', 'astro.config.mjs', 'package.json', 'tsconfig.json']) {
-    await cp(join(repository, path), join(root, path), { recursive: true });
+    await cp(join(repository, path), join(root, path), { recursive: true, filter: path => path !== join(repository, 'scripts/checks/tests') });
   }
   await symlink(join(repository, 'node_modules'), join(root, 'node_modules'), 'dir');
   return root;
@@ -100,7 +101,7 @@ const bytes = Buffer.from('Пример\\n'); process.stdout.write(bytes.subarra
 // Real button styles consume the new foreground for pointer and ARIA pressed states without changing the control box.
 test('controls: default and pressed styles match their semantic pairs', async t => {
   const root = await fixture(t);
-  const browser = await chromium.launch({ channel: 'chrome', env: { ...process.env, TMPDIR: root } });
+  const session = await openBrowser(root), browser = session.browser;
   try {
     const screen = await browser.newPage({ viewport: { width: 390, height: 900 } });
     await screen.route('**/*', route => route.abort());
@@ -135,5 +136,5 @@ test('controls: default and pressed styles match their semantic pairs', async t 
       assert.equal(toggled.color, toggled.pressed); assert.equal(toggled.background, toggled.pressedBackground);
       await button.evaluate(node => node.removeAttribute('aria-pressed'));
     }
-  } finally { await browser.close(); }
+  } finally { await session.close(); }
 });

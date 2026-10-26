@@ -1,37 +1,19 @@
-import { readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { StringDecoder } from 'node:string_decoder';
 
+import { readDenyTokensSync, redactor } from '../../scripts/checks/publication/policy.mjs';
+
 const stateKey = Symbol.for('swarma.diagnostics');
-function policy() {
-  const configured = process.env.IDENT_DENY_TOKENS;
-  let source = configured;
-  if (!source?.trim()) {
-    try { source = readFileSync(join(homedir(), '.config', 'swarma-site', 'deny-tokens.txt'), 'utf8'); }
-    catch (error) {
-      if (error.code !== 'ENOENT') throw new Error('diagnostic-policy: external policy is unreadable');
-      source = '';
-    }
-  }
-  return [...new Set(source.split(/[,\r\n]+/).map(value => value.trim()).filter(Boolean))];
-}
-let tokens;
-export function redact(value) {
-  tokens ??= policy();
-  let text = String(value);
-  // Longest first prevents a short configured prefix exposing the remainder of a longer value.
-  for (const token of [...tokens].sort((a, b) => b.length - a.length)) {
-    text = text.replace(new RegExp(token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), '[redacted]');
-  }
-  return text;
-}
+let sanitize;
+function policy() { return readDenyTokensSync(join(homedir(), '.config', 'swarma-site', 'deny-tokens.txt')); }
+export function redact(value) { sanitize ??= redactor(policy()); return sanitize(value); }
 export function diagnostic(value) { return new Error(redact(value)); }
 
 // Frameworks may reformat errors with raw source paths/frames. Filter both output streams at the process boundary.
 export function installDiagnostics() {
   if (globalThis[stateKey]) return;
-  try { tokens ??= policy(); }
+  try { sanitize ??= redactor(policy()); }
   catch {
     process.stderr.write('diagnostic-policy: external policy is unreadable\n');
     process.exit(1);

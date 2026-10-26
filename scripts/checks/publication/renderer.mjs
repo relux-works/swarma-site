@@ -3,14 +3,14 @@
 import { extname, join, dirname, resolve, sep } from 'node:path';
 import MarkdownIt from 'markdown-it';
 import matter from 'gray-matter';
-import { chromium } from 'playwright';
-import { mkdir, mkdtemp, rm } from 'node:fs/promises';
+import { openBrowser } from './browser.mjs';
 import { cssValues, decodePercent } from './css.mjs';
 import { readPublication } from './reader.mjs';
 import { failure } from './policy.mjs';
 
 const markdown = new MarkdownIt('commonmark', { html: true });
-const markupExtensions = new Set(['.html', '.htm', '.svg', '.astro', '.mdx', '.vue', '.svelte']);
+const markupExtensions = new Set(['.html', '.htm', '.svg']);
+const frameworkExtensions = new Set(['.astro', '.mdx', '.vue', '.svelte']);
 export function* jsonStrings(value) {
   if (typeof value === 'string') yield value;
   else if (Array.isArray(value)) { for (const item of value) yield* jsonStrings(item); }
@@ -18,25 +18,20 @@ export function* jsonStrings(value) {
 }
 export function publicationHTML(path, text) {
   if (extname(path) === '.md') return markdown.render(matter(text).content);
-  if (extname(path) === '.astro' || extname(path) === '.mdx') return text.replace(/^---\r?\n[\s\S]*?\r?\n---(?:\r?\n|$)/u, '');
+  // Surface preflight excludes frontmatter via the library, without evaluating framework source.
+  if (['.astro', '.mdx'].includes(extname(path))) return matter(text, { engines: {
+    yaml: () => ({}), json: () => ({}), javascript: () => ({}), js: () => ({}),
+  } }).content;
   return text;
 }
 const types = new Map([['.css', 'text/css'], ['.svg', 'image/svg+xml'], ['.png', 'image/png'], ['.jpg', 'image/jpeg'], ['.woff2', 'font/woff2']]);
 export async function publicationReader(root, { assetRoots = [] } = {}) {
-  let browser, context, page, cdp, current, scratch;
+  let browser, context, page, cdp, current, session;
   const cache = new Map();
   async function ready() {
     if (browser) return;
-    const temp = join(root, '.temp/publication-browser');
-    await mkdir(temp, { recursive: true });
-    if (!scratch) scratch = await mkdtemp(join(temp, 'run-'));
-    // Chromium's Unix socket needs the caller's short OS temporary directory, independently of document depth.
-    // Playwright owns and removes its profile; downloads and traces remain in the reader's explicit scratch.
-    browser = await chromium.launch({
-      headless: true, executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || undefined,
-      downloadsPath: scratch, tracesDir: scratch,
-      env: { ...process.env, XDG_CACHE_HOME: join(scratch, 'cache'), XDG_CONFIG_HOME: join(scratch, 'config'), XDG_DATA_HOME: join(scratch, 'data') },
-    });
+    session = await openBrowser(root);
+    browser = session.browser;
     context = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 1440, height: 1000 }, serviceWorkers: 'block' });
     await context.route('**/*', async route => {
       try {
@@ -144,6 +139,8 @@ export async function publicationReader(root, { assetRoots = [] } = {}) {
       let result;
       if (suffix === '.json') result = { values: [...jsonStrings(JSON.parse(text))], prose: [], accessible: [] };
       else if (suffix === '.css') result = { values: cssValues(text), prose: [], accessible: [] };
+      // Framework templates are source code; their compiled dist HTML is the browser contract.
+      else if (frameworkExtensions.has(suffix)) result = { values: [], prose: [text], accessible: [] };
       else if (suffix === '.md' || markupExtensions.has(suffix) || /^\s*</u.test(text)) {
         if (suffix === '.svg' && /<!DOCTYPE|<!ENTITY/iu.test(text)) throw failure('publication-decode');
         result = await render(path, publicationHTML(path, text), excluded);
@@ -152,6 +149,6 @@ export async function publicationReader(root, { assetRoots = [] } = {}) {
       cache.set(key, result);
       return result;
     },
-    async close() { try { await context?.close(); } finally { try { await browser?.close(); } finally { if (scratch) await rm(scratch, { recursive: true, force: true }); } } },
+    async close() { try { await context?.close(); } finally { await session?.close(); } },
   };
 }

@@ -1,18 +1,18 @@
 import { readFile, mkdir, writeFile } from 'node:fs/promises';
 import { resolve, join } from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { chromium } from 'playwright';
+import { openBrowser } from './publication/browser.mjs';
 import { document, filesAt } from './lib.mjs';
 import { installDiagnostics, redact } from '../../src/lib/diagnostics.mjs';
 
 // Chromium resolves all 16 appearances; the upstream contract supplies pairs and WCAG alpha/luminance arithmetic.
 export async function check(root, { control = false, cssOverride } = {}) {
   const output = join(root, '.temp/contrast');
-  await mkdir(join(output, 'browser-tmp'), { recursive: true });
+  await mkdir(output, { recursive: true });
   const contractResult = spawnSync('python3', ['-B', 'scripts/check_computed_contrast.py', '--contract'], { cwd: root, encoding: 'utf8' });
   if (contractResult.status !== 0) throw new Error('contrast-browser: contract unavailable');
   const contract = JSON.parse(contractResult.stdout);
-  const browser = await chromium.launch({ channel: 'chrome', headless: true, env: { ...process.env, TMPDIR: join(output, 'browser-tmp') } });
+  const session = await openBrowser(root), browser = session.browser;
   const evidence = [];
   try {
     const files = (await filesAt(root, 'dist')).filter(file => file.endsWith('.html'));
@@ -101,7 +101,7 @@ export async function check(root, { control = false, cssOverride } = {}) {
     console.log(`pairs: ${total}, failures: 0, forced-color failures: 0`);
   } finally {
     await writeFile(join(output, 'report.json'), redact(JSON.stringify(evidence, null, 2)) + '\n');
-    await browser.close();
+    await session.close();
   }
 }
 if (process.argv[1]?.endsWith('/contrast.mjs')) {

@@ -145,9 +145,9 @@ test('identifiers exception diagnostics are safe', async t => {
   };
   const root = await fixture(t);
   safe(run('identifiers', root, undefined, environment));
-  await put(root, 'config/public-repos.json', tokens.join(' '));
+  await put(root, 'config/site.json', tokens.join(' '));
   safe(run('identifiers', root, 'identifier-allowlist', environment));
-  await put(root, 'config/public-repos.json', '{"repositories":[],"emails":[]}');
+  await put(root, 'config/site.json', '{"github_org":"relux-works","contact_email":"contact@example.org"}');
   const path = join(root, 'public/zz-host-alpha.txt');
   await put(root, 'public/zz-host-alpha.txt', 'Ordinary text');
   safe(run('identifiers', root, 'deny-token', environment));
@@ -161,7 +161,7 @@ test('identifiers exception diagnostics are safe', async t => {
 
 // Malformed configurations reject by a fixed rule, independently of parser exception wording.
 for (const value of ['{', 'null', '[]', '{"repositories":[1],"emails":[]}', '{"repositories":[],"emails":"all"}']) test(`identifiers invalid allowlist ${value}`, async t => {
-  const root = await fixture(t, { 'config/public-repos.json': value });
+  const root = await fixture(t, { 'config/site.json': value });
   run('identifiers', root, 'identifier-allowlist');
 });
 

@@ -18,7 +18,8 @@ after(async () => {
 
 async function sourceFixture(t) {
   const root = await fixture(t);
-  for (const path of ['src', 'config', 'scripts', 'astro.config.mjs', 'package.json', 'tsconfig.json']) await cp(join(repository, path), join(root, path), { recursive: true });
+  // Copy production scanner dependencies without unrelated test-only policy plants.
+  for (const path of ['src', 'config', 'scripts', 'astro.config.mjs', 'package.json', 'tsconfig.json']) await cp(join(repository, path), join(root, path), { recursive: true, filter: path => path !== join(repository, 'scripts/checks/tests') });
   // English cases create their entire locale explicitly, independent of authored English content.
   await rm(join(root, 'src/content/pages/en'), { recursive: true, force: true });
   await symlink(join(repository, 'node_modules'), join(root, 'node_modules'), 'dir');
@@ -214,4 +215,39 @@ test('build: external SVG availability is rejected beside a neutral badge', asyn
   const result = run('status-language', root, 'status-language');
   assert.ok(result.stderr.split('\n').includes('dist/badge.svg: status-language'), result.stderr);
   evidence.push({ name: 'external SVG readiness badge', check: 'status-language', buildExit: 0, checkExit: result.status, diagnostic: 'dist/badge.svg: status-language' });
+});
+
+// Browser block layout exposes the ordinary availability phrase missed by handwritten span concatenation.
+test('integration: block-span availability rejects after clean built control', async t => {
+  const root = await sourceFixture(t);
+  await layoutPlant(root, '<p><span style="display:block">In</span><span>preparation</span></p>');
+  build(root);
+  verdict('block-span clean control', 'status-language', root);
+  const file = join(root, 'src/layouts/Page.astro');
+  await writeFile(file, (await readFile(file, 'utf8')).replace('<span style="display:block">In</span><span>preparation</span>', '<span style="display:block">available</span><span>now</span>'));
+  build(root);
+  verdict('block-span availability', 'status-language', root, 'status-language');
+});
+
+// Astro really copies the BOM unchanged; both output readers reject it and npm prebuild preserves prior output.
+test('integration: BOM public file is rejected in source and actual dist', async t => {
+  const root = await sourceFixture(t);
+  await put(root, 'public/probe.html', '<p>Swarma</p>');
+  build(root);
+  verdict('BOM clean build control', 'publication-surface', root);
+  const bytes = Buffer.concat([Buffer.from([239, 187, 191]), Buffer.from('<p>Swarma</p>')]);
+  await put(root, 'public/probe.html', bytes);
+  build(root);
+  assert.deepEqual(await readFile(join(root, 'dist/probe.html')), bytes);
+  const result = run('publication-surface', root, 'publication-decode');
+  assert.match(result.stderr, /dist\/probe\.html: publication-decode/u);
+  assert.match(result.stderr, /public\/probe\.html: publication-decode/u);
+  verdict('BOM output identifier rejection', 'identifiers', root, 'publication-decode');
+  const before = await readFile(join(root, 'dist/index.html'));
+  const guarded = spawnSync('npm', ['run', 'build'], { cwd: root, encoding: 'utf8', timeout: 90000, env: { ...process.env, IDENT_DENY_TOKENS: 'zz-host-alpha' } });
+  assert.ifError(guarded.error);
+  assert.equal(guarded.status, 1, guarded.stdout + guarded.stderr);
+  assert.match(guarded.stderr, /publication-decode/u);
+  assert.deepEqual(await readFile(join(root, 'dist/index.html')), before);
+  evidence.push({ name: 'BOM integration guard', buildExit: 1, checkExit: result.status, diagnostic: 'publication-decode', bytesPreservedByAstro: true, previousOutputPreservedByNpm: true });
 });

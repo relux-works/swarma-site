@@ -34,13 +34,15 @@ locale home links the product identity to the root selector.
 | Astro: `npm run build` | Static pages compile with validated conventions and publication gates | `dist/`, `.temp/astro-cache/` |
 | Astro: `npm run dev` | Local authoring preview; stop after use | Local foreground server |
 | npm: `npm ci` | Install the lockfile versions | `node_modules/` |
-| Node: `npm test` | Positive fixtures pass; bounded violations fail for their intended reasons | Console, `.temp/*-evidence.json`; fixtures are removed |
+| Node: `npm test` (four concurrent files) | Positive fixtures pass; bounded violations fail for their intended reasons | Console, `.temp/*-evidence.json`; fixtures are removed |
 | `npm run check` | Complete local validation sequence | Console and `.temp/` reports |
 | `npm run check:no-status` | No status route, marker, keys, chips, provenance attributes or status links | Console |
 | `npm run check:status-language` | No availability claims in authored or rendered text or accessible labels; no exemptions | Console |
 | `npm run check:names` | Canonical names and no infrastructure product names in site content | Console |
 | `npm run check:i18n` | Valid metadata, canonical slugs and Russian counterpart for every English page | Console |
 | `npm run check:identifiers` | No private identifiers, paths or unconfigured repository links/contact values | Console |
+| `npm run check:browser` | Shared real Chromium startup and rendered-text control, with safe diagnostics | Console; transient browser scratch |
+| markdown-it / PostCSS / css-tree | CommonMark rendering and library CSS syntax/literal extraction for publication consumers | In-memory values |
 | parse5: `npm run check:publication-surface` | Only supported publication HTML features in source/output | Console |
 | `npm run check:brand` | Copied artwork bytes match the pinned owner's manifest | Console |
 | `npm run check:fonts` | Licensed local font assets match their manifest | Console |
@@ -72,8 +74,8 @@ content names the role instead. Claude Code and Codex are allowed harness names.
 remain the book's terms. The policy declaration and its test controls are outside publication scans.
 
 HTML publication checks reject nested documents, SVG scripting, templates, forms, hidden fallback
-content and unsupported browser surfaces. Immutable font and owner-brand binary exemptions apply
-only after exact SHA-256 verification. Changed bytes cannot obtain an exemption.
+content and unsupported browser surfaces. The text reader validates explicit binary signatures. Independent font and owner-brand integrity gates
+require exact SHA-256 matches; changed shipped assets fail those gates.
 
 ## Content conventions
 
@@ -133,3 +135,67 @@ technology journeys, final authored-content integration and public release decis
 separate gates; see `UNRESOLVED_QUESTIONS.md`.
 
 ## Structural publication consumers
+
+The tracked identifier policies and test controls contain only generic shapes and synthetic values.
+Real internal names are supplied outside the repository through `IDENT_DENY_TOKENS`
+(comma-separated literals), or the untracked local file `$HOME/.config/swarma-site/deny-tokens.txt`
+(one literal per line; commas are also accepted). A nonempty environment list takes precedence.
+Tokens must match `[a-z0-9][a-z0-9._-]{2,}` after ASCII whitespace trimming. Invalid entries fail;
+CI requires the explicit environment list and never reads a local fallback. Comparisons normalize
+Unicode whitespace and invisible formatting and use ASCII-only case folding. Standalone SVG documents
+receive rendered text, accessible-name and attribute checks, including public-to-dist copies;
+malformed XML fails publication-decode. Matches include normalized literal substrings; diagnostics name the rule and redact matching filenames.
+Raw source remains checked, including code examples. Consumer values come from real parsers: JSON keys and
+strings from JSON.parse, Markdown from the CommonMark preset of markdown-it, and CSS literals/URLs from css-tree after strict PostCSS syntax validation.
+CommonMark handles emphasis, inline code, fenced and indented code, nesting and link destinations; code entities
+remain literal. No custom Markdown, HTML or CSS escape parser determines a scanner verdict.
+
+Framework templates (Astro, MDX, Vue and Svelte) retain raw-source checks; the scanner does not
+interpret their uncompiled syntax as HTML. Their compiled output in `dist/` receives the rendered checks.
+Chromium loads generated HTML with its shipped stylesheets unchanged. The browser supplies DOM innerText,
+decoded attributes, accessibility-tree names/descriptions and computed generated content. Local asset interception
+blocks external requests and script execution. Styled documents are sampled at 390px and 1440px in light, dark,
+increased-contrast and forced-color appearances. Unstyled documents need one equivalent observation.
+Percent decoding is applied once to URL values. JSON/CSS strings are never recursively HTML-decoded.
+Downloads, traces and browser XDG caches live under .temp/publication-browser/. Playwright manages and removes browser profiles in the caller's OS temporary directory (TMPDIR when supplied); keep that path short for Chromium's Unix socket limit.
+PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH can select an existing local Chromium executable; CI uses the pinned Playwright
+browser installed by the workflow.
+
+All publication text must be valid UTF-8 without BOM or NUL bytes, including extensionless files. Unsupported
+encodings fail publication-decode before interpretation; the publication-surface check also runs before Astro.
+Known binary image/font extensions require matching signatures rather than accepting renamed text. Binary payloads
+are outside text rendering; attributes and external raw literals remain checked. SVG DTD/entity declarations are
+unsupported. Malformed JSON/CSS input also fails publication-decode instead of silently skipping values.
+Configuration parse failures return identifier-allowlist; external-source read failures return identifier-deny-tokens;
+file/traversal failures return identifier-scan. Shared CLI output redacts configured literals for every check,
+including findings from names, availability, publication features and metadata checks. Unexpected
+exceptions become fixed diagnostics, never underlying messages, filenames or tracebacks. The allowlist derives solely from validated site/contact and repository configuration.
+External tokens scan all repository files, including policy sources, tests, configuration and CI files,
+without the generic-rule exemptions. Only Git metadata, dependency directories, local context and generated
+scratch/cache directories (`.temp/`, `.astro/`, `.val/`) are omitted; built `dist/` files remain checked.
+Never add real tokens to source, fixtures, documentation, command arguments or logs.
+
+Set the repository secret `IDENT_DENY_TOKENS` before running CI; the workflow passes it only to the checks step.
+That step rejects an empty or delimiter-only secret before running checks, without using a local-file fallback.
+CI requires a nonempty repository secret, even if `IDENT_DENY_TOKENS_OPTIONAL=1`.
+Locally, missing tokens print a warning and run generic checks, but still exit nonzero.
+Only an explicit local `IDENT_DENY_TOKENS_OPTIONAL=1 npm run check` permits a generic-only pass.
+The isolated controls inject synthetic lists and temporary home directories; they do not need the real list.
+They assert safe output for malformed configuration and actual unreadable files, and pair encoded identifier
+plants with valid controls in source and output. Real Astro builds verify that encoded public files reach `dist/`
+and are rejected there, alongside clean public-to-dist controls.
+
+
+### Scanner threat model
+
+The checks prevent accidental publication by ordinary authors: prohibited identifiers and names, internal paths,
+private links and unsupported availability claims in text, code, attributes and common encodings. Deliberately
+obfuscating authors are outside this model. Rendered values are taken from Chromium, CommonMark and library syntax
+parsers, never a custom markup grammar; CSS colors, when evaluated, must come from getComputedStyle. The contrast gate also uses computed browser colors.
+
+The publication-feature denylist remains enforced. Text is UTF-8 without BOM; every diagnostic path is redacted.
+Each affected rule has a clean control beside a known violation, asserting its intended diagnostic and safe output.
+The controls cover malformed/unreadable inputs, source and output encodings, Markdown emphasis and all code forms,
+generated browser text, and real Astro public-to-dist copies. They establish these bounded contracts, not resistance
+to arbitrary program transformations or comprehensive accessibility conformance.
+

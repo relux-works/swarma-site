@@ -18,8 +18,7 @@
         "ru": "Что нужно знать заранее"
       },
       {
-        "ru": "Дизайн и готовность",
-        "en": "Design and readiness"
+        "ru": "Дизайн и готовность"
       },
       {
         "ru": "Карта пяти частей",
@@ -94,8 +93,7 @@
         "en": "One path through the three layers"
       },
       {
-        "ru": "Порядок постройки",
-        "en": "Order of construction"
+        "ru": "Порядок постройки"
       }
     ],
     "title_en": "Swarma as a whole"
@@ -110,7 +108,7 @@
       },
       {
         "ru": "Полномочия только сужаются",
-        "en": "Authority only narrows"
+        "en": "Capabilities only narrow"
       },
       {
         "ru": "Журнал хранит истину, сессия модели служит кэшем",
@@ -241,7 +239,7 @@
         "ru": "Дальше"
       }
     ],
-    "title_en": "Keys and the keyholder"
+    "title_en": "Keys and the key holder"
   },
   {
     "number": "06",
@@ -274,7 +272,7 @@
         "ru": "Человеческое разрешение и реестр"
       }
     ],
-    "title_en": "Grants and authority"
+    "title_en": "Grants and capabilities"
   },
   {
     "number": "07",
@@ -285,7 +283,7 @@
       },
       {
         "ru": "Носитель не становится источником полномочий",
-        "en": "The carrier does not become a source of authority"
+        "en": "The carrier does not become a source of capabilities"
       },
       {
         "ru": "Уровни уверенности для сообщений людей"
@@ -1204,8 +1202,7 @@
     "title": "Где мы и что дальше",
     "sections": [
       {
-        "ru": "Карта по слоям",
-        "en": "Layer map"
+        "ru": "Карта по слоям"
       },
       {
         "ru": "Состояние по частям платформы"

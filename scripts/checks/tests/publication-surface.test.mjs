@@ -7,6 +7,9 @@ test('publication surface clean control', async t => {
   const html = '<!doctype html><html lang="ru"><head><meta name="description" content="Swarma Signer"><style>@media (min-width: 1px) { p { color: inherit !important; } }</style></head><body><main><a href="/ru/">Swarma</a><img src="d&#97;ta:image/png;base64,AA==" alt="Image"><button type="button">Details</button></main></body></html>';
   const root = await fixture(t, { 'src/layouts/Page.astro': `---\nconst example = '<input>';\n---\n${html}`, 'public/clean.html': html, 'dist/index.html': html });
   run('publication-surface', root);
+  // Frontmatter is excluded from the HTML surface, while actual template markup remains checked.
+  await put(root, 'src/layouts/Page.astro', `---\nconst example = '<input>';\n---\n<input>`);
+  run('publication-surface', root, 'publication-input');
 });
 
 // Each unused HTML feature fails its own named rule in both source and built output, without forbidden prose.

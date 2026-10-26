@@ -1,5 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import { tokenRanges } from './normalization.mjs';
+import { readFileSync } from 'node:fs';
 
 export const tokenPattern = /^[a-z0-9][a-z0-9._-]{2,}$/u;
 export const splitTokens = text => {
@@ -10,6 +11,11 @@ export const splitTokens = text => {
 export async function readDenyTokens(file, environment = process.env.IDENT_DENY_TOKENS ?? '', ci = process.env.CI) {
   if (environment || (ci && !['0', 'false'].includes(ci.toLowerCase()))) return splitTokens(environment);
   try { return splitTokens(await readFile(file, 'utf8')); }
+  catch (error) { if (error.code === 'ENOENT') return []; throw failure('identifier-deny-tokens'); }
+}
+export function readDenyTokensSync(file, environment = process.env.IDENT_DENY_TOKENS ?? '', ci = process.env.CI) {
+  if (environment || (ci && !['0', 'false'].includes(ci.toLowerCase()))) return splitTokens(environment);
+  try { return splitTokens(readFileSync(file, 'utf8')); }
   catch (error) { if (error.code === 'ENOENT') return []; throw failure('identifier-deny-tokens'); }
 }
 export function redactor(tokens) {

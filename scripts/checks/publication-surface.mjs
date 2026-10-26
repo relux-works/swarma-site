@@ -69,7 +69,7 @@ export async function check(root) {
     catch (error) { if (error.rule) { errors.push(`${path}: ${error.rule}`); continue; } throw error; }
     if (publication.binary) continue;
     let source = publication.text;
-    // Astro/Markdown frontmatter is not HTML. Generated markup is checked independently in dist.
+    // CommonMark is rendered by its library; raw template preflight is supplemented by compiled dist.
     if (/\.(?:astro|md|mdx)$/.test(path)) source = publicationHTML(path, source);
     for (const rule of surfaceRules(source)) if (!allowed.has(`${path}:${rule}`)) errors.push(`${path}: ${rule}`);
   }

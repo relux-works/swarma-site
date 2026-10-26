@@ -12,3 +12,21 @@ export function infrastructureRules(text) {
   text = normalizeText(text);
   return infrastructureProducts.some(name => new RegExp(`(?<![\\p{L}\\p{N}_])${name}(?![\\p{L}\\p{N}_])`, 'iu').test(text)) ? ['infrastructure-product'] : [];
 }
+export async function check(root) {
+  const reader = await publicationReader(root), errors = [];
+  try {
+    for (const file of await scanFiles(root)) {
+      const path = relative(root, file);
+      try {
+        const { text, binary } = await readPublication(file);
+        if (binary) continue;
+        const { prose, values } = await reader.values(path, text);
+        if ([text, ...prose, ...values].some(value => nameRules(value).length)) errors.push(`${path}: canonical-name`);
+        if ((path.startsWith('src/content/') || (path.startsWith('dist/') && /\.html?$/u.test(path)))
+          && [...prose, ...values].some(value => infrastructureRules(value).length)) errors.push(`${path}: infrastructure-product`);
+      } catch (error) { errors.push(`${path}: ${error.rule === 'publication-decode' ? error.rule : 'publication-decode'}`); }
+    }
+  } finally { await reader.close(); }
+  return [...new Set(errors)];
+}
+await cli(import.meta.url, check);

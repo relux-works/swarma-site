@@ -3,8 +3,6 @@ import { join, relative, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { parse } from 'parse5';
 import { denyTokens, redactor, safeError } from './scanner-policy.mjs';
-import { approvedBrand } from './brand-assets.mjs';
-import { approvedFont } from './font-approved.mjs';
 import { installDiagnostics } from '../../src/lib/diagnostics.mjs';
 
 export async function filesAt(root, path) {
@@ -29,19 +27,6 @@ export async function scanFiles(root) {
   });
 }
 
-export async function scanText(root, inspect) {
-  const errors = [];
-  for (const file of await scanFiles(root)) {
-    const data = await readFile(file);
-    if (await approvedFont(root, relative(root, file), data)) continue;
-    const brandPath = relative(root, file).replace(/^dist\//, 'public/');
-    if (await approvedBrand(root, brandPath, data)) continue;
-    const text = data.toString('utf8');
-    for (const rule of inspect(text)) errors.push(`${relative(root, file)}: ${rule}`);
-  }
-  return errors;
-}
-
 export function document(html) { return parse(html); }
 
 export function attributes(html, { accessible = false } = {}) {
@@ -58,6 +43,7 @@ export function attributes(html, { accessible = false } = {}) {
   return output.join('\n');
 }
 
+// Structural test assertions only; publication verdicts use Chromium through publicationReader.
 export function visibleText(html, { excludedNodes = new Set() } = {}) {
   const output = [];
   function visit(node) {
