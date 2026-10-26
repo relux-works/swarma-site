@@ -71,6 +71,9 @@ test('standalone SVG: neutral document and policy plants', async t => {
   const svg = text => `<svg xmlns="http://www.w3.org/2000/svg" width="320" height="50"><text x="10" y="32">${text}</text></svg>`;
   const root = await fixture(t, { 'public/badge.svg': svg('In preparation'), 'dist/badge.svg': svg('In preparation') });
   for (const check of ['identifiers', 'names', 'status-language']) run(check, root);
+  // CSS comments in an external public SVG are not consumer availability text.
+  await put(root, 'public/badge.svg', '<svg xmlns="http://www.w3.org/2000/svg"><style>/* available now */</style><text>In preparation</text></svg>');
+  run('status-language', root);
   for (const [text, check, rule] of [['Swarma Chain available now', 'status-language', 'status-language'], ['Swarm&#32;Runtime', 'names', 'canonical-name'], ['zz-host-al&#x200d;pha', 'identifiers', 'deny-token']]) {
     await put(root, 'dist/badge.svg', svg(text));
     const result = run(check, root, rule);

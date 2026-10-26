@@ -71,28 +71,28 @@ test('diagnostics: split streams, literal patterns and unreadable policy', async
   const moduleURL = new URL('../../../src/lib/diagnostics.mjs', import.meta.url).href;
   const source = `import { installDiagnostics, diagnostic } from ${JSON.stringify(moduleURL)};
 installDiagnostics(); installDiagnostics();
-console.log(diagnostic('zz-policy.(value)').message);
-process.stdout.write('Safe: '); process.stdout.write('ZZ-POLICY.'); process.stdout.write('(VALUE)\\n');
-process.stderr.write('zz-policy.'); process.stderr.write('(value)');
+console.log(diagnostic('zz-policy.value').message);
+process.stdout.write('Safe: '); process.stdout.write('ZZ-POLICY.'); process.stdout.write('VALUE\\n');
+process.stderr.write('zz-policy.'); process.stderr.write('value');
 const bytes = Buffer.from('Пример\\n'); process.stdout.write(bytes.subarray(0, 1)); process.stdout.write(bytes.subarray(1));`;
   let result = spawnSync(process.execPath, ['--input-type=module', '-e', source], { cwd: root, encoding: 'utf8',
-    env: { ...process.env, IDENT_DENY_TOKENS: 'zz-policy,zz-policy.(value)' } });
+    env: { ...process.env, IDENT_DENY_TOKENS: 'zz-policy,zz-policy.value' } });
   assert.equal(result.status, 0, result.stdout + result.stderr);
   assert.equal(result.stdout, '[redacted]\nSafe: [redacted]\nПример\n');
   assert.equal(result.stderr, '[redacted]');
   // Node's default fatal formatter bypasses write hooks and can expose source frames; installed boundaries fail safely.
-  for (const statement of ["throw new Error('zz-policy.(value)')", "throw 'zz-policy.(value)'",
-                           "Promise.reject(new Error('zz-policy.(value)'))", "Promise.reject('zz-policy.(value)')"]) {
+  for (const statement of ["throw new Error('zz-policy.value')", "throw 'zz-policy.value'",
+                           "Promise.reject(new Error('zz-policy.value'))", "Promise.reject('zz-policy.value')"]) {
     const fatal = `import { installDiagnostics } from ${JSON.stringify(moduleURL)}; installDiagnostics(); ${statement};`;
     const failed = spawnSync(process.execPath, ['--input-type=module', '-e', fatal], { cwd: root, encoding: 'utf8',
-      env: { ...process.env, IDENT_DENY_TOKENS: 'zz-policy.(value)' } });
+      env: { ...process.env, IDENT_DENY_TOKENS: 'zz-policy.value' } });
     assert.equal(failed.status, 1);
     assert.equal(failed.stdout, '');
     assert.equal(failed.stderr, 'build-diagnostic: unexpected failure\n');
   }
   await put(root, 'home/.config/swarma-site/deny-tokens.txt/placeholder', 'Public');
   result = spawnSync(process.execPath, ['--input-type=module', '-e', source], { cwd: root, encoding: 'utf8',
-    env: { ...process.env, IDENT_DENY_TOKENS: '', HOME: join(root, 'home') } });
+    env: { ...process.env, IDENT_DENY_TOKENS: '', CI: '', HOME: join(root, 'home') } });
   assert.equal(result.status, 1);
   assert.equal(result.stdout, '');
   assert.equal(result.stderr, 'diagnostic-policy: external policy is unreadable\n');
@@ -197,7 +197,7 @@ test('supervisor: streams, child exit and broken policy module fail safely', asy
   for (const name of ['check_contrast.py', 'check_computed_contrast.py']) {
     await put(root, `scripts/${name}`, await readFile(join(repository, `scripts/${name}`)));
   }
-  await put(root, 'scripts/checks/publication/policy.mjs', await readFile(join(repository, 'scripts/checks/publication/policy.mjs')));
+  for (const name of ['policy', 'normalization']) await put(root, `scripts/checks/publication/${name}.mjs`, await readFile(join(repository, `scripts/checks/publication/${name}.mjs`)));
   for (const [launcher, implementation] of [['check_contrast.py', 'contrast_contract.py'], ['check_computed_contrast.py', 'computed_contrast.py']]) {
     await put(root, `scripts/${implementation}`, `print('${token}') ; invalid =`);
     result = spawnSync('python3', ['-B', `scripts/${launcher}`], { cwd: root, env, encoding: 'utf8' });
@@ -227,4 +227,71 @@ test('contrast: link and style media preserve the screen cascade and local impor
   await assert.rejects(() => contrast(root), /FAIL light role-human-text on role-human-fill 1\.00/);
   await put(root, 'dist/index.html', `<!doctype html><html><head>${link}<style media="print">${tokens}</style></head><body>Control</body></html>`);
   await assert.rejects(() => contrast(root), /FAIL light role-human-text on role-human-fill 1\.00/);
+});
+
+// An outer supervisor redacts npm's own headers/bootstrap errors and direct child arguments while preserving exit codes.
+test('supervisor: npm bootstrap and echoed arguments remain inside the outer boundary', async t => {
+  const root = await fixture(t);
+  for (const path of ['scripts/run.mjs', 'scripts/checks/publication/policy.mjs', 'scripts/checks/publication/normalization.mjs']) await put(root, path, await readFile(join(repository, path)));
+  const token = 'zz-npm-canary';
+  const env = { ...process.env, IDENT_DENY_TOKENS: token, npm_config_cache: join(root, 'node_modules/.cache/npm') };
+  const manifest = { name: 'boundary-probe', private: true,
+    scripts: { check: 'node scripts/run.mjs node scripts/probe.mjs' }, description: token };
+  await put(root, 'package.json', JSON.stringify(manifest));
+  await put(root, 'scripts/probe.mjs', 'console.log("safe result"); console.log(JSON.stringify(process.argv.slice(2)));');
+  const invoke = args => {
+    const result = spawnSync(process.execPath, ['scripts/run.mjs', ...args], { cwd: root, env, encoding: 'utf8', timeout: 60000 });
+    assert.ifError(result.error);
+    assert.equal((result.stdout + result.stderr).toLowerCase().includes(token), false);
+    return result;
+  };
+  let result = invoke(['npm', 'run', 'check']);
+  assert.equal(result.status, 0, result.stdout + result.stderr); assert.match(result.stdout, /safe result/);
+  for (const args of [['node', 'scripts/probe.mjs', token], ['npm', 'run', 'check', '--', token]]) {
+    result = invoke(args);
+    assert.equal(result.status, 0, result.stdout + result.stderr); assert.match(result.stdout, /\[redacted\]/);
+  }
+  // Forwarding is an argv operation: shell syntax remains ordinary data and causes no file write.
+  result = invoke(['npm', 'run', 'check', '--', `${token}; node -e "require('fs').writeFileSync('escaped','bad')"`]);
+  assert.equal(result.status, 0, result.stdout + result.stderr);
+  await assert.rejects(readFile(join(root, 'escaped')), { code: 'ENOENT' });
+  await put(root, 'package.json', JSON.stringify(manifest).replace(/}$/, ',}'));
+  result = invoke(['npm', 'run', 'check']);
+  assert.equal(result.status, 1); assert.match(result.stderr, /EJSONPARSE/); assert.match(result.stderr, /\[redacted\]/);
+});
+
+// Leaf npm options reach the real Astro/checker; compound --shell tasks reject extras without interpreting them.
+test('supervisor: npm help and contrast control reach their intended commands', async t => {
+  const root = await sourceFixture(t);
+  const env = { ...process.env, SWARMA_BOOK_FIGURES: '0' };
+  const invoke = args => spawnSync(process.execPath, ['scripts/run.mjs', 'npm', 'run', ...args], { cwd: root, env, encoding: 'utf8', timeout: 90000 });
+  let result = invoke(['build']); assert.ifError(result.error); assert.equal(result.status, 0, result.stdout + result.stderr);
+  result = invoke(['build', '--', '--help']); assert.ifError(result.error);
+  assert.equal(result.status, 0, result.stdout + result.stderr); assert.match(result.stdout, /--help/);
+  result = invoke(['check:contrast', '--', '--control']); assert.ifError(result.error);
+  assert.equal(result.status, 1); assert.match(result.stdout + result.stderr, /FAIL light text-faint/);
+  assert.doesNotMatch(result.stdout + result.stderr, /diagnostic-boundary: command unavailable/);
+  result = invoke(['check', '--', '--help']); assert.ifError(result.error);
+  assert.equal(result.status, 1); assert.match(result.stderr, /diagnostic-boundary: command unavailable/);
+});
+
+// Full npm builds reject ordinary HTML class/attribute spellings for the same status-forbidden rule; clean output survives rejection.
+test('no-status: actual builds reject unquoted, spaced and multiple class tokens', async t => {
+  const root = await sourceFixture(t);
+  const env = { ...process.env, SWARMA_BOOK_FIGURES: '0' };
+  const build = () => spawnSync(process.execPath, ['scripts/run.mjs', 'npm', 'run', 'build'], { cwd: root, env, encoding: 'utf8', timeout: 90000 });
+  let result = build(); assert.ifError(result.error); assert.equal(result.status, 0, result.stdout + result.stderr);
+  const clean = (await readFile(join(root, 'dist/ru/platform/index.html'), 'utf8')).replace('</main>', '<span class="ordinary-note">Текст</span></main>');
+  await put(root, 'public/legacy.html', clean);
+  result = build(); assert.ifError(result.error); assert.equal(result.status, 0, result.stdout + result.stderr);
+  const previous = await readFile(join(root, 'dist/legacy.html'));
+  for (const attribute of ['class=status-chip', 'class = "status-chip"', 'class="note status-chip other"', 'class\n=\n"status-table"', 'data-status-row = "part"']) {
+    await put(root, 'public/legacy.html', clean.replace('class="ordinary-note"', attribute));
+    result = build(); assert.ifError(result.error);
+    assert.equal(result.status, 1, result.stdout + result.stderr);
+    assert.match(result.stderr, /public\/legacy\.html: status-forbidden/);
+    assert.deepEqual(await readFile(join(root, 'dist/legacy.html')), previous);
+  }
+  await put(root, 'public/legacy.html', clean);
+  result = build(); assert.ifError(result.error); assert.equal(result.status, 0, result.stdout + result.stderr);
 });

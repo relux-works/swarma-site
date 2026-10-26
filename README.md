@@ -9,10 +9,10 @@ and limits. Delivery status remains in the book and is never reproduced on the s
 Use Node 22.23.4 or newer, npm, Python 3.12 and installed Google Chrome. Dependencies are pinned.
 
 ```sh
-npm ci
-npm run dev
-npm run build
-npm run check
+node scripts/run.mjs npm ci
+node scripts/run.mjs npm run dev
+node scripts/run.mjs npm run build
+node scripts/run.mjs npm run check
 ```
 
 Stop the development server when finished. Builds write to `dist/`; checks and browser reports
@@ -31,29 +31,29 @@ locale home links the product identity to the root selector.
 
 | Tool / command | Claim or purpose | Output |
 | --- | --- | --- |
-| Astro: `npm run build` | Static pages compile with validated conventions and publication gates | `dist/`, `.temp/astro-cache/` |
-| Astro: `npm run dev` | Local authoring preview; stop after use | Local foreground server |
-| npm: `npm ci` | Install the lockfile versions | `node_modules/` |
-| Node: `npm test` (four concurrent files) | Positive fixtures pass; bounded violations fail for their intended reasons | Console, `.temp/*-evidence.json`; fixtures are removed |
-| `npm run check` | Complete local validation sequence | Console and `.temp/` reports |
-| `npm run check:no-status` | No status route, marker, keys, chips, provenance attributes or status links | Console |
-| `npm run check:status-language` | No availability claims in authored or rendered text or accessible labels; no exemptions | Console |
-| `npm run check:names` | Canonical names and no infrastructure product names in site content | Console |
-| `npm run check:i18n` | Valid metadata, canonical slugs and Russian counterpart for every English page | Console |
-| `npm run check:identifiers` | No private identifiers, paths or unconfigured repository links/contact values | Console |
-| `npm run check:browser` | Shared real Chromium startup and rendered-text control, with safe diagnostics | Console; transient browser scratch |
+| Astro: `node scripts/run.mjs npm run build` | Static pages compile with validated conventions and publication gates | `dist/`, `.temp/astro-cache/` |
+| Astro: `node scripts/run.mjs npm run dev` | Local authoring preview; stop after use | Local foreground server |
+| npm: `node scripts/run.mjs npm ci` | Install the lockfile versions | `node_modules/` |
+| Node: `node scripts/run.mjs npm test` (four concurrent files) | Positive fixtures pass; bounded violations fail for their intended reasons | Console, `.temp/*-evidence.json`; fixtures are removed |
+| `node scripts/run.mjs npm run check` | Complete local validation sequence | Console and `.temp/` reports |
+| `node scripts/run.mjs npm run check:no-status` | No status route, marker, keys, chips, provenance attributes or status links | Console |
+| `node scripts/run.mjs npm run check:status-language` | No availability claims in authored or rendered text or accessible labels; no exemptions | Console |
+| `node scripts/run.mjs npm run check:names` | Canonical names and no infrastructure product names in site content | Console |
+| `node scripts/run.mjs npm run check:i18n` | Valid metadata, canonical slugs and Russian counterpart for every English page | Console |
+| `node scripts/run.mjs npm run check:identifiers` | No private identifiers, paths or unconfigured repository links/contact values | Console |
+| `node scripts/run.mjs npm run check:browser` | Shared real Chromium startup and rendered-text control, with safe diagnostics | Console; transient browser scratch |
 | markdown-it / PostCSS / css-tree | CommonMark rendering and library CSS syntax/literal extraction for publication consumers | In-memory values |
-| parse5: `npm run check:publication-surface` | Only supported publication HTML features in source/output | Console |
-| `npm run check:brand` | Copied artwork bytes match the pinned owner's manifest | Console |
-| `npm run check:fonts` | Licensed local font assets match their manifest | Console |
-| Python / Chromium: `npm run check:contrast` | Every built screen document passes 2816 numeric token pairs across 16 appearances, including forced colors and reduced transparency | `.temp/contrast/report.json` |
-| Python: `python3 -B scripts/check_contrast.py src/styles/tokens.css` | Chromium resolves the copied tokens; 2816 numeric pairs and forced system-color roles | Console |
-| Python: `python3 -B scripts/check_contrast.py src/styles/tokens.css --control` | Known low-contrast control must fail | Console; exit 1 |
-| `npm run check:figures` | With figures off, no copied, inline, base64, geometry or hash representation of a book SVG reaches output | Console |
-| Playwright / axe: `npm run check:a11y` | Every built route in light/dark, desktop/mobile and open drawer; overflow and focus contract | `.temp/a11y/report.json`, screenshots |
-| Playwright: `npm run check:header` | Header boxes do not overlap at each integer width 320–1920 with 16px and 32px root text; enlarged-text keyboard journeys | `.temp/a11y/geometry.json` |
-| `node scripts/checks/a11y.mjs --matrix` | Extended appearance/width checks | `.temp/a11y/matrix.json` |
-| `node scripts/checks/a11y.mjs --control` | Missing-alt witness must fail with `image-alt` | `.temp/a11y/control.json` |
+| parse5: `node scripts/run.mjs npm run check:publication-surface` | Only supported publication HTML features in source/output | Console |
+| `node scripts/run.mjs npm run check:brand` | Copied artwork bytes match the pinned owner's manifest | Console |
+| `node scripts/run.mjs npm run check:fonts` | Licensed local font assets match their manifest | Console |
+| Python / Chromium: `node scripts/run.mjs npm run check:contrast` | Every built screen document passes 2816 numeric token pairs across 16 appearances, including forced colors and reduced transparency | `.temp/contrast/report.json` |
+| Python: `node scripts/run.mjs python3 -B scripts/check_contrast.py src/styles/tokens.css` | Chromium resolves the copied tokens; 2816 numeric pairs and forced system-color roles | Console |
+| Python: `node scripts/run.mjs python3 -B scripts/check_contrast.py src/styles/tokens.css --control` | Known low-contrast control must fail | Console; exit 1 |
+| `node scripts/run.mjs npm run check:figures` | With figures off, no copied, inline, base64, geometry or hash representation of a book SVG reaches output | Console |
+| Playwright / axe: `node scripts/run.mjs npm run check:a11y` | Every built route in light/dark, desktop/mobile and open drawer; overflow and focus contract | `.temp/a11y/report.json`, screenshots |
+| Playwright: `node scripts/run.mjs npm run check:header` | Header boxes do not overlap at each integer width 320–1920 with 16px and 32px root text; enlarged-text keyboard journeys | `.temp/a11y/geometry.json` |
+| `node scripts/run.mjs node scripts/checks/a11y.mjs --matrix` | Extended appearance/width checks | `.temp/a11y/matrix.json` |
+| `node scripts/run.mjs node scripts/checks/a11y.mjs --control` | Missing-alt witness must fail with `image-alt` | `.temp/a11y/control.json` |
 
 ## Publication policy
 
@@ -86,7 +86,7 @@ require exact SHA-256 matches; changed shipped assets fail those gates.
 - A blockquote beginning `**Предел.**` or `**Limit.**` becomes a named limits aside. Ordinary quotes
   stay quotes. Ordinary tables have a named keyboard-scroll region.
 - `[[figure three-layers]]`, `[[figure protocol-topology]]` and `[[figure sublayers]]` select original
-  book artwork. The default emits none. `SWARMA_BOOK_FIGURES=1 npm run check` permits private
+  book artwork. The default emits none. `SWARMA_BOOK_FIGURES=1 node scripts/run.mjs npm run check` permits private
   inspection; it does not authorize public diagram publication. Unknown names fail in both modes.
   The output gate covers assets copied through public folders and imports as well as markup.
 - `[[publications book]]` and `[[publications papers]]` render source metadata and abstracts. No PDF
@@ -94,8 +94,9 @@ require exact SHA-256 matches; changed shipped assets fail those gates.
 - `[[repos]]` renders configured repository entries. Unknown descriptions fail.
 - Legacy delivery-state keys, markers and routes are forbidden. They are not content conventions.
 
-All supported build and check commands start through `scripts/run.mjs`. npm scripts use it
-automatically. To run Astro directly with the same diagnostic boundary:
+Start every documented command through the outer `scripts/run.mjs` supervisor, including npm.
+It redacts npm bootstrap errors and lifecycle argument echoes before they reach output. Inner
+npm-script supervisors provide additional protection after npm starts. To run Astro directly:
 
 ```sh
 node scripts/run.mjs node node_modules/astro/bin/astro.mjs build
@@ -105,7 +106,17 @@ Use `node scripts/run.mjs node scripts/checks/<checker>.mjs` for a direct Node c
 The documented Python CLIs enter this supervisor before importing checker code or parsing
 arguments. The parent filters stdout and stderr line by line, including unterminated tails,
 and preserves child exit codes. Policy/bootstrap failures stop with a fixed safe diagnostic.
-Raw framework or checker executables bypass this supported entrypoint.
+Provide deny tokens through the environment or the untracked policy file, never command arguments.
+Leaf npm scripts forward options as an argument array, without interpreting shell metacharacters:
+
+```sh
+node scripts/run.mjs npm run build -- --help
+node scripts/run.mjs npm run check:contrast -- --control
+```
+
+Compound commands (`check`, `test`, `prebuild`, `postbuild`) accept no extra options. Use the named
+leaf checker for a control or help option. The internal `--shell` form accepts one fixed command
+string and rejects additional arguments; forwarded values never become shell source.
 
 The contrast gate loads every built HTML document unchanged in Chromium screen media, with
 local resources routed at their original URLs. The browser decides stylesheet media, order,
@@ -193,11 +204,11 @@ without the generic-rule exemptions. Only Git metadata, dependency directories, 
 scratch/cache directories (`.temp/`, `.astro/`, `.val/`) are omitted; built `dist/` files remain checked.
 Never add real tokens to source, fixtures, documentation, command arguments or logs.
 
-Set the repository secret `IDENT_DENY_TOKENS` before running CI; the workflow passes it only to the checks step.
+Set the repository secret `IDENT_DENY_TOKENS` before running CI; the workflow passes it to every supervised run step.
 That step rejects an empty or delimiter-only secret before running checks, without using a local-file fallback.
 CI requires a nonempty repository secret, even if `IDENT_DENY_TOKENS_OPTIONAL=1`.
 Locally, missing tokens print a warning and run generic checks, but still exit nonzero.
-Only an explicit local `IDENT_DENY_TOKENS_OPTIONAL=1 npm run check` permits a generic-only pass.
+Only an explicit local `IDENT_DENY_TOKENS_OPTIONAL=1 node scripts/run.mjs npm run check` permits a generic-only pass.
 The isolated controls inject synthetic lists and temporary home directories; they do not need the real list.
 They assert safe output for malformed configuration and actual unreadable files, and pair encoded identifier
 plants with valid controls in source and output. Real Astro builds verify that encoded public files reach `dist/`
@@ -216,4 +227,3 @@ Each affected rule has a clean control beside a known violation, asserting its i
 The controls cover malformed/unreadable inputs, source and output encodings, Markdown emphasis and all code forms,
 generated browser text, and real Astro public-to-dist copies. They establish these bounded contracts, not resistance
 to arbitrary program transformations or comprehensive accessibility conformance.
-

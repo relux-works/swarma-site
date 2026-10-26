@@ -23,7 +23,7 @@ export async function check(root) {
       try {
         const { text: source } = await readPublication(file);
         const { prose } = await reader.values(path, source);
-        if (statusRules(prose.join('\n')).length || (!path.startsWith('dist/') && statusRules(source).length)) errors.push(`${path}: status-language`);
+        if (statusRules(prose.join('\n')).length || (path.startsWith('src/content/') && statusRules(source).length)) errors.push(`${path}: status-language`);
       } catch (error) { errors.push(`${path}: ${error.rule ?? 'publication-decode'}`); }
     }
   } finally { await reader.close(); }

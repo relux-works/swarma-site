@@ -52,12 +52,16 @@ export async function publicationReader(root, { assetRoots = [] } = {}) {
     page = await context.newPage();
     cdp = await context.newCDPSession(page);
   }
-  async function render(path, html, excluded = []) {
+  async function load(path, html) {
     await ready();
     const svg = extname(path).toLowerCase() === '.svg';
     current = { path, html, failed: false, contentType: `${svg ? 'image/svg+xml' : 'text/html'}; charset=utf-8`, urlPath: '/' + path.replace(/^(?:dist|public)\//u, '').split('/').map(encodeURIComponent).join('/') };
     await page.goto('http://publication.invalid' + current.urlPath, { waitUntil: 'load', timeout: 10000 });
     if (svg && await page.evaluate(() => document.documentElement.localName !== 'svg' || Boolean(document.querySelector('parsererror')))) throw failure('publication-decode');
+    if (current.failed) throw failure('publication-decode');
+  }
+  async function render(path, html, excluded = []) {
+    await load(path, html);
     const styled = await page.evaluate(() => document.styleSheets.length > 0 || Boolean(document.querySelector('[style]')));
     let observed = false;
     const values = [], prose = [], accessible = [], styles = [], json = [];
@@ -132,6 +136,13 @@ export async function publicationReader(root, { assetRoots = [] } = {}) {
     return { values: [...new Set(values)], prose: [...new Set([...prose, ...accessible])], accessible };
   }
   return {
+    // Structural policies read browser-decoded class tokens and attribute names, independently of source spelling.
+    async elements(path, text) {
+      await load(path, publicationHTML(path, text));
+      return await page.evaluate(() => [...document.querySelectorAll('*')].map(node => ({
+        classes: [...node.classList], attributes: [...node.attributes].map(attribute => attribute.name),
+      })));
+    },
     async values(path, text, { excluded = [] } = {}) {
       const key = `${path}\0${text}\0${excluded.join(',')}`;
       if (cache.has(key)) return cache.get(key);
