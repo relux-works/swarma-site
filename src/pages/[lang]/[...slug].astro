@@ -1,0 +1,24 @@
+---
+import { getCollection, render } from 'astro:content';
+import Page from '../../layouts/Page.astro';
+import StatusTable from '../../components/StatusTable.astro';
+import type { Locale } from '../../lib/routes';
+
+export async function getStaticPaths() {
+  const pages = await getCollection('pages');
+  return pages.map(page => {
+    const [lang, ...parts] = page.id.split('/');
+    const slug = parts.join('/');
+    return { params: { lang, slug: slug === 'index' ? undefined : slug }, props: { page, lang } };
+  });
+}
+const { page, lang } = Astro.props;
+const { Content } = await render(page);
+---
+<Page title={page.data.title} description={page.data.description} lang={lang as Locale} id={page.id}>
+  <Content />
+  {page.id === 'ru/status' && <>
+    <p>Книга Swarma, версия 1.6.1, глава 29: Где мы и что дальше. Карта по слоям.</p>
+    <StatusTable />
+  </>}
+</Page>

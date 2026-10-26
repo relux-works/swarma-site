@@ -1,0 +1,12 @@
+---
+import rows from '../data/status/layer-map.ru.json';
+interface Props { id: string }
+const row = rows.find(row => row.id === Astro.props.id);
+if (!row) throw new Error('Unknown status row');
+---
+<tr data-status-source="book-1.6.1" data-status-row={row.id}>
+  <th scope="row">{row.capability}</th>
+  <td>{row.works_today}</td>
+  <td>{row.not_yet}</td>
+  <td>{row.chapter}</td>
+</tr>

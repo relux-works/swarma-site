@@ -1,0 +1,13 @@
+---
+import { getCollection } from 'astro:content';
+import Page from '../layouts/Page.astro';
+import { locales, localeLabels, route } from '../lib/routes';
+const pages = await getCollection('pages');
+const homes = locales.flatMap(locale => {
+  const page = pages.find(page => page.id === `${locale}/index`);
+  return page ? [{ locale, page }] : [];
+});
+---
+<Page title="Swarma" description="Swarma" lang="ru">
+  <ul>{homes.map(({ locale, page }) => <li><a href={route(page.id)} lang={locale} hreflang={locale}>{localeLabels[locale]}</a></li>)}</ul>
+</Page>

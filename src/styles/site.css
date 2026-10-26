@@ -1,0 +1,34 @@
+* { box-sizing: border-box; }
+html { scrollbar-gutter: stable; }
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-ui);
+  font-optical-sizing: auto;
+  font-synthesis: none;
+  letter-spacing: 0;
+  line-height: 1.6;
+}
+.container { max-inline-size: var(--layout-max); margin-inline: auto; padding-inline: var(--layout-gutter); }
+header { border-block-end: 1px solid var(--color-divider); }
+.header-inner { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4); padding-block: var(--space-4); }
+.wordmark { font-weight: 700; }
+nav { min-inline-size: 0; }
+nav ul { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-4); list-style: none; margin: 0; padding: 0; }
+nav a, .wordmark { display: inline-flex; align-items: center; min-block-size: 2.75rem; }
+a { color: var(--color-link); text-underline-offset: 0.2em; }
+a:hover { color: var(--color-link-hover); }
+a[aria-current="page"] { text-decoration-thickness: 0.15em; }
+:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 3px; }
+.skip-link { position: absolute; inset-inline-start: var(--space-4); inset-block-start: var(--space-4); padding: var(--space-3); background: var(--color-surface); z-index: 1; transform: translateY(-200%); }
+.skip-link:focus { transform: none; }
+main { padding-block: var(--space-12); min-block-size: 16rem; }
+h1 { font-family: var(--font-display); font-size: 2.5rem; line-height: 1.1; text-wrap: balance; margin-block: 0 var(--space-6); }
+p { max-inline-size: var(--layout-reading); }
+footer { padding-block: var(--space-6); border-block-start: 1px solid var(--color-divider); color: var(--color-text-muted); }
+.table-region { max-inline-size: 100%; overflow: auto; margin-block: var(--space-8); }
+table { border-collapse: collapse; inline-size: 100%; min-inline-size: 48rem; }
+caption { text-align: start; font-weight: 700; margin-block-end: var(--space-4); }
+th, td { text-align: start; vertical-align: top; padding: var(--space-3); border-block-end: 1px solid var(--color-border); overflow-wrap: anywhere; }
+@media (min-width: 48rem) { h1 { font-size: 3.5rem; } }
