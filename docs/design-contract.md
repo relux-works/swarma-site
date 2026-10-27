@@ -72,10 +72,12 @@ search; this is a recorded deviation from the documentation archetype (section 1
 At 390 px and at 1440 px the first viewport shows, in this order:
 
 1. The header (section 8.1).
-2. The page title block: the name "Swarma" as the product statement (`h1`), the literal category
-   from the book subtitle, platform for swarms of AI agents from one machine to an open network
-   (ch. 00, title page), and one short paragraph naming the three layers (ch. 00 "Три слоя Swarma").
-3. One primary action, a link to `/book/`, and one secondary link to `/open-source/`.
+2. The page title block: the name "Swarma" as the product statement (`h1`), the literal category from the book
+   subtitle (ch. 00, title page), and the three layer rows (8.14) naming the three layers (ch. 00 "Три слоя
+   Swarma").
+3. One action row: the primary action link (8.13) "Книга о Swarma" to `/book/`, and on the same row one
+   secondary text link "Открытый код" to `/open-source/`. The home page has no section index and no version
+   context line.
 4. The top edge of the next section, so the page does not read as an isolated poster.
 
 No image, illustration, animation or statistic appears in the first viewport. The site has no
@@ -83,11 +85,11 @@ registration, sign-up or form of any kind; the publication-surface check denies 
 
 ### Platform page, first viewport
 
-On `/platform/` and each layer page the first viewport shows the header, the page title block with a
-lead paragraph, the version context line (book version and date, from the book metadata), and a
-section index (on-page navigation). On `/platform/` the three layers with
-one line each are visible without scrolling at 1440 px (ch. 02 "Имена и участники"). At 390 px the
-section index collapses to a native `details` disclosure placed after the lead.
+On `/platform/` and each layer page the first viewport shows the header, the page title block with a lead
+paragraph, and the version context line. On `/platform/` the title block also holds the three layer rows (8.14),
+visible without scrolling at 1440 px (ch. 02 "Имена и участники"). At 1024 px and wider the section index is a
+sticky column to the right of the content; below 1024 px it is a native `details` disclosure, closed by default,
+placed after the title block.
 
 ## 4. Design system and invariants
 
@@ -114,7 +116,8 @@ Taken from the system:
 
 - **Typography.** PT Sans for display and interface text (page and section headings, navigation,
   tables, captions), PT Serif for reading prose (lead and body
-  paragraphs), PT Mono for technical text (chapter references, versions, code). Weights
+  paragraphs), PT Mono for technical text (code, identifiers, repository names, layer numbers); versions, dates and chapter
+  references are set in PT Sans (section 12). Weights
   400 and 700; PT Mono has 400 only, so technical text is never bold. `letter-spacing: 0`
   everywhere, `font-synthesis: none`. The fixed responsive type scale; no font size tied to viewport
   width. Reading measure at most `45rem`.
@@ -324,7 +327,8 @@ are semantic roles; "type" refers to the shared type roles and scale.
   minmax(0, 13.75rem)`), height `--layout-header-height`. Inline start: the Swarma horizontal
   lockup (6.6).
   Centre: primary navigation (`nav` with an accessible name) to Platform, Principles, Book, Papers,
-  Open source. Inline end: the language switch (8.3). The header is static (not sticky), so
+  Open source. Inline end: the language switch (8.3). Below the navigation breakpoint the language switch moves into the
+  drawer, after the navigation, and the header keeps one row and its height. The header is static (not sticky), so
   it never covers a focused element or an anchor target.
 - **States:** default, hover, focus-visible, pressed, current page (`aria-current="page"`, shown by
   an underline that does not change the link's box), mobile menu open and closed. Below about
@@ -335,9 +339,10 @@ are semantic roles; "type" refers to the shared type roles and scale.
   `aria-expanded`; the drawer is a dialog: focus moves into it on open, stays inside while open,
   returns to the button on close; `Escape`, outside press and route change close it; background
   scroll is locked without shifting page width (`scrollbar-gutter: stable`).
-- **Tokens and type:** `--color-bg` (solid, no translucent material), `--color-text`,
-  `--color-link-hover` for hover, `--color-focus`, `--color-divider` for the bottom rule,
-  `--color-scrim` behind the drawer; PT Sans compact interface size for links.
+- **Tokens and type:** `--color-bg` (solid, no translucent material), `--color-text`, `--color-link-hover` for
+  hover, `--color-focus`, `--color-divider` for the bottom rule, `--color-scrim` behind the drawer. Navigation
+  links in PT Sans body size, each centred in a target of at least 44 × 44 px, with `--space-6` between items;
+  the language switch in PT Sans compact interface size.
 
 ### 8.2 Footer
 
@@ -369,16 +374,16 @@ are semantic roles; "type" refers to the shared type roles and scale.
 ### 8.4 Page title block
 
 - **Purpose:** the one `h1` of the page, the lead and the version context.
-- **Content:** title; lead paragraph; version context line with the book version and date from the
-  book metadata; on documentation pages the section index. The block carries no status, no
-  readiness marker and no "by design" disclaimer (section 11): the page body keeps the book's voice,
-  which describes the finished design in the present tense.
+- **Content:** title; lead paragraph; on `/platform/` and the home page the layer rows (8.14); the rest of the
+  introduction with its source line; on documentation pages the version context line with the book version and
+  date from the book metadata. The section index follows the title block (8.15). The block carries no status, no
+  readiness marker and no "by design" disclaimer (section 11).
 - **States:** static.
 - **Keyboard and screen reader:** `h1` first in `main`; the section index is a `nav` with an
   accessible name, a native `details` disclosure below 640 px.
-- **Tokens and type:** PT Sans 700 at page-heading size (product-statement size only on the home
-  page), PT Serif at lead size, `--color-text`; `--color-text-muted` for the version line, PT Mono
-  for the version string.
+- **Tokens and type:** PT Sans 700 at page-heading size (product-statement size only on the home page), PT Serif
+  at lead size, `--color-text`; the version line in PT Sans compact interface size with tabular figures in
+  `--color-text-muted`.
 
 ### 8.5 Section with chapter reference
 
@@ -395,9 +400,12 @@ are semantic roles; "type" refers to the shared type roles and scale.
 - **States:** default; link hover and focus.
 - **Keyboard and screen reader:** the reference is a normal link whose text names the chapter and
   section; no icon-only reference; headings form a meaningful outline.
-- **Tokens and type:** full-width band, `--color-bg` or `--color-surface-subtle` alternating where
-  bands need separation; PT Sans 700 at section heading size; body prose in PT Serif; PT Mono
-  technical size for the reference in `--color-text-muted` with `--color-link` for its link.
+- **Tokens and type:** on documentation pages each section is separated from the previous one by a 1 px
+  `--color-divider` rule and `--space-12` above and below it (`--space-8` below 640 px), with no alternating
+  background; on the home page sections alternate full-width `--color-bg` and `--color-surface-subtle` bands with
+  `--layout-section` padding. Section headings in PT Sans 700 (section 12 for the documentation step); body prose
+  in PT Serif; the reference in PT Sans compact interface size in `--color-text-muted`, with `--color-link` for
+  its links.
 
 ### 8.6 Removed: status table and status row
 
@@ -409,7 +417,7 @@ number stays free so that the references to 8.7 and later components keep their 
 - **Purpose:** state what a mechanism does not guarantee, next to the mechanism. The book names the
   limits of each guarantee (ch. 00 "Читатель"), and the site keeps them beside the claim.
 - **Content:** a short heading ("Пределы" in Russian, "Limits" in English), the limits in the
-  book's terms, the chapter reference.
+  book's terms, the chapter reference. The heading carries the label; the text that follows does not repeat it.
 - **States:** static.
 - **Keyboard and screen reader:** an `aside` with an accessible name from its heading, placed in
   source order right after the text it qualifies. Not a live region, not collapsible.
@@ -477,6 +485,43 @@ statement of what runs today.
 - **Tokens and type:** repository name in PT Mono, description in PT Sans body size,
   `--color-text`, `--color-link`, `--color-focus`, `--color-divider` between rows.
 
+### 8.13 Primary action link
+
+- **Purpose:** the one primary action of the home page.
+- **Content:** a native link with a destination-specific label.
+- **States:** default, hover, focus-visible, pressed.
+- **Keyboard and screen reader:** a native link; no `role="button"`.
+- **Tokens and type:** PT Sans 700 at body size, `--color-on-strong-action` on `--color-strong-action`
+  (`--color-strong-action-hover` on hover), `--radius-control`, `--space-3` by `--space-6` padding, at least 44 px
+  tall; `--color-focus` outline; a 1 px `ButtonText` border in forced colours.
+
+### 8.14 Layer rows
+
+- **Purpose:** the three layers with one line each, in the fixed order Runtime, Protocol, Chain.
+- **Content:** per row the layer number in the technical face, the layer name as a link to its page, and one
+  sentence from ch. 00 "Три слоя Swarma"; the same component, as a description list, holds the per-layer rows of
+  `/principles/`.
+- **States:** link hover and focus-visible.
+- **Keyboard and screen reader:** an ordered list (a description list on `/principles/`); the link text is the
+  layer name.
+- **Tokens and type:** rows separated by 1 px `--color-divider` with `--space-4` padding; the number in PT Mono
+  at technical size in `--color-text-muted`; the name in PT Sans 700 at subsection size in `--color-link`; the
+  sentence in PT Sans body size; one column below 640 px.
+
+### 8.15 Section index
+
+- **Purpose:** on-page navigation of a documentation page.
+- **Placement:** at 1024 px and wider, a sticky column of 15rem to the right of the 45rem content column, with
+  `--space-16` between them; below 1024 px, a native `details` disclosure after the title block, closed by
+  default.
+- **Keyboard and screen reader:** a `nav` with an accessible name; native links in heading order; at least
+  44 px targets.
+- **Tokens and type:** in the column, PT Sans compact interface size in `--color-text-muted` with a 1 px
+  `--color-divider` rail; in the disclosure, PT Sans body size in `--color-link`.
+
+Render the section index only when the page has at least two `h2` sections. Pages with fewer sections keep
+the documentation grid, title block, version context and body, with no empty navigation.
+
 ## 9. Route outlines (M1)
 
 Wireframes in text. Each line names a section and what it shows, with the chapter it draws on. Final
@@ -492,8 +537,7 @@ or a "by design" disclaimer.
 
 ### `/ru/` (home)
 
-1. Title block: "Swarma" and the literal category (ch. 00, title page); one paragraph with the three
-   layers (ch. 00 "Три слоя Swarma"); action to the book, link to the open-source page.
+1. Title block: "Swarma" and the literal category (ch. 00, title page); the three layer rows (8.14, ch. 00 "Три слоя Swarma"); action to the book, link to the open-source page.
 2. The problem: the three questions familiar to anyone who has run several coding agents at once:
    who acts, on what grounds, who answers for the result when a session stops (ch. 00 "Для кого эта
    книга", opening; ch. 01 "Кто говорит и что ему разрешено", "Ответственность не передаётся
@@ -509,7 +553,7 @@ or a "by design" disclaimer.
 ### `/ru/platform/` (overview)
 
 1. Title block: Swarma as three layers, each answering its own question
-   (ch. 02, opening).
+   (ch. 02, opening); the three layer rows (8.14).
 2. Layer order: numbered bottom-up, built in the other direction (ch. 02, opening; "Порядок
    постройки").
 3. Names: the platform, the three layers, Swarma Keeper and Swarma Curator, and why the key holder
@@ -739,6 +783,8 @@ Checks required for each release:
 | Deviation | Family rule | Reason |
 | --- | --- | --- |
 | No site search in M1 | The documentation archetype puts navigation, search and version context in the first screen | M1 has ten routes in each language, each documentation page has a section index, and the book is the complete reference. Search returns when further routes make navigation alone insufficient |
+| Documentation section headings at 2rem on desktop | The fixed scale sets section headings at 2.75rem on desktop | Documentation pages carry 8 to 14 sections; at 2.75rem against a 3.5rem page heading the hierarchy reads flat. The value is the scale's own mobile section step |
+| Versions, dates and chapter references in PT Sans | The technical role sets versions and chapter references in PT Mono | PT Mono's full-cell period makes "1.6.1" read as spaced digits, and references in mono read as code; PT Sans with tabular figures keeps them precise and readable |
 
 Colour-level deviations, such as the accent's closeness to the information role, are recorded in the
 design system, which owns the palette.
