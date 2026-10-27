@@ -18,6 +18,7 @@ after(async () => {
 
 // The production gate accepts centred shipped CSS with default/overlay and genuine 15px classic scrollbars,
 // on short and scrolling pages; its unchanged 1px tolerance accepts the boundary and rejects ±2px shifts.
+// An integer fixture width isolates the reference frame from platform font rounding at the 1px boundary.
 for (const mode of ['default', 'classic']) test(`header centre: ${mode} scrollbars preserve the page axis and rejection`, async t => {
   const root = await fixture(t);
   let session;
@@ -37,7 +38,7 @@ for (const mode of ['default', 'classic']) test(`header centre: ${mode} scrollba
     const record = { mode, browser: session.browser.version(), platform: process.platform, states: [] };
     for (const width of [1440, 1920]) for (const tall of [false, true]) {
       await page.setViewportSize({ width, height: 900 });
-      await page.setContent(`<!doctype html><html lang="en"><head><style>${css}</style></head><body><header class="site-header"><div class="container header-inner" data-desktop="true"><a class="product-lockup">Swarma</a><nav class="desktop-nav" data-site-nav><ul><li><a>Platform</a></li></ul></nav><div class="header-end">EN</div></div></header><main style="height:${tall ? 2000 : 100}px">Diagram</main></body></html>`);
+      await page.setContent(`<!doctype html><html lang="en"><head><style>${css} .desktop-nav { inline-size: 200px; }</style></head><body><header class="site-header"><div class="container header-inner" data-desktop="true"><a class="product-lockup">Swarma</a><nav class="desktop-nav" data-site-nav><ul><li><a>Platform</a></li></ul></nav><div class="header-end">EN</div></div></header><main style="height:${tall ? 2000 : 100}px">Diagram</main></body></html>`);
       const centred = await checkHeaderCentre(page, '/ru/platform/');
       assert.equal(centred.offset, 0);
       assert.equal(centred.innerWidth, width);
