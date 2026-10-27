@@ -258,10 +258,16 @@ test('integration: BOM public file is rejected in source and actual dist', async
 test('build: publication file types reject unsupported source and copied output', async t => {
   const root = await sourceFixture(t);
   await put(root, 'public/supported.json', '{"protocol":"Transport"}');
-  build(root); run('publication-surface', root);
+  await put(root, 'public/supported.md', 'Swarma **Protocol**');
+  await put(root, 'public/supported.svg', '<svg xmlns="http://www.w3.org/2000/svg"><text>Swarma</text></svg>');
+  build(root); run('publication-surface', root); run('names', root);
   const plants = [
     ['.well-known/other/client', String.raw`{"protocol":"Ma\u0074rix"}`],
     ['nested/probe.unknown', '{"protocol":"Transport"}'],
+    ['case-upper.MD', 'Swarm **Signer**'],
+    ['case-mixed.Md', 'Swarma **Protocol**'],
+    ['case-probe.SVG', '<svg xmlns="http://www.w3.org/2000/svg"><text>Swarma</text></svg>'],
+    ['case-probe.Json', '{"name":"Swarma"}'],
   ];
   for (const [path, bytes] of plants) await put(root, `public/${path}`, bytes);
   build(root);
@@ -274,7 +280,8 @@ test('build: publication file types reject unsupported source and copied output'
     }
   }
   build(root); run('publication-surface', root);
-  const before = await readFile(join(root, 'dist/index.html'));
+  const snapshot = async () => Promise.all((await filesAt(root, 'dist')).sort().map(async path => [path, await readFile(path)]));
+  const before = await snapshot();
   for (const [path, bytes] of plants) {
     await put(root, `public/${path}`, bytes);
     const guarded = spawnSync('npm', ['run', 'build'], { cwd: root, encoding: 'utf8', timeout: 90000,
@@ -282,7 +289,7 @@ test('build: publication file types reject unsupported source and copied output'
     assert.ifError(guarded.error);
     assert.equal(guarded.status, 1, guarded.stdout + guarded.stderr);
     assert.ok(guarded.stderr.split('\n').includes(`public/${path}: publication-file-type`), guarded.stderr);
-    assert.deepEqual(await readFile(join(root, 'dist/index.html')), before);
+    assert.deepEqual(await snapshot(), before);
     await assert.rejects(readFile(join(root, `dist/${path}`)), { code: 'ENOENT' });
     assert.equal(await readFile(join(root, `public/${path}`), 'utf8'), bytes);
     await rm(join(root, 'public', path)); run('publication-surface', root);

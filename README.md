@@ -214,7 +214,8 @@ The single explicit extension-to-reader allowlist is `scripts/checks/publication
 | `.txt`, `.js` | Existing UTF-8 text checks; scripts are not executed by the publication reader |
 | `.png`, `.jpg`, `.jpeg`, `.gif`, `.webp`, `.ico`, `.woff`, `.woff2` | Existing binary signature checks |
 
-Unknown extensions and extensionless files fail `publication-file-type` before content checks.
+Extensions match case-sensitively and must use the lowercase spellings above. Unknown extensions,
+other case variants and extensionless files fail `publication-file-type` before content checks.
 The only exact path exceptions are `.well-known/matrix/client`, `.well-known/matrix/server` and `_headers`,
 once under each of `public/` and `dist/`. Machine files use the JSON reader and retain their exact content hashes;
 the host consumes `_headers` as configuration, with its existing exact selector checks. All other files under

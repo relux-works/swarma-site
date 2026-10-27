@@ -96,3 +96,34 @@ test('publication file types retain binary signature checks', async t => {
     await put(root, path, png); run('publication-surface', root);
   }
 });
+
+// Case variants reject by path before decoding; lowercase neutral controls and restored trees pass in both stages.
+test('publication file types require lowercase extension spelling', async t => {
+  const root = await controls(t);
+  const cases = [
+    ['md', ['MD', 'Md'], 'Swarma **Protocol**', ['Swarm **Signer**', 'Swarm Signer', '<input>']],
+    ['svg', ['SVG'], '<svg xmlns="http://www.w3.org/2000/svg"><text>Swarma</text></svg>', ['<svg>', '<input>']],
+    ['json', ['Json'], '{"name":"Swarma"}', ['{"name":', '<input>']],
+  ];
+  for (const prefix of ['public', 'dist']) for (const [suffix, variants, clean, plants] of cases) {
+    const lower = `${prefix}/case-probe.${suffix}`;
+    await put(root, lower, clean); run('publication-surface', root); run('names', root);
+    if (suffix === 'md') {
+      for (const text of ['Swarm **Signer**', 'Swarm Signer']) {
+        await put(root, lower, text); run('names', root, 'canonical-name');
+      }
+      await put(root, lower, clean); run('names', root);
+    }
+    await rm(join(root, lower));
+    for (const variant of variants) {
+      const path = `${prefix}/case-probe.${variant}`;
+      for (const bytes of [clean, ...plants]) {
+        await put(root, path, bytes);
+        const result = run('publication-surface', root, 'publication-file-type');
+        assert.equal(result.stderr.trim(), `${path}: publication-file-type`);
+        assert.equal(await readFile(join(root, path), 'utf8'), bytes);
+      }
+      await rm(join(root, path)); run('publication-surface', root);
+    }
+  }
+});
