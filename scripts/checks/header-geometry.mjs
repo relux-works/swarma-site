@@ -1,3 +1,15 @@
+// Stable gutters reduce the root layout box even when clientWidth still includes an unpainted scrollbar.
+export async function checkHeaderCentre(page, route) {
+  const measurement = await page.locator('[data-site-nav]').evaluate(node => {
+    const box = node.getBoundingClientRect(), root = document.documentElement.getBoundingClientRect();
+    return { offset: Math.abs(box.left + box.width / 2 - (root.left + root.width / 2)),
+      navCentre: box.left + box.width / 2, rootLeft: root.left, rootWidth: root.width,
+      clientWidth: document.documentElement.clientWidth, innerWidth, scrollHeight: document.documentElement.scrollHeight, viewportHeight: innerHeight };
+  });
+  if (measurement.offset > 1) throw new Error(`a11y-header: ${route} centre offset ${measurement.offset}`);
+  return measurement;
+}
+
 // Every integer width is measured against real browser boxes, with normal and doubled root text.
 export async function headerGeometry(page, origin, route, plant = false) {
   await page.goto(origin + route);

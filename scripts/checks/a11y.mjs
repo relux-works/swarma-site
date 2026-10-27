@@ -2,7 +2,7 @@ import { createServer } from 'node:http';
 import { readFile, mkdir, writeFile } from 'node:fs/promises';
 import { resolve, join, extname, sep, relative } from 'node:path';
 import { openBrowser } from './publication/browser.mjs';
-import { headerGeometry } from './header-geometry.mjs';
+import { checkHeaderCentre, headerGeometry } from './header-geometry.mjs';
 import AxeBuilder from '@axe-core/playwright';
 import { filesAt } from './lib.mjs';
 import { installDiagnostics } from '../../src/lib/diagnostics.mjs';
@@ -77,8 +77,7 @@ try {
         const titleCount = await page.locator('h1').count();
         if (titleCount !== 1) throw new Error(`a11y-heading: ${route} h1 count ${titleCount}`);
         if (await page.locator('[data-site-nav]').isVisible()) {
-          const offset = await page.locator('[data-site-nav]').evaluate(node => { const box = node.getBoundingClientRect(); return Math.abs(box.left + box.width / 2 - document.documentElement.clientWidth / 2); });
-          if (offset > 1) throw new Error(`a11y-header: ${route} centre offset ${offset}`);
+          await checkHeaderCentre(page, route);
         }
         if (await page.locator('.menu-trigger').isVisible()) {
           const trigger = page.locator('.menu-trigger');

@@ -50,7 +50,7 @@ locale home links the product identity to the root selector.
 | Python: `node scripts/run.mjs python3 -B scripts/check_contrast.py src/styles/tokens.css` | Chromium resolves the copied tokens; 2816 numeric pairs and forced system-color roles | Console |
 | Python: `node scripts/run.mjs python3 -B scripts/check_contrast.py src/styles/tokens.css --control` | Known low-contrast control must fail | Console; exit 1 |
 | `node scripts/run.mjs npm run check:figures` | With figures off, no copied, inline, base64, geometry or hash representation of a book SVG reaches output | Console |
-| Playwright / axe: `node scripts/run.mjs npm run check:a11y` | Every built route in light/dark, desktop/mobile and open drawer; overflow and focus contract | `.temp/a11y/report.json`, screenshots |
+| Playwright / axe: `node scripts/run.mjs npm run check:a11y` | Every built route in light/dark, desktop/mobile and open drawer; overflow, focus and header alignment to the root layout box | `.temp/a11y/report.json`, screenshots |
 | Playwright: `node scripts/run.mjs npm run check:header` | Header boxes do not overlap at each integer width 320–1920 with 16px and 32px root text; enlarged-text keyboard journeys | `.temp/a11y/geometry.json` |
 | `node scripts/run.mjs node scripts/checks/a11y.mjs --matrix` | Extended appearance/width checks | `.temp/a11y/matrix.json` |
 | `node scripts/run.mjs node scripts/checks/a11y.mjs --control` | Missing-alt witness must fail with `image-alt` | `.temp/a11y/control.json` |
