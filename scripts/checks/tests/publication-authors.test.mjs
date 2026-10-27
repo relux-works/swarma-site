@@ -53,7 +53,7 @@ function build(root, entry) {
   assert.equal(result.status, entry ? 1 : 0, output);
   if (entry) {
     assert.ok(output.includes(`publication-authors: ${entry} (en)`), output);
-    assert.match(output, /\/(?:book|papers)\.md:\d+:/);
+    assert.ok(!output.includes('generating static routes'), output);
   }
 }
 async function russianPages(root) {
@@ -61,7 +61,7 @@ async function russianPages(root) {
     [path.slice(join(root, 'dist').length), createHash('sha256').update(await readFile(path)).digest('hex')])));
 }
 
-// Actual Astro pages show the approved names in each locale. Missing English lists fail after
+// Actual Astro pages show the requested names in each locale. Missing English lists fail after
 // a successful cached build for both entry kinds; restoring data preserves every Russian HTML byte.
 test('publications: real bilingual builds reject missing English authors', async t => {
   const root = await fixture(t);

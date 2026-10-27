@@ -103,7 +103,9 @@ require exact SHA-256 matches; changed shipped assets fail those gates.
   The output gate covers assets copied through public folders and imports as well as markup.
 - `[[publications book]]` and `[[publications papers]]` render source metadata and abstracts. No PDF
   is copied or linked before the publication decision. Author lists use the page language; a missing,
-  empty or invalid list fails the build without a fallback to another language.
+  empty or invalid list fails the build without a fallback to another language. Build startup checks
+  every entry in both languages, including entries that no page renders. Every chapter also requires
+  nonempty `title_ru` and `title_en` fields; chapter titles never fall back to another language.
 - `[[repos]]` renders configured repository entries. Unknown descriptions fail.
 - Legacy delivery-state keys, markers and routes are forbidden. They are not content conventions.
 

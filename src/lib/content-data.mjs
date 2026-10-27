@@ -11,4 +11,13 @@ export function publicationAuthors(entry, lang) {
   }
   return authors;
 }
+export function validateContentData() {
+  for (const entry of [publications.book, ...publications.papers]) {
+    for (const lang of ['ru', 'en']) publicationAuthors(entry, lang);
+  }
+  for (const chapter of chapters) for (const lang of ['ru', 'en']) {
+    const title = chapter[`title_${lang}`];
+    if (typeof title !== 'string' || !title.trim()) throw diagnostic(`chapter-title: ${chapter.number} (${lang})`);
+  }
+}
 export const escape = value => String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);

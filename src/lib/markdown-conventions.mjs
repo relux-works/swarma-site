@@ -17,7 +17,7 @@ export function chapterReferences(text, lang) {
     const match = pattern.exec(value);
     if (!match) throw diagnostic('malformed-reference');
     const chapter = chapters.find(chapter => chapter.number === match[1]);
-    if (!chapter || (lang === 'en' ? chapter.title_en : chapter.title) !== match[2] || (match[3] && !chapter.sections.some(section => section[lang] === match[3]))) throw diagnostic('chapter-reference-mismatch');
+    if (!chapter || chapter[`title_${lang}`] !== match[2] || (match[3] && !chapter.sections.some(section => section[lang] === match[3]))) throw diagnostic('chapter-reference-mismatch');
     return `<a href="/${lang}/book/#ch${match[1]}">${escape(value)}</a>`;
   }).join('; ')}</p>`;
 }

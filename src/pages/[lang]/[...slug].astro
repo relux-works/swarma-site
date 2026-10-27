@@ -19,6 +19,6 @@ const { Content } = await render(page);
   <Content />
   {page.id === `${lang}/book` && <section class="book-chapters" aria-labelledby="book-contents">
     <h2 id="book-contents">{lang === 'en' ? 'Book chapters' : 'Главы книги'}</h2>
-    <ol start="0">{chapters.map(chapter => <li id={`ch${chapter.number}`}><span class="technical">{chapter.number}</span> {lang === 'en' && chapter.title_en ? chapter.title_en : <span lang="ru">{chapter.title}</span>}</li>)}</ol>
+    <ol start="0">{chapters.map(chapter => <li id={`ch${chapter.number}`}><span class="technical">{chapter.number}</span> {lang === 'en' ? chapter.title_en : <span lang="ru">{chapter.title_ru}</span>}</li>)}</ol>
   </section>}
 </Page>

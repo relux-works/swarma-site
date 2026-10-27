@@ -5,7 +5,9 @@ import { unified } from '@astrojs/markdown-remark';
 import conventions from './src/lib/markdown-conventions.mjs';
 import { emitBookFigures } from './src/lib/book-figures.mjs';
 import { installDiagnostics } from './src/lib/diagnostics.mjs';
+import { validateContentData } from './src/lib/content-data.mjs';
 installDiagnostics();
+validateContentData();
 // Markdown output depends on versioned data as well as page text; config moves must invalidate it.
 const renderingFiles = ['config/site.json', 'config/repos.json',
   ...['diagnostics', 'markdown-conventions', 'book-figures', 'content-data', 'repository-render', 'repository-descriptions', 'strings'].map(name => `src/lib/${name}.mjs`),

@@ -59,10 +59,10 @@ test('identifiers: invalid configuration is rejected with a named diagnostic', a
   run('identifiers', root);
 });
 
-// Only accepted translations enter English reference validation; the complete Russian catalogue stays available.
-test('references: accepted English subset replaces earlier proposals', async () => {
+// Every chapter has both titles; only accepted section translations enter English reference validation.
+test('references: complete bilingual titles preserve the accepted section subset', async () => {
   const catalog = JSON.parse(await readFile(new URL('../../../src/data/book-chapters.json', import.meta.url), 'utf8'));
-  assert.equal(catalog.filter(chapter => chapter.title_en).length, 31);
+  assert.equal(catalog.filter(chapter => chapter.title_en && chapter.title_ru).length, 32);
   assert.equal(catalog.flatMap(chapter => chapter.sections).filter(section => section.en).length, 64);
   assert.match(chapterReferences('Source: chapter 05 "Keys and the key holder", section "The kernel establishes the peer"', 'en'), /ch05/);
   assert.throws(() => chapterReferences('Source: chapter 00 "Who this book is for", section "Design and readiness"', 'en'), /chapter-reference-mismatch/);
