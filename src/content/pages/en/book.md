@@ -7,7 +7,7 @@ nav: true
 
 [[publications book]]
 
-The book "Swarma", subtitled "A platform for swarms of AI agents: from one machine to an open network". Authors: Алексей Григорьев, Иван Опарин. Version 1.6.1, October 2026.
+The book "Swarma", subtitled "A platform for swarms of AI agents: from one machine to an open network". Authors: Alexey Grigorev, Ivan Oparin. Version 1.6.1, October 2026.
 
 Source: chapter 00 "Who this book is for"
 
