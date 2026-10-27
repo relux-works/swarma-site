@@ -34,10 +34,14 @@ jobs:
             node scripts/checks/deny-policy.mjs
             npm run check
           '
+      - name: Required evidence
+        run: node scripts/run.mjs node scripts/checks/ci-evidence.mjs
       - uses: actions/upload-artifact@v4
         if: always()
+        continue-on-error: true
         with:
           name: accessibility-figures-${{ matrix.figures }}
+          retention-days: 3
           include-hidden-files: true
           if-no-files-found: error
           path: |
