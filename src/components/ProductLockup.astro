@@ -1,0 +1,12 @@
+---
+interface Props { href: string }
+const { href } = Astro.props;
+---
+<a class="product-lockup" dir="ltr" href={href} aria-label="Swarma">
+  <picture>
+    <source media="(forced-colors: active) and (prefers-color-scheme: light)" srcset="/brand/swarma-lockup-horizontal-mono.svg" />
+    <source media="(forced-colors: active) and (prefers-color-scheme: dark)" srcset="/brand/swarma-lockup-horizontal-white.svg" />
+    <source media="(prefers-color-scheme: dark)" srcset="/brand/swarma-lockup-horizontal-dark.svg" />
+    <img src="/brand/swarma-lockup-horizontal.svg" alt="" width="344" height="120" />
+  </picture>
+</a>

@@ -38,9 +38,12 @@ jobs:
         if: always()
         with:
           name: accessibility-figures-${{ matrix.figures }}
+          include-hidden-files: true
+          if-no-files-found: error
           path: |
             .temp/a11y/
             .temp/contrast/
+            .temp/product-identity/
             .temp/conventions-evidence.json
             .temp/conventions-a11y-*.json
             .temp/build-regression-evidence.json

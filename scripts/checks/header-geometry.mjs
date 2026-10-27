@@ -35,12 +35,12 @@ export async function headerGeometry(page, origin, route, plant = false) {
         frame.style.width = `${width}px`;
         void doc.documentElement.clientWidth;
         win.dispatchEvent(new Event('resize'));
-        const identity = rect(doc.querySelector('.product-lockup'));
-        const image = rect(doc.querySelector('.product-lockup img'));
+        const identity = rect(doc.querySelector('.site-header .product-lockup'));
+        const image = rect(doc.querySelector('.site-header .product-lockup img'));
         const nav = doc.querySelector('.desktop-nav');
         const expanded = win.getComputedStyle(nav).visibility === 'visible';
         const targets = [doc.querySelector('.header-end'), ...(expanded ? [nav] : [])].map(rect);
-        const padding = win.getComputedStyle(doc.querySelector('.product-lockup'));
+        const padding = win.getComputedStyle(doc.querySelector('.site-header .product-lockup'));
         const clear = 12 * image.width / 344;
         if (image.width < 160 - .1 || parseFloat(padding.paddingLeft) < clear || parseFloat(padding.paddingRight) < clear || parseFloat(padding.paddingTop) < clear || parseFloat(padding.paddingBottom) < clear || targets.some(target => overlaps(identity, target))) collisions.push({ width, size, identity, targets, image });
         if (width % 100 === 0 || [320, 390, 768, 1099, 1100, 1280, 1440, 1920].includes(width)) snapshots.push({ width, size, expanded, identity, targets, image });

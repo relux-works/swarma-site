@@ -1,5 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
+import ProductLockup from '../components/ProductLockup.astro';
 import { locales, localeLabels, route, type Locale } from '../lib/routes';
 import { strings } from '../lib/strings.mjs';
 import site from '../../config/site.json';
@@ -47,12 +48,7 @@ const footerPages = ['book', 'papers', 'privacy'].flatMap(slug => {
     <a class="skip-link" href="#main">{labels.skip}</a>
     <header class="site-header">
       <div class="container header-inner">
-        <a class="product-lockup" dir="ltr" href={home ? route(home.id) : '/'} aria-label={lang === 'ru' ? 'Swarma, главная' : 'Swarma home'}>
-          <picture>
-            <source media="(prefers-color-scheme: dark)" srcset="/brand/swarma-lockup-horizontal-dark.svg" />
-            <img src="/brand/swarma-lockup-horizontal.svg" alt="Swarma" width="344" height="120" />
-          </picture>
-        </a>
+        <ProductLockup href={home ? route(home.id) : '/'} />
         <nav class="desktop-nav" data-site-nav aria-label={labels.navigation}>
           <ul>{navigation.map(page => <li><a href={route(page.id)} aria-current={id === page.id ? 'page' : undefined}>{page.data.title}</a></li>)}</ul>
         </nav>
@@ -79,6 +75,7 @@ const footerPages = ['book', 'papers', 'privacy'].flatMap(slug => {
     <footer class="site-footer">
       <div class="container footer-inner">
         <div>
+          <ProductLockup href={home ? route(home.id) : '/'} />
           <p class="relationship"><bdi dir="ltr">Relux Works · Swarma</bdi></p>
           <a class="operator-lockup" href="https://relux.works/" aria-label="Relux Works" dir="ltr">
             <span class="lockup-light" aria-hidden="true" set:html={lightLockup.replace('<svg ', '<svg aria-hidden="true" ')} />
@@ -126,7 +123,7 @@ const footerPages = ['book', 'papers', 'privacy'].flatMap(slug => {
         });
         const header = document.querySelector<HTMLElement>('.header-inner')!;
         const nav = document.querySelector<HTMLElement>('.desktop-nav')!;
-        const identity = document.querySelector<HTMLElement>('.product-lockup')!;
+        const identity = document.querySelector<HTMLElement>('.site-header .product-lockup')!;
         const end = document.querySelector<HTMLElement>('.header-end')!;
         const sync = () => {
           const style = getComputedStyle(header);

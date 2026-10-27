@@ -20,6 +20,8 @@ write to `.temp/`. `prebuild` rejects obsolete status conventions, invalid local
 and changed brand assets. `postbuild` rejects public book diagrams and rendered status UI.
 CI runs the complete check command on self-hosted Linux with Node 22 and Python 3 in both figure modes.
 The existing install step provides pinned Playwright Chromium; local runs may select an installed browser.
+CI retains the selected reports and screenshots in `accessibility-figures-0` and
+`accessibility-figures-1` archives, including files under `.temp/`; an empty upload selection fails the job.
 
 Pages live in `src/content/pages/ru/` and `src/content/pages/en/`. Each requires `title`,
 `description`, numeric `order` and boolean `nav`. The path determines the slug; `index.md` is the
@@ -35,6 +37,7 @@ locale home links the product identity to the root selector.
 | Astro: `node scripts/run.mjs npm run dev` | Local authoring preview; stop after use | Local foreground server |
 | npm: `node scripts/run.mjs npm ci` | Install the lockfile versions | `node_modules/` |
 | Node: `node scripts/run.mjs npm test` (four concurrent files) | Positive fixtures pass; bounded violations fail for their intended reasons | Console, `.temp/*-evidence.json`; fixtures are removed |
+| Playwright: `node scripts/run.mjs node --test scripts/checks/tests/product-identity.test.mjs` | Actual Astro header/footer artwork, names, size and order in normal/forced light/dark; bounded violations reject and restoration passes | `.temp/product-identity/report.json`, screenshots |
 | `node scripts/run.mjs npm run check` | Complete local validation sequence | Console and `.temp/` reports |
 | `node scripts/run.mjs npm run check:no-status` | No status routes, markers, keys or links; Chromium rejects status classes/data attributes in HTML, Markdown and standalone SVG | Console |
 | `node scripts/run.mjs npm run check:status-language` | No availability claims in authored or rendered text or accessible labels; no exemptions | Console |

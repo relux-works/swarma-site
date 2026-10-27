@@ -81,10 +81,10 @@ try {
         }
         if (await page.locator('.menu-trigger').isVisible()) {
           const trigger = page.locator('.menu-trigger');
-          const before = await page.locator('.product-lockup').boundingBox();
+          const before = await page.locator('.site-header .product-lockup').boundingBox();
           await trigger.click();
           await page.waitForFunction(() => { const dialog = document.querySelector('#site-menu'); return dialog.open && getComputedStyle(dialog).opacity === '1'; });
-          const after = await page.locator('.product-lockup').boundingBox();
+          const after = await page.locator('.site-header .product-lockup').boundingBox();
           if (Math.abs(before.x - after.x) > 1) throw new Error(`a11y-menu: ${route} scroll lock shifted page`);
           await scan(page, route, width, theme, 'menu-open');
           await page.locator('.menu-close').focus();
