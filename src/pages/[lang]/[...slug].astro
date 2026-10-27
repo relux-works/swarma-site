@@ -15,7 +15,7 @@ export async function getStaticPaths() {
 const { page, lang } = Astro.props;
 const { Content } = await render(page);
 ---
-<Page title={page.data.title} description={page.data.description} lang={lang as Locale} id={page.id}>
+<Page title={page.data.title} description={page.data.description} lang={lang as Locale} id={page.id} contentTitle>
   <Content />
   {page.id === `${lang}/book` && <section class="book-chapters" aria-labelledby="book-contents">
     <h2 id="book-contents">{lang === 'en' ? 'Book chapters' : 'Главы книги'}</h2>

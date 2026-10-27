@@ -13,8 +13,8 @@ import '../styles/fonts.css';
 import '../styles/tokens.css';
 import '../styles/site.css';
 
-interface Props { title: string; description: string; lang: Locale; id?: string }
-const { title, description, lang, id } = Astro.props;
+interface Props { title: string; description: string; lang: Locale; id?: string; contentTitle?: boolean }
+const { title, description, lang, id, contentTitle = false } = Astro.props;
 const pages = await getCollection('pages');
 const home = pages.find(page => page.id === `${lang}/index`);
 const primarySlugs = ['platform', 'principles', 'open-source', 'book', 'papers'];
@@ -66,11 +66,17 @@ const footerPages = ['book', 'papers', 'privacy'].flatMap(slug => {
           <nav aria-label={labels.navigation}>
             <ul>{navigation.map(page => <li><a href={route(page.id)} aria-current={id === page.id ? 'page' : undefined}>{page.data.title}</a></li>)}</ul>
           </nav>
+          {counterparts.length > 1 && <div class="drawer-languages">
+            <p>{labels.languages}</p>
+            <nav class="language-switch" aria-label={labels.languages}>
+              <ul>{counterparts.map(({ locale, page }) => <li><a href={route(page.id)} lang={locale} hreflang={locale} aria-current={lang === locale ? 'true' : undefined}>{localeLabels[locale]}</a></li>)}</ul>
+            </nav>
+          </div>}
         </div>
       </dialog>
     </header>
-    <main id="main" class="container" tabindex="-1">
-      <h1 class:list={{ 'home-title': slug === 'index' }}>{title}</h1>
+    <main id="main" class:list={{ container: !(contentTitle && slug === 'index'), 'home-page': contentTitle && slug === 'index' }} tabindex="-1">
+      {!contentTitle && <h1>{title}</h1>}
       <slot />
     </main>
     <footer class="site-footer">
@@ -136,6 +142,7 @@ const footerPages = ['book', 'papers', 'privacy'].flatMap(slug => {
           const expanded = available >= needed;
           header.dataset.desktop = String(expanded);
           nav.inert = !expanded;
+          if (languages) languages.inert = !expanded;
           if (expanded && dialog.open) close();
         };
         const observer = new ResizeObserver(sync);
@@ -143,14 +150,6 @@ const footerPages = ['book', 'papers', 'privacy'].flatMap(slug => {
         document.fonts.ready.then(sync);
         window.addEventListener('resize', sync);
         sync();
-      }
-      const disclosure = document.querySelector<HTMLDetailsElement>('.section-index details');
-      if (disclosure) {
-        const query = matchMedia('(min-width: 640px)');
-        const sync = () => { disclosure.open = query.matches; disclosure.querySelector('summary')!.tabIndex = query.matches ? -1 : 0; };
-        sync();
-        query.addEventListener('change', sync);
-        disclosure.addEventListener('toggle', () => { if (query.matches && !disclosure.open) disclosure.open = true; });
       }
     </script>
   </body>

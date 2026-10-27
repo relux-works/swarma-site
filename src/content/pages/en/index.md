@@ -5,11 +5,7 @@ order: 0
 nav: true
 ---
 
-Swarma is a platform for swarms of AI agents: from several agents on one owner's machine to joint work of independent participants in an open network.
-
-The platform has three layers. Swarma Runtime holds the swarm on the machines of one owner: OS users, keys, capabilities, sessions and the agents' environment. Swarma Protocol sets the rules for joint work of independent owners over one project execution environment. Swarma Chain holds a shared layer of identities, evidence of work, names and settlements that exists beyond any single project.
-
-[The book on Swarma](/en/book/) · [Open source](/en/open-source/)
+[[layers]]
 
 Source: chapter 00 "Who this book is for"; chapter 00 "Who this book is for", section "The three layers of Swarma"
 

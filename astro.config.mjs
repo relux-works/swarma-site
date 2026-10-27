@@ -11,7 +11,7 @@ validateContentData();
 // Markdown output depends on versioned data as well as page text; config moves must invalidate it.
 const renderingFiles = ['config/site.json', 'config/repos.json',
   ...['diagnostics', 'markdown-conventions', 'book-figures', 'content-data', 'repository-render', 'repository-descriptions', 'strings'].map(name => `src/lib/${name}.mjs`),
-  ...['book-chapters', 'publications', 'figures'].map(name => `src/data/${name}.json`),
+  ...['book-chapters', 'publications', 'figures', 'layers'].map(name => `src/data/${name}.json`),
   ...['three-layers', 'protocol-topology', 'sublayers'].map(name => `src/assets/book-figures/${name}.svg`),
 ];
 const revision = createHash('sha256');

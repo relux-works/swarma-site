@@ -9,7 +9,7 @@ editorial voice and the Russian copy rules.
 ## 1. Method
 
 - Build: `origin/main` at `b78d2ae`, public mode (book figures off, as in production).
-- Routes: all 21 built pages, that is the root locale selection plus ten routes in each of Russian and English.
+- Routes: all 21 built pages, that is the root locale selection plus ten routes in each of Russian and English. This is the audit baseline; the implementation also checks the 404 page added by the deployment contract, matching the current source route inventory.
 - States: 390 × 844 and 1440 × 900 CSS px, light and dark system appearance, so 84 captures. Each capture has a
   first-viewport screenshot, and the light appearance also has a full-page one.
 - Measurements: computed font family, size, weight and line height of `h1`, `h2`, `h3`, lead, version line and

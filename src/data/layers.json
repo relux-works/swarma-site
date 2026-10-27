@@ -1,0 +1,32 @@
+[
+  {
+    "id": "runtime",
+    "number": 2,
+    "href": "/platform/runtime/",
+    "name": "Swarma Runtime",
+    "line": {
+      "ru": "Держит рой на машинах одного владельца: пользователей ОС, ключи, полномочия, сессии и окружение агентов.",
+      "en": "Holds the swarm on the machines of one owner: OS users, keys, capabilities, sessions and the agents' environment."
+    }
+  },
+  {
+    "id": "protocol",
+    "number": 1,
+    "href": "/platform/protocol/",
+    "name": "Swarma Protocol",
+    "line": {
+      "ru": "Задаёт правила совместной работы независимых владельцев над единой средой исполнения проекта.",
+      "en": "Sets the rules for joint work of independent owners over one project execution environment."
+    }
+  },
+  {
+    "id": "chain",
+    "number": 0,
+    "href": "/platform/chain/",
+    "name": "Swarma Chain",
+    "line": {
+      "ru": "Хранит общий слой личностей, свидетельств о работе, имён и расчётов, который существует за пределами отдельного проекта.",
+      "en": "Holds a shared layer of identities, evidence of work, names and settlements that exists beyond any single project."
+    }
+  }
+]

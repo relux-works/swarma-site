@@ -35,7 +35,7 @@ function build(root, figures = false, diagnostic) {
   evidence.push({ figures, buildExit: result.status, diagnostic: diagnostic ?? 'valid conventions' });
 }
 const metadata = '';
-const richBody = `Проектное описание по книге.\n\n## Три слоя\n\nSwarma Runtime, Swarma Protocol, Swarma Chain.\n\nИсточник: глава 02 "Swarma целиком", раздел "Имена и участники"; глава 08 "Допуск к носителю"\n\n### Граница\n\n> **Предел.** Описание границы.\n\n### Ещё одна граница\n\n> **Предел.** Другая граница.\n\n> Обычная цитата.\n\n| Часть | Вопрос |\n| --- | --- |\n| Runtime | Граница |\n\n[[figure three-layers]]\n\n[[figure protocol-topology]]\n\n[[figure sublayers]]\n\n[[publications book]]\n\n[[publications papers]]\n\n[[repos]]\n`;
+const richBody = `Проектное описание по книге.\n\n## Три слоя\n\nSwarma Runtime, Swarma Protocol, Swarma Chain.\n\nИсточник: глава 02 "Swarma целиком", раздел "Имена и участники"; глава 08 "Допуск к носителю"\n\n### Граница\n\n> **Предел.** Описание границы.\n\n### Ещё одна граница\n\n> **Предел.** Другая граница.\n\n> Обычная цитата.\n\n## Материалы\n\n| Часть | Вопрос |\n| --- | --- |\n| Runtime | Граница |\n\n[[figure three-layers]]\n\n[[figure protocol-topology]]\n\n[[figure sublayers]]\n\n[[publications book]]\n\n[[publications papers]]\n\n[[repos]]\n`;
 function content(extra = metadata, body = richBody) { return page(extra ? extra + '\n' : '', body); }
 function nodes(node) { return [node, ...(node.childNodes ?? []).flatMap(nodes)]; }
 const attr = (node, name) => node.attrs?.find(attr => attr.name === name)?.value;
@@ -104,6 +104,7 @@ for (const [name, extra, body, diagnostic] of [
   ['unknown section', '', 'Источник: глава 02 "Swarma целиком", раздел "Нет такого раздела"', 'chapter-reference-mismatch'],
   ['status marker forbidden', '', '[[status]]', 'status-forbidden'],
   ['malformed repository marker', '', '[[repos extra]]', 'malformed-marker'],
+  ['malformed layer marker', '', '[[layers extra]]', 'malformed-marker'],
   ['unknown figure when disabled', '', '[[figure missing-figure]]', 'unknown-figure'],
 ]) test(`conventions: ${name}`, async t => { const root = await sourceFixture(t, content(extra, body)); build(root, false, diagnostic); });
 // Valid fonts pass both gates; changed binary bytes fail integrity and disguised text fails structural decoding.

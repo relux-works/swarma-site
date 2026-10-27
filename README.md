@@ -153,7 +153,7 @@ figure-on/off stores. A configuration move or flag change cannot reuse stale pri
 The header uses the original Swarma horizontal lockup, with a dark `picture` source, accessible home
 link and 160px image minimum. Its additional 6px padding exceeds the 12-master-unit clear-space
 requirement at that scale. Navigation collapses according to measured content width and font size;
-when the product and service controls cannot share a row, the collapsed header wraps.
+the collapsed header keeps one row and puts the language switch after navigation in the drawer.
 Favicons, Apple touch and manifest icons are the supplied exports. The product artwork is never
 retyped, filtered or recolored. `src/data/brand-assets.json` records the source repository,
 revision and unchanged entries of its `assets/manifest.json`.
@@ -294,3 +294,15 @@ it checks actual browser enforcement, not Cloudflare account, DNS or edge config
 The Permissions-Policy disables every feature exposed by the pinned Chromium;
 the browser gate fails if an allowed feature appears after a browser update.
 Negative controls require an inline script to be blocked with a CSP violation and a changed pinned file to reject.
+
+## Visual layout checks
+
+`npm run check:visual` measures all built routes at 390 × 844 and 1440 × 900 in light and dark.
+It checks heading and metadata typography, first-viewport budgets, documentation columns, sticky
+section navigation, native mobile disclosure, layer rows, section rhythm and header geometry.
+The section index is rendered only when a documentation page has at least two `h2` sections.
+The report is `.temp/visual/report.json`. `npm test` qualifies each measurement with an isolated
+planted violation and a restored built-page control; its evidence is `.temp/visual/controls.json`.
+These commands use the same local Chromium setup as `npm run check:a11y`; run `npm run build` first.
+`npm run check` includes the visual gate. Screenshot review and real assistive technology remain
+separate release checks.

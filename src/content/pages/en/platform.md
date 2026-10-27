@@ -7,6 +7,8 @@ nav: true
 
 Swarma consists of three layers: a runtime on the machines of one owner, a protocol for joint work of independent owners, and a chain with shared state. Each layer answers its own question. Where does the agent physically live, and what limits its process? On what grounds does someone else's work change a shared project? Where does a participant exist and build up a history outside a particular project? An answer to one of these questions does not close the other two.
 
+[[layers]]
+
 Source: chapter 02 "Swarma as a whole"
 
 ## Order of the layers

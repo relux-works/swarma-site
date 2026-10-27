@@ -11,7 +11,7 @@
     "prebuild": "node scripts/run.mjs --shell \"npm run check:publication-surface && npm run check:no-status && npm run check:i18n && npm run check:brand\"",
     "build": "node scripts/run.mjs node node_modules/astro/bin/astro.mjs build",
     "test": "node scripts/run.mjs --shell \"node --test --test-concurrency=4 scripts/checks/tests/*.test.mjs\"",
-    "check": "node scripts/run.mjs --shell \"npm run check:browser && npm test && npm run build && npm run check:publication-surface && npm run check:identifiers && npm run check:status-language && npm run check:names && npm run check:i18n && npm run check:fonts && npm run check:contrast && npm run check:a11y && npm run check:header && npm run check:deployment\"",
+    "check": "node scripts/run.mjs --shell \"npm run check:browser && npm test && npm run build && npm run check:publication-surface && npm run check:identifiers && npm run check:status-language && npm run check:names && npm run check:i18n && npm run check:fonts && npm run check:contrast && npm run check:a11y && npm run check:header && npm run check:deployment && npm run check:visual\"",
     "check:identifiers": "node scripts/run.mjs node scripts/checks/identifiers.mjs",
     "check:status-language": "node scripts/run.mjs node scripts/checks/status-language.mjs",
     "check:names": "node scripts/run.mjs node scripts/checks/names.mjs",
@@ -26,7 +26,8 @@
     "check:figures": "node scripts/run.mjs node scripts/checks/figure-publication.mjs",
     "check:header": "node scripts/run.mjs node scripts/checks/a11y.mjs --geometry",
     "check:browser": "node scripts/run.mjs node scripts/checks/browser-ready.mjs",
-    "check:deployment": "node scripts/run.mjs node scripts/checks/deployment.mjs"
+    "check:deployment": "node scripts/run.mjs node scripts/checks/deployment.mjs",
+    "check:visual": "node scripts/run.mjs node scripts/checks/visual-contract.mjs"
   },
   "dependencies": {
     "astro": "7.4.2",

@@ -1,8 +1,9 @@
 import chapters from '../data/book-chapters.json' with { type: 'json' };
 import publications from '../data/publications.json' with { type: 'json' };
 import figures from '../data/figures.json' with { type: 'json' };
+import layers from '../data/layers.json' with { type: 'json' };
 import { diagnostic } from './diagnostics.mjs';
-const data = { 'book-chapters': chapters, publications, figures };
+const data = { 'book-chapters': chapters, publications, figures, layers };
 export const loadData = name => data[name];
 export function publicationAuthors(entry, lang) {
   const authors = entry.authors?.[lang];
