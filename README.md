@@ -36,7 +36,7 @@ locale home links the product identity to the root selector.
 | npm: `node scripts/run.mjs npm ci` | Install the lockfile versions | `node_modules/` |
 | Node: `node scripts/run.mjs npm test` (four concurrent files) | Positive fixtures pass; bounded violations fail for their intended reasons | Console, `.temp/*-evidence.json`; fixtures are removed |
 | `node scripts/run.mjs npm run check` | Complete local validation sequence | Console and `.temp/` reports |
-| `node scripts/run.mjs npm run check:no-status` | No status route, marker, keys, chips, provenance attributes or status links | Console |
+| `node scripts/run.mjs npm run check:no-status` | No status routes, markers, keys or links; Chromium rejects status classes/data attributes in HTML, Markdown and standalone SVG | Console |
 | `node scripts/run.mjs npm run check:status-language` | No availability claims in authored or rendered text or accessible labels; no exemptions | Console |
 | `node scripts/run.mjs npm run check:names` | Canonical names and no infrastructure product names in site content | Console |
 | `node scripts/run.mjs npm run check:i18n` | Valid metadata, canonical slugs and Russian counterpart for every English page | Console |
