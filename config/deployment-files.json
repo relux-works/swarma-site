@@ -1,0 +1,29 @@
+{
+  "allow": [
+    {
+      "path": "public/.well-known/matrix/server",
+      "sha256": "d859092f488fd0fb931bedc499fe0970182462a1470d91228bdc7d5af0f7274a"
+    },
+    {
+      "path": "dist/.well-known/matrix/server",
+      "sha256": "d859092f488fd0fb931bedc499fe0970182462a1470d91228bdc7d5af0f7274a"
+    },
+    {
+      "path": "public/.well-known/matrix/client",
+      "sha256": "78ca7ce1813f11fd9eb49f2bd0ec927ee447ff77b49171e22a0bf889ebefaade"
+    },
+    {
+      "path": "dist/.well-known/matrix/client",
+      "sha256": "78ca7ce1813f11fd9eb49f2bd0ec927ee447ff77b49171e22a0bf889ebefaade"
+    }
+  ],
+  "headerSelectors": [
+    {
+      "paths": [
+        "public/_headers",
+        "dist/_headers"
+      ],
+      "line": "/.well-known/matrix/*"
+    }
+  ]
+}

@@ -6,7 +6,8 @@ and limits. Delivery status remains in the book and is never reproduced on the s
 
 ## Development
 
-Use Node 22.23.4 or newer, npm, Python 3.12 and installed Google Chrome. Dependencies are pinned.
+Use Node 22.23.4 or newer within major version 22, npm, Python 3.12 and installed Google Chrome.
+`.nvmrc` selects major 22. Dependencies are pinned in `package-lock.json`.
 
 ```sh
 node scripts/run.mjs npm ci
@@ -36,6 +37,7 @@ locale home links the product identity to the root selector.
 
 | Tool / command | Claim or purpose | Output |
 | --- | --- | --- |
+| `node scripts/run.mjs npm run check:deployment` | Load every built HTML page through the shipped headers; verify CSP, disabled permissions, bilingual 404 and exact machine-file hashes | Console; temporary loopback server and browser close before exit |
 | Astro: `node scripts/run.mjs npm run build` | Static pages compile with validated conventions and publication gates | `dist/`, `.temp/astro-cache/` |
 | Astro: `node scripts/run.mjs npm run dev` | Local authoring preview; stop after use | Local foreground server |
 | npm: `node scripts/run.mjs npm ci` | Install the lockfile versions | `node_modules/` |
@@ -234,3 +236,32 @@ Each affected rule has a clean control beside a known violation, asserting its i
 The controls cover malformed/unreadable inputs, source and output encodings, Markdown emphasis and all code forms,
 generated browser text, and real Astro public-to-dist copies. They establish these bounded contracts, not resistance
 to arbitrary program transformations or comprehensive accessibility conformance.
+
+## Deployment
+
+Cloudflare Workers Builds uses `npm ci && npm run build` as the build command.
+The provider's deploy step (`npx wrangler deploy` by default) reads `wrangler.jsonc`,
+uploads `dist/` as static assets and binds the custom domain declared there.
+The configuration describes asset serving without a Worker entry script or runtime variables.
+The repository does not require a local deploy command or a Wrangler dependency for its build.
+See the [Workers Builds configuration](https://developers.cloudflare.com/workers/ci-cd/builds/configuration/).
+
+Astro copies `public/` files into `dist/`. The asset service interprets `_headers`
+as response rules, combining matching selectors rather than serving that file as an asset.
+The global rule sets CSP and the other security headers; the delegation endpoint selector
+adds JSON content type and wildcard CORS only for its machine metadata.
+`config/deployment-files.json` records exact source/output paths and SHA-256 hashes for those files,
+plus the one exact protocol selector line. The check rejects changed or missing pinned files.
+See the [static-asset header rules](https://developers.cloudflare.com/workers/static-assets/headers/).
+
+The root `404.html` contains Russian and English error copy in the site's shared layout.
+With `assets.not_found_handling` set to `404-page`, unmatched requests use the nearest
+`404.html` with HTTP status 404. See [custom 404 routing](https://developers.cloudflare.com/workers/static-assets/routing/static-site-generation/).
+Astro emits external stylesheets so the CSP requires no inline-style exception.
+
+`npm run check:deployment` runs after the build as part of `npm run check`.
+Its local server implements the shipped relative-path/single-splat header subset and root 404 fallback;
+it checks actual browser enforcement, not Cloudflare account, DNS or edge configuration.
+The Permissions-Policy disables every feature exposed by the pinned Chromium;
+the browser gate fails if an allowed feature appears after a browser update.
+Negative controls require an inline script to be blocked with a CSP violation and a changed pinned file to reject.
