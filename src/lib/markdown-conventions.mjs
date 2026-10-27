@@ -4,6 +4,7 @@ import { loadData, escape } from './content-data.mjs';
 import { repositoryEntries } from './repository-render.mjs';
 import { strings } from './strings.mjs';
 import { diagnostic } from './diagnostics.mjs';
+import { bookFigureAsset } from './book-figures.mjs';
 const textOf = node => node.value ?? (node.children ?? []).map(textOf).join('');
 const html = value => ({ type: 'html', value });
 export function chapterReferences(text, lang) {
@@ -28,11 +29,10 @@ export function bookFigure(name, lang, enabled = process.env.SWARMA_BOOK_FIGURES
   const figure = loadData('figures')[name];
   if (!figure) throw diagnostic(`unknown-figure: ${name}`);
   if (!enabled) return '';
-  const svg = readFileSync(new URL(`../assets/book-figures/${figure.file}`, import.meta.url), 'utf8');
+  const { bytes, src } = bookFigureAsset(figure.file);
+  const svg = bytes.toString('utf8');
   const viewBox = /viewBox="([^"]+)"/.exec(svg)?.[1]?.split(/\s+/).map(Number);
   if (!viewBox || viewBox.length !== 4) throw diagnostic(`invalid-figure-viewbox: ${name}`);
-  // An image data URI preserves the exact SVG bytes and emits no artifact in default builds.
-  const src = `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`;
   const source = lang === 'ru' ? `Источник: книга Swarma, версия 1.6.1, глава ${figure.chapter}, рисунок: ${figure.caption}` : `Source: Swarma book, version 1.6.1, chapter ${figure.chapter}, figure: ${figure.caption}`;
   return `<figure class="book-figure"><div class="figure-ground"><img src="${src}" width="${viewBox[2]}" height="${viewBox[3]}" alt="${escape(figure.alt)}"></div><figcaption>${escape(figure.caption)}<span class="chapter-reference">${escape(source)}</span></figcaption></figure>`;
 }

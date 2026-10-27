@@ -97,6 +97,9 @@ require exact SHA-256 matches; changed shipped assets fail those gates.
 - `[[figure three-layers]]`, `[[figure protocol-topology]]` and `[[figure sublayers]]` select original
   book artwork. The default emits none. `SWARMA_BOOK_FIGURES=1 node scripts/run.mjs npm run check` permits private
   inspection; it does not authorize public diagram publication. Unknown names fail in both modes.
+  Enabled builds emit only referenced SVGs under `dist/_astro/book-figures/` with content-hashed names
+  and original bytes, referenced by same-origin URLs under the unchanged CSP. Disabled builds emit
+  neither figure files nor references, including after switching from an enabled build.
   The output gate covers assets copied through public folders and imports as well as markup.
 - `[[publications book]]` and `[[publications papers]]` render source metadata and abstracts. No PDF
   is copied or linked before the publication decision.

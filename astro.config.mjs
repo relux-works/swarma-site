@@ -3,11 +3,12 @@ import { readFileSync } from 'node:fs';
 import { defineConfig } from 'astro/config';
 import { unified } from '@astrojs/markdown-remark';
 import conventions from './src/lib/markdown-conventions.mjs';
+import { emitBookFigures } from './src/lib/book-figures.mjs';
 import { installDiagnostics } from './src/lib/diagnostics.mjs';
 installDiagnostics();
 // Markdown output depends on versioned data as well as page text; config moves must invalidate it.
 const renderingFiles = ['config/site.json', 'config/repos.json',
-  ...['diagnostics', 'markdown-conventions', 'content-data', 'repository-render', 'repository-descriptions', 'strings'].map(name => `src/lib/${name}.mjs`),
+  ...['diagnostics', 'markdown-conventions', 'book-figures', 'content-data', 'repository-render', 'repository-descriptions', 'strings'].map(name => `src/lib/${name}.mjs`),
   ...['book-chapters', 'publications', 'figures'].map(name => `src/data/${name}.json`),
   ...['three-layers', 'protocol-topology', 'sublayers'].map(name => `src/assets/book-figures/${name}.svg`),
 ];
@@ -24,4 +25,7 @@ export default defineConfig({
   cacheDir: `./.temp/astro-cache/${figures ? 'figures-on' : 'figures-off'}-${renderingRevision}/`,
   trailingSlash: 'always',
   markdown: { processor: unified({ smartypants: false, remarkPlugins: [[conventions, { figures }]] }) },
+  integrations: [{ name: 'book-figures', hooks: {
+    'astro:build:done': ({ dir }) => emitBookFigures(dir, figures),
+  } }],
 });

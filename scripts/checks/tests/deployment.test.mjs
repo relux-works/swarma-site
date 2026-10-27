@@ -120,6 +120,43 @@ test('deployment gate rejects unsafe policy instead of treating a quiet console 
   assert.ok(!errors.some(error => error.endsWith('deployment-csp')));
 });
 
+// Original SVG bytes load from this origin; reintroducing them as a data URI fails img-src and the real gate, then restoration passes.
+test('deployment book figure URL and data URI regression controls', async t => {
+  const root = await pinnedFixture(t);
+  const svg = await readFile(join(repository, 'src/assets/book-figures/three-layers.svg'));
+  for (const prefix of ['public', 'dist']) await put(root, `${prefix}/_headers`, headers);
+  await put(root, 'dist/404.html', html('<h1>Страница не найдена</h1><p lang="en">Page not found</p>'));
+  await put(root, 'dist/site.css', 'body { font-family: sans-serif; }');
+  await put(root, 'dist/figure.svg', svg);
+  const server = await staticServer(join(root, 'dist'), parseHeaders(headers));
+  let browser;
+  try {
+    browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || undefined });
+    const page = await preparePage(await browser.newContext());
+    for (const [src, blocked] of [['/figure.svg', false], [`data:image/svg+xml;base64,${svg.toString('base64')}`, true], ['/figure.svg', false]]) {
+      const source = html(`<h1>Swarma</h1><img src="${src}" alt="Swarma">`);
+      await put(root, 'dist/index.html', source);
+      const observed = await inspectPage(page, server.origin + '/');
+      assert.equal(observed.status, 200);
+      const image = await page.locator('img').evaluate(image => ({ complete: image.complete, width: image.naturalWidth }));
+      assert.equal(image.complete, true);
+      assert.equal(image.width > 0, !blocked);
+      if (blocked) {
+        assert.ok(observed.violations.includes('img-src'));
+        assert.ok(observed.consoleViolations.length > 0);
+        assert.deepEqual(await check(root), ['dist/index.html: deployment-csp']);
+      } else {
+        assert.deepEqual(observed.violations, []);
+        assert.deepEqual(observed.consoleViolations, []);
+        assert.deepEqual(observed.failedRequests, []);
+        assert.deepEqual(await check(root), []);
+      }
+      assert.equal(await readFile(join(root, 'dist/index.html'), 'utf8'), source);
+      assert.deepEqual(await readFile(join(root, 'dist/figure.svg')), svg);
+    }
+  } finally { try { await browser?.close(); } finally { await server.close(); } }
+});
+
 // A wildcard, page path, duplicate entry or malformed digest cannot widen the machine-file pin list.
 test('deployment pin configuration rejects broad or malformed entries', async t => {
   const root = await pinnedFixture(t);

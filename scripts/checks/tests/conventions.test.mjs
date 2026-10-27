@@ -58,7 +58,8 @@ for (const figures of [false, true]) test(`conventions: complete valid fixture, 
   assert.ok(all.some(node => attr(node, 'aria-label') === 'Таблица 1' && attr(node, 'tabindex') === '0'));
   assert.equal(all.filter(node => attr(node, 'class') === 'publication').length, 5);
   assert.equal(all.filter(node => attr(node, 'class') === 'book-figure').length, figures ? 3 : 0);
-  assert.equal(all.filter(node => node.tagName === 'img' && attr(node, 'src')?.startsWith('data:image/svg+xml;base64,')).length, figures ? 3 : 0);
+  assert.equal(all.filter(node => node.tagName === 'img' && attr(node, 'src')?.startsWith('/_astro/book-figures/')).length, figures ? 3 : 0);
+  assert.equal(html.includes('data:image/svg+xml'), false);
   const reference = all.find(node => attr(node, 'class') === 'chapter-reference');
   assert.equal(visibleText(reference).trim(), 'Источник: глава 02 "Swarma целиком", раздел "Имена и участники"; глава 08 "Допуск к носителю"');
   assert.ok(all.some(node => attr(node, 'href') === '/ru/book/#ch08'));
@@ -79,13 +80,20 @@ for (const figures of [false, true]) test(`conventions: complete valid fixture, 
     }
   }
   if (figures) {
-    const images = all.filter(node => node.tagName === 'img' && attr(node, 'src')?.startsWith('data:image/svg+xml;base64,'));
-    for (const [index, name] of ['three-layers', 'protocol-topology', 'sublayers'].entries()) assert.deepEqual(Buffer.from(attr(images[index], 'src').split(',')[1], 'base64'), await readFile(join(root, `src/assets/book-figures/${name}.svg`)));
+    // Same-origin image URLs resolve to emitted files containing the exact original SVG bytes.
+    const images = all.filter(node => node.tagName === 'img' && attr(node, 'src')?.startsWith('/_astro/book-figures/'));
+    for (const [index, name] of ['three-layers', 'protocol-topology', 'sublayers'].entries()) {
+      assert.match(attr(images[index], 'src'), /^\/_astro\/book-figures\/[a-f0-9]{64}\.svg$/);
+      assert.deepEqual(await readFile(join(root, 'dist', attr(images[index], 'src'))), await readFile(join(root, `src/assets/book-figures/${name}.svg`)));
+    }
     // The same checkout must not reuse a private rendering when its build flag is removed.
     build(root, false);
     const publicHtml = await readFile(join(root, 'dist/ru/platform/index.html'), 'utf8');
     assert.equal(publicHtml.includes('book-figure'), false);
     assert.equal(publicHtml.includes('data:image/svg+xml'), false);
+    for (const image of images) await assert.rejects(readFile(join(root, 'dist', attr(image, 'src'))), { code: 'ENOENT' });
+    const { check } = await import('../figure-publication.mjs');
+    assert.deepEqual(await check(root, ['--off']), []);
   } else assert.equal(html.includes('figure-ground'), false);
 });
 // Each malformed convention fails the actual Astro build with the intended reason, file and source line.
