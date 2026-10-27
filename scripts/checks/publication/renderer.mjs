@@ -7,9 +7,9 @@ import { openBrowser } from './browser.mjs';
 import { cssValues, decodePercent } from './css.mjs';
 import { readPublication } from './reader.mjs';
 import { failure } from './policy.mjs';
+import { publicationType } from './types.mjs';
 
 const markdown = new MarkdownIt('commonmark', { html: true });
-const markupExtensions = new Set(['.html', '.htm', '.svg']);
 const frameworkExtensions = new Set(['.astro', '.mdx', '.vue', '.svelte']);
 export function* jsonStrings(value) {
   if (typeof value === 'string') yield value;
@@ -25,7 +25,7 @@ export function publicationHTML(path, text) {
   return text;
 }
 const types = new Map([['.css', 'text/css'], ['.svg', 'image/svg+xml'], ['.png', 'image/png'], ['.jpg', 'image/jpeg'], ['.woff2', 'font/woff2']]);
-export async function publicationReader(root, { assetRoots = [] } = {}) {
+export async function publicationReader(root, { assetRoots = [], fileType = publicationType } = {}) {
   let browser, context, page, cdp, current, session;
   const cache = new Map();
   async function ready() {
@@ -147,12 +147,13 @@ export async function publicationReader(root, { assetRoots = [] } = {}) {
       const key = `${path}\0${text}\0${excluded.join(',')}`;
       if (cache.has(key)) return cache.get(key);
       const suffix = extname(path).toLowerCase();
+      const type = fileType(path);
       let result;
-      if (suffix === '.json') result = { values: [...jsonStrings(JSON.parse(text))], prose: [], accessible: [] };
-      else if (suffix === '.css') result = { values: cssValues(text), prose: [], accessible: [] };
+      if (type === 'json') result = { values: [...jsonStrings(JSON.parse(text))], prose: [], accessible: [] };
+      else if (type === 'css') result = { values: cssValues(text), prose: [], accessible: [] };
       // Framework templates are source code; their compiled dist HTML is the browser contract.
       else if (frameworkExtensions.has(suffix)) result = { values: [], prose: [text], accessible: [] };
-      else if (suffix === '.md' || markupExtensions.has(suffix) || /^\s*</u.test(text)) {
+      else if (['markdown', 'html', 'svg'].includes(type) || /^\s*</u.test(text)) {
         if (suffix === '.svg' && /<!DOCTYPE|<!ENTITY/iu.test(text)) throw failure('publication-decode');
         result = await render(path, publicationHTML(path, text), excluded);
         if (suffix === '.md') result.values.push(...jsonStrings(matter(text).data));

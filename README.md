@@ -52,7 +52,7 @@ locale home links the product identity to the root selector.
 | `node scripts/run.mjs npm run check:identifiers` | No private identifiers, paths or unconfigured repository links/contact values | Console |
 | `node scripts/run.mjs npm run check:browser` | Shared real Chromium startup and rendered-text control, with safe diagnostics | Console; transient browser scratch |
 | markdown-it / PostCSS / css-tree | CommonMark rendering and library CSS syntax/literal extraction for publication consumers | In-memory values |
-| parse5: `node scripts/run.mjs npm run check:publication-surface` | Only supported publication HTML features in source/output | Console |
+| parse5 / shared readers: `node scripts/run.mjs npm run check:publication-surface` | Explicit published file types, decoded consumers and supported HTML features | Console |
 | `node scripts/run.mjs npm run check:brand` | Copied artwork bytes match the pinned owner's manifest | Console |
 | `node scripts/run.mjs npm run check:fonts` | Licensed local font assets match their manifest | Console |
 | Python / Chromium: `node scripts/run.mjs npm run check:contrast` | Every built screen document passes 2816 numeric token pairs across 16 appearances, including forced colors and reduced transparency | `.temp/contrast/report.json` |
@@ -199,7 +199,27 @@ Downloads, traces and browser XDG caches live under .temp/publication-browser/. 
 PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH can select an existing local Chromium executable; CI uses the pinned Playwright
 browser installed by the workflow.
 
-All publication text must be valid UTF-8 without BOM or NUL bytes, including extensionless files. Unsupported
+Before reading publication contents, the publication-surface gate classifies every file in `public/` and `dist/`.
+The single explicit extension-to-reader allowlist is `scripts/checks/publication/types.mjs`:
+
+| Extensions | Consumer |
+| --- | --- |
+| `.html`, `.htm`, `.svg` | Chromium DOM, accessible values and rendered text |
+| `.json`, `.webmanifest` | Whole-file `JSON.parse`, including strings and object keys |
+| `.css` | Existing PostCSS / css-tree reader |
+| `.md` | Existing CommonMark reader |
+| `.txt`, `.js` | Existing UTF-8 text checks; scripts are not executed by the publication reader |
+| `.png`, `.jpg`, `.jpeg`, `.gif`, `.webp`, `.ico`, `.woff`, `.woff2` | Existing binary signature checks |
+
+Unknown extensions and extensionless files fail `publication-file-type` before content checks.
+The only exact path exceptions are `.well-known/matrix/client`, `.well-known/matrix/server` and `_headers`,
+once under each of `public/` and `dist/`. Machine files use the JSON reader and retain their exact content hashes;
+the host consumes `_headers` as configuration, with its existing exact selector checks. All other files under
+`.well-known/` reject, including otherwise supported extensions. Content allowances cannot waive the type gate.
+Supported published text is also passed through its decoded reader by publication-surface before acceptance.
+The npm prebuild lifecycle runs this gate before Astro replaces the previous output; post-build checks cover generated files.
+
+All publication text must be valid UTF-8 without BOM or NUL bytes, including the exact path exceptions. Unsupported
 encodings fail publication-decode before interpretation; the publication-surface check also runs before Astro.
 Known binary image/font extensions require matching signatures rather than accepting renamed text. Binary payloads
 are outside text rendering; attributes and external raw literals remain checked. SVG DTD/entity declarations are

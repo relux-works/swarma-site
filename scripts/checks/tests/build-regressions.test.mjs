@@ -20,8 +20,8 @@ async function sourceFixture(t) {
   const root = await fixture(t);
   // Copy production scanner dependencies without unrelated test-only policy plants.
   for (const path of ['src', 'config', 'scripts', 'astro.config.mjs', 'package.json', 'tsconfig.json']) await cp(join(repository, path), join(root, path), { recursive: true, filter: path => path !== join(repository, 'scripts/checks/tests') });
-  // The copied deployment policy needs its exact source bytes; the real build produces the pinned output copies.
-  for (const path of ['public/.well-known', 'public/_headers']) await cp(join(repository, path), join(root, path), { recursive: true });
+  // Published documents are decoded with their real local assets; Astro also produces the pinned metadata copies.
+  await cp(join(repository, 'public'), join(root, 'public'), { recursive: true });
   // English cases create their entire locale explicitly, independent of authored English content.
   await rm(join(root, 'src/content/pages/en'), { recursive: true, force: true });
   await symlink(join(repository, 'node_modules'), join(root, 'node_modules'), 'dir');
@@ -252,4 +252,41 @@ test('integration: BOM public file is rejected in source and actual dist', async
   assert.match(guarded.stderr, /publication-decode/u);
   assert.deepEqual(await readFile(join(root, 'dist/index.html')), before);
   evidence.push({ name: 'BOM integration guard', buildExit: 1, checkExit: result.status, diagnostic: 'publication-decode', bytesPreservedByAstro: true, previousOutputPreservedByNpm: true });
+});
+
+// Astro copies unsupported files unchanged; the output gate rejects them and npm prebuild preserves prior output.
+test('build: publication file types reject unsupported source and copied output', async t => {
+  const root = await sourceFixture(t);
+  await put(root, 'public/supported.json', '{"protocol":"Transport"}');
+  build(root); run('publication-surface', root);
+  const plants = [
+    ['.well-known/other/client', String.raw`{"protocol":"Ma\u0074rix"}`],
+    ['nested/probe.unknown', '{"protocol":"Transport"}'],
+  ];
+  for (const [path, bytes] of plants) await put(root, `public/${path}`, bytes);
+  build(root);
+  const result = run('publication-surface', root, 'publication-file-type');
+  for (const [path, bytes] of plants) {
+    assert.equal(await readFile(join(root, `dist/${path}`), 'utf8'), bytes);
+    for (const prefix of ['public', 'dist']) {
+      assert.ok(result.stderr.split('\n').includes(`${prefix}/${path}: publication-file-type`), result.stderr);
+      await rm(join(root, prefix, path));
+    }
+  }
+  build(root); run('publication-surface', root);
+  const before = await readFile(join(root, 'dist/index.html'));
+  for (const [path, bytes] of plants) {
+    await put(root, `public/${path}`, bytes);
+    const guarded = spawnSync('npm', ['run', 'build'], { cwd: root, encoding: 'utf8', timeout: 90000,
+      env: { ...process.env, HOME: root, CI: '', IDENT_DENY_TOKENS: 'zz-host-alpha' } });
+    assert.ifError(guarded.error);
+    assert.equal(guarded.status, 1, guarded.stdout + guarded.stderr);
+    assert.ok(guarded.stderr.split('\n').includes(`public/${path}: publication-file-type`), guarded.stderr);
+    assert.deepEqual(await readFile(join(root, 'dist/index.html')), before);
+    await assert.rejects(readFile(join(root, `dist/${path}`)), { code: 'ENOENT' });
+    assert.equal(await readFile(join(root, `public/${path}`), 'utf8'), bytes);
+    await rm(join(root, 'public', path)); run('publication-surface', root);
+    evidence.push({ name: 'unsupported publication file type', path, directAstroCopiesBytes: true, outputGateExit: 1,
+      npmBuildExit: 1, diagnostic: 'publication-file-type', previousOutputPreserved: true, plantBytesUnchanged: true });
+  }
 });

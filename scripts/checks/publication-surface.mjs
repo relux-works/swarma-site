@@ -3,7 +3,7 @@ import { parse } from 'parse5';
 import { cli, filesAt } from './lib.mjs';
 import { readPublication } from './publication-reader.mjs';
 import { failure } from './scanner-policy.mjs';
-import { publicationHTML } from './publication-values.mjs';
+import { publicationHTML, publicationFileType, publicationReader } from './publication-values.mjs';
 
 const deniedTags = new Set(['form', 'input', 'textarea', 'select', 'iframe', 'object', 'embed', 'noscript', 'template']);
 const rules = new Set([...deniedTags].map(tag => `publication-${tag}`).concat([
@@ -53,26 +53,39 @@ function allowances(config) {
 }
 
 export async function check(root) {
-  let allowed;
-  try { allowed = allowances(JSON.parse((await readPublication(join(root, 'config/publication-surface.json'))).text)); }
-  catch { throw failure('publication-config'); }
   const files = [
     ...await filesAt(root, 'src'),
     ...await filesAt(root, 'public'),
     ...await filesAt(root, 'dist'),
   ];
+  // Classify every published path before reading any publication bytes or applying content allowances.
+  const published = path => /^(?:public|dist)\//u.test(path);
+  const unsupported = files.map(file => relative(root, file)).filter(path => published(path) && !publicationFileType(path));
+  if (unsupported.length) return unsupported.map(path => `${path}: publication-file-type`);
+  let allowed;
+  try { allowed = allowances(JSON.parse((await readPublication(join(root, 'config/publication-surface.json'))).text)); }
+  catch { throw failure('publication-config'); }
   const errors = [];
-  for (const file of files) {
-    const path = relative(root, file);
-    let publication;
-    try { publication = await readPublication(file); }
-    catch (error) { if (error.rule) { errors.push(`${path}: ${error.rule}`); continue; } throw error; }
-    if (publication.binary) continue;
-    let source = publication.text;
-    // CommonMark is rendered by its library; raw template preflight is supplemented by compiled dist.
-    if (/\.(?:astro|md|mdx)$/.test(path)) source = publicationHTML(path, source);
-    for (const rule of surfaceRules(source)) if (!allowed.has(`${path}:${rule}`)) errors.push(`${path}: ${rule}`);
-  }
+  const reader = await publicationReader(root);
+  try {
+    for (const file of files) {
+      const path = relative(root, file);
+      let publication;
+      try { publication = await readPublication(file); }
+      catch (error) { if (error.rule) { errors.push(`${path}: ${error.rule}`); continue; } throw error; }
+      if (publication.binary) continue;
+      let source = publication.text;
+      // CommonMark is rendered by its library; raw template preflight is supplemented by compiled dist.
+      if (/\.(?:astro|md|mdx)$/.test(path)) source = publicationHTML(path, source);
+      const rejected = surfaceRules(source).filter(rule => !allowed.has(`${path}:${rule}`));
+      for (const rule of rejected) errors.push(`${path}: ${rule}`);
+      // Supported output must also decode through its real consumer, including JSON manifests and standalone SVG.
+      if (published(path) && !rejected.length) {
+        try { await reader.values(path, publication.text); }
+        catch { errors.push(`${path}: publication-decode`); }
+      }
+    }
+  } finally { await reader.close(); }
   return errors;
 }
 await cli(import.meta.url, check);

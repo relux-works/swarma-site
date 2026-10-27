@@ -27,10 +27,10 @@ for (const [name, html, rule] of reviewPlants) test(`publication review plant: $
   run('publication-surface', root, rule);
 });
 
-// All component, layout and page roots plus public and non-HTML-named output are covered.
+// All source/publication roots are covered; an unsupported output path rejects before its content is interpreted.
 for (const path of ['src/layouts/Probe.astro', 'src/pages/probe.astro', 'src/content/pages/ru/probe.md', 'src/components/Probe.tsx', 'public/probe.html', 'dist/nested/probe', 'dist/image.svg']) test(`publication scan root ${path}`, async t => {
   const root = await fixture(t, { [path]: '<input>' });
-  run('publication-surface', root, 'publication-input');
+  run('publication-surface', root, path === 'dist/nested/probe' ? 'publication-file-type' : 'publication-input');
 });
 
 // Nested HTML, foreign content, source expressions and normalized URL variants still fail closed.
