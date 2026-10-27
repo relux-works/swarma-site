@@ -84,3 +84,31 @@ test('names deployment configuration rejects widened paths and selector lines', 
   }
   await put(root, 'config/deployment-files.json', policy); run('names', root);
 });
+
+const svg = body => `<svg xmlns="http://www.w3.org/2000/svg" width="320" height="50">${body}</svg>`;
+const neighborCases = [
+  { name: 'JSON object value', suffix: 'json', clean: '{"protocol":"Transport"}',
+    plants: ['{"protocol":"Matrix"}', String.raw`{"protocol":"Ma\u0074rix"}`] },
+  { name: 'JSON nested key', suffix: 'json', clean: '{"metadata":{"transport":"role"}}',
+    plants: ['{"metadata":{"Matrix":"role"}}', String.raw`{"metadata":{"Ma\u0074rix":"role"}}`] },
+  { name: 'JSON root string', suffix: 'json', clean: '"Transport"',
+    plants: ['"Matrix"', String.raw`"Ma\u0074rix"`] },
+  { name: 'SVG rendered text', suffix: 'svg', clean: svg('<text x="10" y="32">Transport</text>'),
+    plants: ['Matrix', 'Ma&#116;rix', 'Ma&#x74;rix'].map(value => svg(`<text x="10" y="32">${value}</text>`)) },
+  { name: 'SVG accessible label', suffix: 'svg', clean: svg('<rect width="20" height="20" role="img" aria-label="Transport" />'),
+    plants: ['Matrix', 'Ma&#116;rix'].map(value => svg(`<rect width="20" height="20" role="img" aria-label="${value}" />`)) },
+];
+// Shared whole-file JSON and standalone-SVG readers expose plain/escaped names at both publication stages; exact pins still pass.
+for (const entry of neighborCases) test(`names decoded neighboring ${entry.name}`, async t => {
+  const root = await controls(t);
+  run('names', root);
+  for (const prefix of ['public', 'dist']) {
+    const path = `${prefix}/.well-known/other/protocol.${entry.suffix}`;
+    await put(root, path, entry.clean); run('names', root);
+    for (const plant of entry.plants) {
+      await put(root, path, plant); run('names', root, 'infrastructure-product');
+      assert.equal(await readFile(join(root, path), 'utf8'), plant);
+      await put(root, path, entry.clean); run('names', root);
+    }
+  }
+});

@@ -45,7 +45,9 @@ export async function check(root) {
             const index = selector ? lines.indexOf(selector.line) : -1;
             // Remove one exact selector occurrence, so a duplicate or any second product line still rejects.
             if (index >= 0) lines.splice(index, 1);
-            if (infrastructureRules(`${path}\n${lines.join('\n')}`).length) errors.push(`${path}: infrastructure-product`);
+            // Metadata retains shared decoded values; headers are plain configuration after the exact selector removal.
+            const representations = [path, lines.join('\n'), ...(headers ? [] : [...prose, ...values])];
+            if (representations.some(value => infrastructureRules(value).length)) errors.push(`${path}: infrastructure-product`);
           }
         }
       } catch (error) { errors.push(`${path}: ${error.rule === 'publication-decode' ? error.rule : 'publication-decode'}`); }
