@@ -95,17 +95,18 @@ export async function deploymentFiles(root) {
   const policy = JSON.parse(await readFile(join(root, 'config/deployment-files.json'), 'utf8'));
   if (!policy || Object.keys(policy).sort().join() !== 'allow,headerSelectors' || !Array.isArray(policy.allow) || policy.allow.length !== 4
     || !Array.isArray(policy.headerSelectors) || policy.headerSelectors.length !== 1) throw failure();
+  const expectedPaths = ['public', 'dist'].flatMap(prefix => ['server', 'client'].map(name => `${prefix}/.well-known/matrix/${name}`));
   const seen = new Set();
   for (const entry of policy.allow) {
     if (!entry || Object.keys(entry).sort().join() !== 'path,sha256' || typeof entry.path !== 'string'
-      || !/^(?:public|dist)\/\.well-known\/[a-z]+\/(?:server|client)$/u.test(entry.path)
+      || !expectedPaths.includes(entry.path)
       || !/^[a-f0-9]{64}$/u.test(entry.sha256) || seen.has(entry.path)) throw failure();
     seen.add(entry.path);
   }
   const selector = policy.headerSelectors[0];
   if (!selector || Object.keys(selector).sort().join() !== 'line,paths'
     || JSON.stringify(selector.paths) !== JSON.stringify(['public/_headers', 'dist/_headers'])
-    || typeof selector.line !== 'string' || !/^\/\.well-known\/[a-z]+\/\*$/u.test(selector.line)) throw failure();
+    || selector.line !== '/.well-known/matrix/*') throw failure();
   const errors = [];
   for (const entry of policy.allow) {
     try {

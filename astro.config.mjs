@@ -19,6 +19,7 @@ const figures = process.env.SWARMA_BOOK_FIGURES === '1';
 export default defineConfig({
   output: 'static',
   build: { inlineStylesheets: 'never' },
+  vite: { build: { assetsInlineLimit: 0 } },
   // Isolate the content store: switching figures must never reuse a private rendering.
   cacheDir: `./.temp/astro-cache/${figures ? 'figures-on' : 'figures-off'}-${renderingRevision}/`,
   trailingSlash: 'always',

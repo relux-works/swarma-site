@@ -251,13 +251,15 @@ as response rules, combining matching selectors rather than serving that file as
 The global rule sets CSP and the other security headers; the delegation endpoint selector
 adds JSON content type and wildcard CORS only for its machine metadata.
 `config/deployment-files.json` records exact source/output paths and SHA-256 hashes for those files,
-plus the one exact protocol selector line. The check rejects changed or missing pinned files.
+plus the one exact protocol selector line. Both the names check and deployment gate reject changed or missing pinned files.
+The names check allows only the exact selector line once in each header file; it still rejects
+a second product-name line, neighboring metadata paths and infrastructure names in page content.
 See the [static-asset header rules](https://developers.cloudflare.com/workers/static-assets/headers/).
 
 The root `404.html` contains Russian and English error copy in the site's shared layout.
 With `assets.not_found_handling` set to `404-page`, unmatched requests use the nearest
 `404.html` with HTTP status 404. See [custom 404 routing](https://developers.cloudflare.com/workers/static-assets/routing/static-site-generation/).
-Astro emits external stylesheets so the CSP requires no inline-style exception.
+Astro emits external stylesheets and processed scripts, so the CSP requires no inline exception.
 
 `npm run check:deployment` runs after the build as part of `npm run check`.
 Its local server implements the shipped relative-path/single-splat header subset and root 404 fallback;

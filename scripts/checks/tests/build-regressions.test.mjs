@@ -20,6 +20,8 @@ async function sourceFixture(t) {
   const root = await fixture(t);
   // Copy production scanner dependencies without unrelated test-only policy plants.
   for (const path of ['src', 'config', 'scripts', 'astro.config.mjs', 'package.json', 'tsconfig.json']) await cp(join(repository, path), join(root, path), { recursive: true, filter: path => path !== join(repository, 'scripts/checks/tests') });
+  // The copied deployment policy needs its exact source bytes; the real build produces the pinned output copies.
+  for (const path of ['public/.well-known', 'public/_headers']) await cp(join(repository, path), join(root, path), { recursive: true });
   // English cases create their entire locale explicitly, independent of authored English content.
   await rm(join(root, 'src/content/pages/en'), { recursive: true, force: true });
   await symlink(join(repository, 'node_modules'), join(root, 'node_modules'), 'dir');
