@@ -1,6 +1,6 @@
 import { readFileSync, existsSync } from 'node:fs';
 import Slugger from 'github-slugger';
-import { loadData, escape } from './content-data.mjs';
+import { loadData, escape, publicationAuthors } from './content-data.mjs';
 import { repositoryEntries } from './repository-render.mjs';
 import { strings } from './strings.mjs';
 import { diagnostic } from './diagnostics.mjs';
@@ -23,7 +23,10 @@ export function chapterReferences(text, lang) {
 }
 export function publicationEntries(kind, lang) {
   const data = loadData('publications'), labels = strings[lang];
-  return (kind === 'book' ? [data.book] : data.papers).map(entry => `<article class="publication"><h2>${escape(entry.title)}</h2><p class="publication-subtitle">${escape(entry.subtitle)}</p><dl><div><dt>${labels.authors}</dt><dd>${escape(entry.authors.join(', '))}</dd></div>${entry.version ? `<div><dt>${labels.edition}</dt><dd><bdi class="technical">${escape(entry.version)}</bdi></dd></div>` : ''}<div><dt>${labels.date}</dt><dd class="technical">${escape(entry.date)}</dd></div><div><dt>${labels.language}</dt><dd>${escape(entry.language)}</dd></div></dl><p>${escape(entry.abstract)}</p><p class="pdf-placeholder">${labels.pdf}</p></article>`).join('');
+  return (kind === 'book' ? [data.book] : data.papers).map(entry => {
+    const authors = publicationAuthors(entry, lang);
+    return `<article class="publication"><h2>${escape(entry.title)}</h2><p class="publication-subtitle">${escape(entry.subtitle)}</p><dl><div><dt>${labels.authors}</dt><dd>${escape(authors.join(', '))}</dd></div>${entry.version ? `<div><dt>${labels.edition}</dt><dd><bdi class="technical">${escape(entry.version)}</bdi></dd></div>` : ''}<div><dt>${labels.date}</dt><dd class="technical">${escape(entry.date)}</dd></div><div><dt>${labels.language}</dt><dd>${escape(entry.language)}</dd></div></dl><p>${escape(entry.abstract)}</p><p class="pdf-placeholder">${labels.pdf}</p></article>`;
+  }).join('');
 }
 export function bookFigure(name, lang, enabled = process.env.SWARMA_BOOK_FIGURES === '1') {
   const figure = loadData('figures')[name];

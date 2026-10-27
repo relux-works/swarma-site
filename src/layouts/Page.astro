@@ -5,6 +5,7 @@ import { locales, localeLabels, route, type Locale } from '../lib/routes';
 import { strings } from '../lib/strings.mjs';
 import site from '../../config/site.json';
 import publications from '../data/publications.json';
+import { publicationAuthors } from '../lib/content-data.mjs';
 import lightLockup from '../assets/operator/relux-lockup-horizontal.svg?raw';
 import darkLockup from '../assets/operator/relux-lockup-horizontal-dark.svg?raw';
 import monoLockup from '../assets/operator/relux-lockup-horizontal-one-color.svg?raw';
@@ -82,7 +83,7 @@ const footerPages = ['book', 'papers', 'privacy'].flatMap(slug => {
             <span class="lockup-dark" aria-hidden="true" set:html={darkLockup.replace('<svg ', '<svg aria-hidden="true" ')} />
             <span class="lockup-mono" aria-hidden="true" set:html={monoLockup.replace('<svg ', '<svg aria-hidden="true" ')} />
           </a>
-          <p>{publications.book.authors.join(', ')}</p>
+          <p>{publicationAuthors(publications.book, lang).join(', ')}</p>
           <p class="contact"><a href={`mailto:${site.contact_email}`} dir="ltr">{site.contact_email}</a></p>
         </div>
         <nav aria-label={lang === 'ru' ? 'Публикации' : 'Publications'}>

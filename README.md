@@ -102,7 +102,8 @@ require exact SHA-256 matches; changed shipped assets fail those gates.
   neither figure files nor references, including after switching from an enabled build.
   The output gate covers assets copied through public folders and imports as well as markup.
 - `[[publications book]]` and `[[publications papers]]` render source metadata and abstracts. No PDF
-  is copied or linked before the publication decision.
+  is copied or linked before the publication decision. Author lists use the page language; a missing,
+  empty or invalid list fails the build without a fallback to another language.
 - `[[repos]]` renders configured repository entries. Unknown descriptions fail.
 - Legacy delivery-state keys, markers and routes are forbidden. They are not content conventions.
 

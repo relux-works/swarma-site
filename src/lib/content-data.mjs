@@ -1,6 +1,14 @@
 import chapters from '../data/book-chapters.json' with { type: 'json' };
 import publications from '../data/publications.json' with { type: 'json' };
 import figures from '../data/figures.json' with { type: 'json' };
+import { diagnostic } from './diagnostics.mjs';
 const data = { 'book-chapters': chapters, publications, figures };
 export const loadData = name => data[name];
+export function publicationAuthors(entry, lang) {
+  const authors = entry.authors?.[lang];
+  if (!Array.isArray(authors) || !authors.length || authors.some(author => typeof author !== 'string' || !author.trim())) {
+    throw diagnostic(`publication-authors: ${entry.id} (${lang})`);
+  }
+  return authors;
+}
 export const escape = value => String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
