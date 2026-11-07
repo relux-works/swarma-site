@@ -19,7 +19,7 @@ node scripts/run.mjs npm run check
 Stop the development server when finished. Builds write to `dist/`; checks and browser reports
 write to `.temp/`. `prebuild` rejects obsolete status conventions, invalid localization metadata
 and changed brand assets. `postbuild` rejects public book diagrams and rendered status UI.
-CI runs the complete check command on GitHub-hosted Linux with Node 22 and Python 3.14 in both figure modes.
+CI runs the complete check command on GitHub-hosted Linux with Node 22 and Python 3.14 in both figure modes. Pull requests from forks skip the job, because it needs a secret forks do not receive; treat them as untested at merge review.
 The existing install step provides pinned Playwright Chromium; local runs may select an installed browser.
 CI requires all ten expected JSON reports to exist as nonempty files before upload; missing or empty
 reports fail the job independently of artifact storage. It then attempts to retain selected reports and
