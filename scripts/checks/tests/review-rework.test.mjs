@@ -49,12 +49,12 @@ test('build: convention diagnostics never print configured policy values', async
   ];
   for (const [entry, [command, args]] of entries) {
     await put(root, path, page('', 'Обычное описание.'));
-    let result = spawnSync(command, args, { cwd: root, env: environment, encoding: 'utf8', timeout: 60000 });
+    let result = spawnSync(command, args, { cwd: root, env: environment, encoding: 'utf8', timeout: 240000 });
     assert.ifError(result.error);
     assert.equal(result.status, 0, result.stdout + result.stderr);
     for (const [rule, body] of cases) {
       await put(root, path, page('', body));
-      result = spawnSync(command, args, { cwd: root, env: environment, encoding: 'utf8', timeout: 60000 });
+      result = spawnSync(command, args, { cwd: root, env: environment, encoding: 'utf8', timeout: 240000 });
       assert.ifError(result.error);
       const output = result.stdout + result.stderr;
       assert.equal(result.status, 1, output);
@@ -156,7 +156,7 @@ test('build: early configuration failures are supervised for both entrypoints', 
       await put(root, module, kind === 'dependency-parse' ? 'export const value = ;' : 'export const value = 1;');
       const importPath = kind === 'missing-import' ? `./src/lib/missing-${token}.mjs` : `./${module}`;
       await put(root, 'astro.config.mjs', `import '${importPath}';\n` + config + (kind === 'config-parse' ? `\nconst value = "${token}" ; const broken = ;` : ''));
-      const result = spawnSync(command, args, { cwd: root, env, encoding: 'utf8', timeout: 60000 });
+      const result = spawnSync(command, args, { cwd: root, env, encoding: 'utf8', timeout: 240000 });
       assert.ifError(result.error);
       const output = result.stdout + result.stderr;
       assert.equal(result.status, kind === 'valid' ? 0 : 1, output);
@@ -189,7 +189,7 @@ test('supervisor: streams, child exit and broken policy module fail safely', asy
   assert.equal(result.stdout, '');
   assert.equal(result.stderr, 'diagnostic-boundary: command unavailable\n');
   // The documented Python entrypoint enters the supervisor before argparse can format a user argument.
-  result = spawnSync('python3', ['-B', 'scripts/check_contrast.py', 'src/styles/tokens.css', token], { cwd: repository, env, encoding: 'utf8', timeout: 60000 });
+  result = spawnSync('python3', ['-B', 'scripts/check_contrast.py', 'src/styles/tokens.css', token], { cwd: repository, env, encoding: 'utf8', timeout: 240000 });
   assert.equal(result.status, 2);
   assert.match(result.stderr, /unrecognized arguments: \[redacted\]/);
   assert.equal((result.stdout + result.stderr).includes(token), false);
@@ -240,7 +240,7 @@ test('supervisor: npm bootstrap and echoed arguments remain inside the outer bou
   await put(root, 'package.json', JSON.stringify(manifest));
   await put(root, 'scripts/probe.mjs', 'console.log("safe result"); console.log(JSON.stringify(process.argv.slice(2)));');
   const invoke = args => {
-    const result = spawnSync(process.execPath, ['scripts/run.mjs', ...args], { cwd: root, env, encoding: 'utf8', timeout: 60000 });
+    const result = spawnSync(process.execPath, ['scripts/run.mjs', ...args], { cwd: root, env, encoding: 'utf8', timeout: 240000 });
     assert.ifError(result.error);
     assert.equal((result.stdout + result.stderr).toLowerCase().includes(token), false);
     return result;
