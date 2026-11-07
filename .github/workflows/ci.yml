@@ -9,7 +9,7 @@ jobs:
   check:
     name: check (figures ${{ matrix.figures }})
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
-    runs-on: [self-hosted, relux-generic]
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
@@ -29,7 +29,7 @@ jobs:
         run: node scripts/run.mjs node -e "if (Number(process.versions.node.split('.')[0]) !== 22) process.exit(1); console.log(process.version)"
       - run: node scripts/run.mjs npm ci
       - name: Chromium
-        run: node scripts/run.mjs node node_modules/playwright/cli.js install chromium
+        run: node scripts/run.mjs node node_modules/playwright/cli.js install --with-deps chromium
       - name: Checks
         shell: bash
         run: |
